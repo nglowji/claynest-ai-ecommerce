@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><Description>Commerce domain. Business entities and invariants are introduced in P1.</Description></PropertyGroup>
+</Project>

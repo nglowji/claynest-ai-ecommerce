@@ -34,3 +34,13 @@ Thumbs.db
 # Track the phase learning guide; keep local specifications ignored.
 !docs/LEARNING_P0.md
 *.egg-info/
+
+# .NET build output and local tooling
+**/bin/
+**/obj/
+**/TestResults/
+.vs/
+*.user
+*.suo
+!docs/learning/PHASE_0.md
+!docs/ADRs/0001-hybrid-clean-architecture.md
