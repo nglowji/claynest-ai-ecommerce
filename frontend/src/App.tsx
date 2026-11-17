@@ -1,51 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Route, Routes, useLocation, useSearchParams } from 'react-router-dom'
 import Icon from './components/Icon'
+import Brand from './components/Brand'
+import ProductGrid, { type ProductActions } from './components/ProductGrid'
+import HomePage from './components/HomePage'
+import { StoriesPage, StoryPage } from './components/Stories'
+import { stories } from './data/stories'
 import { categories, products, money, normalize, type Category, type Product } from './data/products'
 
 type Cart = Record<number, number>
-type ProductActions = { onAdd: (product: Product) => void; onShow: (product: Product) => void }
-
-function ProductGrid({ items, onAdd, onShow }: ProductActions & { items: Product[] }) {
-  return <div className="product-grid">{items.map(product => <article className="product-card" key={product.id}>
-    <button className="product-image-button" onClick={() => onShow(product)} aria-label={`Xem ${product.name}`}>
-      <img src={product.image} alt={product.name} loading="lazy" width="1254" height="1254" />
-      <span className="quick-view">Xem gần hơn <Icon name="arrow" /></span>
-    </button>
-    <div className="product-info"><div><p className="product-note">{product.note}</p>
-      <h3><button onClick={() => onShow(product)}>{product.name}</button></h3><p className="price">{money(product.price)}</p>
-    </div><button className="add-button" onClick={() => onAdd(product)} aria-label={`Thêm ${product.name} vào giỏ minh họa`}><Icon name="plus" /></button></div>
-  </article>)}</div>
-}
-
-function HomePage(actions: ProductActions) {
-  return <>
-    <section className="banner" aria-labelledby="hero-title">
-      <img src="/images/slow-living/banner-wide.jpg" alt="Gốm mộc và cành olive trên bàn gỗ bên cửa sổ ngập nắng" fetchPriority="high" width="2172" height="724" />
-      <div className="banner-shade" />
-      <div className="banner-content container"><p className="eyebrow">GỐM MỘC CHO TỔ ẤM</p>
-        <h1 id="hero-title">Chậm một nhịp.<br />Chạm <em>bình yên.</em></h1>
-        <p>Một tách trà, một nhành hoa.<br />Một chút an yên cho mỗi ngày.</p>
-        <Link className="button primary" to="/products">Khám phá gốm <Icon name="arrow" /></Link>
-      </div>
-    </section>
-    <section className="products-section container" aria-labelledby="featured-title">
-      <div className="section-heading"><div><p className="eyebrow">DÀNH CHO NHỮNG NGÀY THẢNH THƠI</p><h2 id="featured-title">Gốm cho <em>mỗi ngày.</em></h2></div>
-        <Link className="text-link" to="/products">Xem tất cả <Icon name="arrow" /></Link>
-      </div>
-      <ProductGrid items={products.slice(0, 4)} {...actions} />
-    </section>
-    <section id="story" className="story-section container" aria-labelledby="story-title">
-      <div className="story-image"><img src="/images/slow-living/artisan.jpg" alt="Đôi bàn tay tạo hình bát gốm trên bàn xoay — ảnh AI minh họa" loading="lazy" width="1536" height="1024" /></div>
-      <div className="story-copy"><p className="eyebrow">CHUYỆN CỦA CLAYNEST</p><h2 id="story-title">Từ đất mộc,<br />đến một góc <em>bình yên.</em></h2>
-        <p>Một vệt men ngẫu hứng. Một đường cong rất riêng. Những điều nhỏ khiến ta muốn nâng niu một món gốm lâu hơn.</p>
-        <p>ClayNest là lời mời dành thời gian cho những điều gần gũi — một tách trà, một góc nhà, một người mình thương.</p>
-        <Link className="text-link" to="/products">Chọn món gốm của bạn <Icon name="arrow" /></Link>
-      </div>
-    </section>
-  </>
-}
-
 function ProductsPage(actions: ProductActions) {
   const [params, setParams] = useSearchParams()
   const input = useRef<HTMLInputElement>(null)
@@ -65,7 +28,7 @@ function ProductsPage(actions: ProductActions) {
   }
   return <section className="catalog-page container" aria-labelledby="catalog-title">
     <nav className="breadcrumbs" aria-label="Đường dẫn"><Link to="/">Trang chủ</Link><span aria-hidden="true">/</span><span aria-current="page">Tất cả sản phẩm</span></nav>
-    <div className="catalog-heading"><p className="eyebrow">CỬA HÀNG CLAYNEST</p><h1 id="catalog-title">Tất cả <em>sản phẩm.</em></h1><p>Tìm một món gốm hợp với góc nhỏ của bạn.</p></div>
+    <div className="catalog-heading"><p className="eyebrow">CỬA HÀNG NÀNG GỐM</p><h1 id="catalog-title">Tất cả <em>sản phẩm.</em></h1><p>Tìm một món gốm hợp với góc nhỏ của bạn.</p></div>
     <div className="catalog-controls">
       <div className="search-panel"><Icon name="search" /><input ref={input} value={query} onChange={event => update('q', event.target.value)} placeholder="Tìm món gốm bạn yêu…" aria-label="Tìm kiếm sản phẩm" />
         {query && <button className="icon-button" aria-label="Xóa tìm kiếm" onClick={() => update('q', '')}><Icon name="close" /></button>}
@@ -102,7 +65,8 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [location.pathname, location.hash])
   useEffect(() => {
-    document.title = location.pathname === '/products' ? 'Tất cả sản phẩm | ClayNest' : 'ClayNest | Gốm & những điều an yên'
+    const story = stories.find(item => location.pathname === `/stories/${item.slug}`)
+    document.title = story ? `${story.title} | Nàng Gốm` : location.pathname === '/products' ? 'Tất cả sản phẩm | Nàng Gốm' : location.pathname.startsWith('/stories') ? 'Chuyện của gốm | Nàng Gốm' : 'Nàng Gốm | Gốm mộc & chuyện nhà'
   }, [location.pathname])
   useEffect(() => { if (!notice) return; const id = window.setTimeout(() => setNotice(''), 3000); return () => window.clearTimeout(id) }, [notice])
   function add(product: Product) {
@@ -117,11 +81,13 @@ export default function App() {
   return <>
     <a className="skip-link" href="#main">Đến nội dung chính</a>
     <header className="site-header"><div className="header-inner container">
-      <Link className="brand" to="/" aria-label="ClayNest — Trang chủ"><span className="brand-mark"><Icon name="leaf" /></span>claynest<span className="brand-dot">.</span></Link>
+      <Brand />
       <nav id="mobile-nav" className={menuOpen ? 'main-nav is-open' : 'main-nav'} aria-label="Điều hướng chính">
         <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-active' : ''}>Trang chủ</NavLink>
         <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-active' : ''}>Sản phẩm</NavLink>
-        <Link to="/#story" onClick={() => setMenuOpen(false)}>Về ClayNest</Link>
+        <Link to="/#collections" onClick={() => setMenuOpen(false)}>Bộ sưu tập</Link>
+        <Link to="/#story" onClick={() => setMenuOpen(false)}>Về Nàng</Link>
+        <NavLink to="/stories" className={({ isActive }) => isActive ? 'nav-active' : ''}>Chuyện của gốm</NavLink>
       </nav>
       <div className="header-actions"><Link className="icon-button" aria-label="Tìm kiếm sản phẩm" to="/products?search=1"><Icon name="search" /></Link>
         <button className="icon-button bag-button" aria-label={`Giỏ hàng, ${count} sản phẩm`} onClick={() => setOverlay('cart')}><Icon name="bag" /><span className="bag-count">{count}</span></button>
@@ -131,9 +97,11 @@ export default function App() {
     <main id="main"><Routes>
       <Route path="/" element={<HomePage {...actions} />} />
       <Route path="/products" element={<ProductsPage {...actions} />} />
+      <Route path="/stories" element={<StoriesPage />} />
+      <Route path="/stories/:slug" element={<StoryPage />} />
       <Route path="*" element={<section className="container empty-state not-found"><h1>Không tìm thấy trang</h1><Link className="button primary" to="/">Về trang chủ <Icon name="arrow" /></Link></section>} />
     </Routes></main>
-    <footer className="site-footer"><div className="container footer-main"><div className="footer-brand"><Link className="brand" to="/">claynest<span className="brand-dot">.</span></Link><p>Gốm mộc. Nhà ấm. Ngày an yên.</p></div><nav className="footer-links" aria-label="Liên kết cuối trang"><Link to="/products">Tất cả sản phẩm</Link><Link to="/#story">Về ClayNest</Link></nav></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} ClayNest</span><span>Bản minh họa · Ảnh AI, giá tham khảo · Chưa nhận đơn hàng</span></div></footer>
+    <footer className="site-footer"><div className="container footer-main"><div className="footer-brand"><Brand /><p>Một chút mộc cho nhà.<br />Một chút thương cho những ngày bình thường.</p></div><div className="footer-column"><h2>Ghé nhà Nàng</h2><Link to="/products">Tất cả sản phẩm</Link><Link to="/#collections">Những bộ sưu tập</Link><Link to="/#story">Câu chuyện Nàng Gốm</Link></div><div className="footer-column"><h2>Ở lại một chút</h2><Link to="/stories">Chuyện của gốm</Link><Link to="/#craft">Từ đất đến gốm</Link><Link to="/products?category=B%E1%BB%99%20s%C6%B0u%20t%E1%BA%ADp">Một món quà nhỏ</Link></div><div className="footer-message"><p className="eyebrow">THƯƠNG NHÀ, THƯƠNG MÌNH</p><p>Nhà không cần thật lớn.<br />Chỉ cần có những điều mình yêu.</p><span>Nàng Gốm</span></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Nàng Gốm</span><span>Bản minh họa · Ảnh AI, giá tham khảo · Chưa nhận đơn hàng</span><Link to="/">Về nhà Nàng ↑</Link></div></footer>
     <div className={notice ? 'toast visible' : 'toast'} role="status" aria-live="polite">{notice}</div>
     <dialog ref={modal} className={overlay === 'cart' ? 'store-dialog cart-dialog' : 'store-dialog'} onCancel={() => setOverlay(null)} onClose={() => setOverlay(null)} onClick={event => { if (event.target === event.currentTarget) { const rect = event.currentTarget.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) setOverlay(null) } }} aria-labelledby="dialog-title">
       <button className="icon-button dialog-close" aria-label="Đóng" onClick={() => setOverlay(null)}><Icon name="close" /></button>

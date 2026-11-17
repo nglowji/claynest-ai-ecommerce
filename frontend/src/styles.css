@@ -284,7 +284,7 @@ h1 { white-space: normal; }
 }
 @media(max-width:620px) {
   .banner { height: 560px; min-height: 0; }
-  .banner>img { object-position: 59% center; }
+  .banner>img { object-position: 82% center; }
   .banner-shade { background: linear-gradient(180deg,#f6f1e7ed 0%,#f6f1e7b8 28%,#f6f1e717 70%); }
   .banner-content { justify-content: flex-start; padding-top: 40px; }
   .banner .eyebrow { font-size: 7px; letter-spacing: 2px; margin-bottom: 14px; }
@@ -315,4 +315,245 @@ h1 { white-space: normal; }
 @media(prefers-reduced-motion:reduce) {
   html { scroll-behavior:auto; }
   *, *:before, *:after { transition:none!important; animation:none!important; }
+}
+
+/* Nàng Gốm — a longer, image-led brand story. */
+.nang-gom-brand { gap: 10px; letter-spacing: 0; }
+.brand-emblem { width: 40px; height: 51px; color: #7a8266; flex-shrink: 0; }
+.brand-type { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.brand-name { font: 500 31px/1.1 var(--serif); letter-spacing: -.8px; white-space: nowrap; }
+.brand-tagline { font: 400 6px/1.3 'Be Vietnam Pro',sans-serif; letter-spacing: 1.7px; color: #92967e; white-space: nowrap; }
+.main-nav { gap: 26px; font-size: 11px; }
+.welcome-section { text-align: center; padding-top: 83px; padding-bottom: 15px; max-width: 780px; }
+.welcome-section .eyebrow { margin-bottom: 20px; }
+.welcome-section h2 { font-size: 43px; line-height: 1.4; }
+.welcome-section>p:not(.eyebrow) { max-width: 600px; margin: 25px auto 0; font-size: 12px; line-height: 2.1; color: #78806e; }
+.welcome-signature { display: block; margin-top: 23px; font: italic 15px var(--serif); color: #9a8a70; }
+.products-section { padding-top: 64px; padding-bottom: 72px; }
+.heading-description { font-size: 11px; color: #7c8271; line-height: 2; }
+.collections-section { padding-block: 20px 85px; }
+.collection-mosaic { display: grid; grid-template-columns: 1.18fr 1fr; grid-template-rows: 265px 265px; gap: 20px; }
+.collection-tile { position: relative; overflow: hidden; border-radius: 14px; isolation: isolate; }
+.collection-tile-large { grid-row: 1/3; }
+.collection-tile:after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg,transparent 30%,#222b1c9c); z-index: -1; }
+.collection-tile img { height: 100%; position: absolute; inset: 0; z-index: -2; transition: transform .8s ease; }
+.collection-tile:hover img { transform: scale(1.035); }
+.collection-tile>div { position: absolute; bottom: 28px; left: 30px; right: 30px; color: #fffff7; }
+.collection-tile p { font-size: 7px; letter-spacing: 2px; margin-bottom: 11px; color: #f0f2df; }
+.collection-tile h3 { font: 400 30px/1.3 var(--serif); margin-bottom: 14px; }
+.collection-tile-large h3 { font-size: 38px; }
+.collection-tile span { font-size: 10px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.collection-tile span svg { width: 19px; }
+.nang-story-section { background: #eeeee5; padding-block: 70px; }
+.nang-story-inner { display: grid; grid-template-columns: 1.1fr 1fr; gap: 75px; align-items: center; }
+.nang-story-image { position: relative; padding-bottom: 27px; }
+.nang-story-image img { height: 505px; border-radius: 14px 90px 14px 14px; }
+.nang-story-image>span { display: block; font-size: 7px; color: #979a83; letter-spacing: 1.5px; margin-top: 14px; }
+.nang-story-copy h2 { font-size: 40px; margin-bottom: 27px; }
+.nang-story-copy>p:not(.eyebrow) { font-size: 12px; color: #7c816d; line-height: 2.1; margin-bottom: 18px; max-width: 415px; }
+.nang-story-copy .text-link { margin-top: 8px; }
+.nang-signature { display: block; font: italic 25px var(--serif); color: #8c9876; margin-top: 25px; }
+.craft-section { padding-block: 85px 75px; }
+.craft-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 27px; }
+.craft-image { overflow: hidden; border-radius: 11px; }
+.craft-image img { aspect-ratio: 1.28; transition: transform .8s; }
+.craft-grid article:hover img { transform: scale(1.035); }
+.craft-title { display: flex; align-items: center; gap: 14px; margin-top: 22px; }
+.craft-title>span { font: italic 25px var(--serif); color: #a8ac92; }
+.craft-title h3 { font: 400 22px/1.5 var(--serif); }
+.craft-grid article>p { margin-top: 14px; padding-left: 41px; font-size: 11px; color: #818673; line-height: 2; }
+.gift-section { display: grid; grid-template-columns: .95fr 1.05fr; gap: 65px; align-items: center; background: #f0e8dc; padding: 48px; border-radius: 16px; margin-bottom: 12px; }
+.gift-copy { padding-left: 13px; }
+.gift-copy .eyebrow { font-size: 7px; line-height: 1.9; }
+.gift-copy h2 { font-size: 39px; margin-bottom: 25px; }
+.gift-copy h2 em { color: #a37d60; }
+.gift-copy>p:not(.eyebrow) { font-size: 12px; color: #8d7c68; line-height: 2.1; margin-bottom: 17px; max-width: 380px; }
+.gift-copy .button { margin-top: 7px; background: #907253; }
+.gift-copy .button:hover { background: #755739; }
+.gift-story-link { display: block; font-size: 9px; color: #927d62; margin-top: 18px; }
+.gift-image img { height: 440px; border-radius: 12px; }
+.journal-section { padding-block: 85px 80px; }
+.journal-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 27px; }
+.journal-image { display: block; overflow: hidden; border-radius: 12px; margin-bottom: 22px; }
+.journal-image img { aspect-ratio: 1.42; transition: transform .7s ease; }
+.journal-image:hover img { transform: scale(1.04); }
+.journal-card>.eyebrow { font-size: 7px; letter-spacing: 1.4px; margin-bottom: 12px; }
+.journal-card h3 { font: 400 25px/1.45 var(--serif); margin-bottom: 14px; max-width: 320px; }
+.journal-card h3 a:hover { color: #758265; }
+.journal-card>p:not(.eyebrow) { font-size: 11px; color: #838774; line-height: 2; margin-bottom: 19px; }
+.journal-card .text-link { font-size: 9px; }
+.nang-invitation { background: #edf0e4; text-align: center; padding-block: 50px 55px; position: relative; overflow: hidden; }
+.invitation-flower { display: block; font-size: 33px; line-height: 1; color: #9caa81; margin-bottom: 22px; }
+.invitation-inner>.eyebrow { font-size: 8px; margin-bottom: 20px; }
+.invitation-inner h2 { font-size: 45px; }
+.invitation-inner>p:not(.eyebrow) { font-size: 12px; line-height: 2; color: #80896f; margin-top: 23px; }
+.invitation-inner .button { margin-top: 25px; }
+.invitation-signature { font: italic 26px var(--serif); display: block; color: #9baa83; margin-top: 30px; }
+.footer-main { grid-template-columns: 1.35fr .8fr .8fr 1fr; gap: 40px; padding-block: 55px; align-items: start; }
+.footer-column h2 { font-size: 11px; margin-bottom: 19px; }
+.footer-column>a { display: block; font-size: 10px; color: #858b76; margin-bottom: 10px; }
+.footer-message>.eyebrow { font-size: 7px; letter-spacing: 1.5px; margin: 0 0 17px; }
+.footer-message>p:not(.eyebrow) { font-size: 11px; margin: 0; color: #80896e; line-height: 2; }
+.footer-message>span { font: italic 24px var(--serif); color: #939f7a; display: block; margin-top: 16px; }
+.footer-brand .brand-name { font-size: 31px; }
+.footer-brand .brand-tagline { font-size: 6px; }
+.stories-page { padding-top: 30px; padding-bottom: 85px; min-height: 70vh; }
+.stories-page .catalog-heading { padding-block: 43px; }
+.reading-page { padding-top: 30px; padding-bottom: 80px; }
+.reading-heading { text-align: center; max-width: 800px; margin: 50px auto 40px; }
+.reading-heading h1 { font-size: clamp(35px,4.5vw,58px); line-height: 1.3; letter-spacing: -1px; }
+.reading-heading>p:last-child { font-size: 11px; color: #8c957b; margin-top: 22px; }
+.reading-hero { max-height: 560px; aspect-ratio: 2.15; border-radius: 15px; }
+.reading-body { width: min(690px,calc(100% - 48px)); margin: 42px auto 0; }
+.reading-body p { font-size: 14px; line-height: 2.15; color: #747d68; }
+.reading-body .reading-intro { font: 22px/1.85 var(--serif); color: #59664b; margin-bottom: 38px; }
+.reading-body section { margin-bottom: 32px; }
+.reading-body h2 { font-size: 28px; margin-bottom: 18px; }
+.reading-body .editorial-note { font-size: 10px; padding-top: 20px; margin-top: 35px; border-top: 1px solid var(--line); color: #8e9581; }
+.reading-body>.button { margin-top: 28px; }
+.back-to-stories { display: table; margin-top: 25px; }
+@media(max-width:1100px) {
+  .main-nav { gap: 21px; font-size: 10px; }
+  .nang-story-inner { gap: 45px; }
+  .nang-story-image img { height: 480px; }
+  .nang-story-copy h2 { font-size: 35px; }
+  .gift-section { gap: 35px; padding: 35px; }
+  .gift-copy { padding: 0; }
+  .gift-copy h2 { font-size: 33px; }
+  .gift-image img { height: 430px; }
+  .craft-grid, .journal-grid { gap: 20px; }
+  .craft-title { gap: 10px; }
+  .craft-title h3 { font-size: 20px; }
+  .craft-grid article>p { padding-left: 0; }
+  .journal-card h3 { font-size: 22px; }
+  .footer-main { gap: 25px; }
+  .footer-message>p:not(.eyebrow) { font-size: 9px; }
+}
+@media(max-width:850px) {
+  .nang-gom-brand { gap: 6px; }
+  .brand-emblem { width: 33px; height: 44px; }
+  .brand-name { font-size: 27px; }
+  .brand-tagline { font-size: 5px; letter-spacing: 1.2px; }
+  .main-nav { font-size: 9px; gap: 17px; }
+  .welcome-section { padding-top: 60px; }
+  .welcome-section h2 { font-size: 37px; }
+  .collection-mosaic { grid-template-rows: 225px 225px; gap: 15px; }
+  .collection-tile>div { left: 22px; right: 22px; bottom: 23px; }
+  .collection-tile h3 { font-size: 25px; }
+  .collection-tile-large h3 { font-size: 31px; }
+  .collection-tile span { font-size: 8px; }
+  .heading-description { font-size: 9px; }
+  .collections-section { padding-bottom: 60px; }
+  .nang-story-section { padding-block: 50px; }
+  .nang-story-inner { gap: 30px; }
+  .nang-story-image img { height: 440px; border-top-right-radius: 60px; }
+  .nang-story-copy h2 { font-size: 30px; }
+  .nang-story-copy>p:not(.eyebrow) { font-size: 10px; }
+  .nang-signature { font-size: 22px; }
+  .craft-section { padding-block: 60px; }
+  .craft-title { align-items: baseline; }
+  .craft-title h3 { font-size: 18px; }
+  .craft-title>span { font-size: 20px; }
+  .craft-grid article>p { font-size: 10px; }
+  .gift-section { padding: 28px; gap: 25px; }
+  .gift-copy h2 { font-size: 28px; }
+  .gift-copy .eyebrow { font-size: 6px; }
+  .gift-copy>p:not(.eyebrow) { font-size: 10px; }
+  .gift-image img { height: 420px; }
+  .journal-section { padding-block: 60px; }
+  .journal-card h3 { font-size: 20px; }
+  .journal-card>p:not(.eyebrow) { font-size: 10px; }
+  .journal-card>.eyebrow { font-size: 6px; }
+  .footer-main { grid-template-columns: 1.3fr 1fr 1fr; }
+  .footer-message { grid-column: 1/-1; padding-top: 23px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 25px; align-items: center; }
+  .footer-message>span { margin-top: 0; }
+  .footer-message>.eyebrow { margin: 0; }
+}
+@media(max-width:620px) {
+  .header-inner { height: 78px; }
+  .main-nav { top: 78px; }
+  .main-nav a { font-size: 12px; }
+  .brand-name { font-size: 27px; }
+  .brand-emblem { width: 32px; height: 43px; }
+  .brand-type { gap: 6px; }
+  .brand-tagline { font-size: 5px; }
+  .welcome-section { padding-block: 48px 8px; }
+  .welcome-section h2 { font-size: 32px; }
+  .welcome-section>p:not(.eyebrow) { font-size: 11px; line-height: 2.1; margin-top: 22px; }
+  .welcome-signature { font-size: 13px; line-height: 1.8; max-width: 240px; margin-inline: auto; }
+  .products-section { padding-block: 43px 47px; }
+  .collections-section { padding-block: 5px 47px; }
+  .collections-section .section-heading { display: block; }
+  .heading-description { font-size: 10px; margin-top: 20px; }
+  .collection-mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: 360px 240px; gap: 11px; }
+  .collection-tile-large { grid-column: 1/-1; grid-row: auto; }
+  .collection-tile>div { left: 15px; right: 15px; bottom: 19px; }
+  .collection-tile-large>div { left: 22px; bottom: 24px; }
+  .collection-tile p { font-size: 5px; letter-spacing: 1px; margin-bottom: 9px; }
+  .collection-tile h3 { font-size: 22px; margin-bottom: 11px; }
+  .collection-tile-large h3 { font-size: 31px; }
+  .collection-tile span { font-size: 7px; line-height: 1.7; gap: 8px; }
+  .collection-tile span svg { width: 15px; }
+  .nang-story-section { padding-block: 36px 42px; }
+  .nang-story-inner { grid-template-columns: 1fr; gap: 12px; }
+  .nang-story-image img { height: 350px; border-radius: 13px 65px 13px 13px; }
+  .nang-story-image>span { font-size: 5px; }
+  .nang-story-copy { padding-inline: 5px; }
+  .nang-story-copy h2 { font-size: 33px; }
+  .nang-story-copy>p:not(.eyebrow) { font-size: 11px; max-width: none; }
+  .nang-signature { margin-top: 23px; font-size: 25px; }
+  .craft-section { padding-block: 47px; }
+  .craft-section .section-heading { display: block; }
+  .craft-section .heading-description br { display: none; }
+  .craft-grid { grid-template-columns: 1fr; gap: 30px; }
+  .craft-image img { aspect-ratio: 1.5; }
+  .craft-title { gap: 16px; margin-top: 17px; }
+  .craft-title>span { font-size: 25px; }
+  .craft-title h3 { font-size: 25px; }
+  .craft-grid article>p { font-size: 11px; margin-top: 10px; }
+  .gift-section { grid-template-columns: 1fr; padding: 23px; gap: 27px; border-radius: 13px; }
+  .gift-image { grid-row: 1; }
+  .gift-image img { height: 300px; border-radius: 9px; }
+  .gift-copy { padding-block: 0 8px; }
+  .gift-copy .eyebrow { font-size: 6px; }
+  .gift-copy h2 { font-size: 33px; }
+  .gift-copy>p:not(.eyebrow) { font-size: 11px; }
+  .gift-story-link { font-size: 9px; }
+  .journal-section { padding-block: 47px; }
+  .journal-section .section-heading .text-link { white-space: normal; max-width: 108px; }
+  .journal-grid { grid-template-columns: 1fr; gap: 35px; }
+  .journal-image img { aspect-ratio: 1.55; }
+  .journal-image { margin-bottom: 17px; }
+  .journal-card>.eyebrow { font-size: 7px; }
+  .journal-card h3 { font-size: 27px; max-width: 100%; }
+  .journal-card>p:not(.eyebrow) { font-size: 11px; }
+  .nang-invitation { padding-block: 40px 43px; }
+  .invitation-inner>.eyebrow { font-size: 7px; }
+  .invitation-inner h2 { font-size: 36px; }
+  .invitation-inner>p:not(.eyebrow) { font-size: 11px; }
+  .footer-main { grid-template-columns: 1fr 1fr; gap: 30px 25px; padding-block: 35px; }
+  .footer-brand { grid-column: 1/-1; }
+  .footer-brand p { font-size: 10px; }
+  .footer-column h2 { font-size: 11px; }
+  .footer-column>a { font-size: 9px; }
+  .footer-message { grid-template-columns: 1fr; gap: 13px; }
+  .footer-message>p:not(.eyebrow) { font-size: 11px; }
+  .footer-bottom { font-size: 7px; }
+  .stories-page { padding-top: 22px; padding-bottom: 50px; }
+  .reading-page { padding-top: 22px; padding-bottom: 50px; }
+  .reading-heading { margin-block: 35px 30px; }
+  .reading-heading h1 { font-size: 35px; }
+  .reading-hero { aspect-ratio: 1.2; border-radius: 12px; }
+  .reading-body { width: calc(100% - 44px); margin-top: 30px; }
+  .reading-body .reading-intro { font-size: 21px; line-height: 1.8; }
+  .reading-body h2 { font-size: 26px; }
+  .reading-body p { font-size: 13px; line-height: 2.1; }
+}
+@media(max-width:370px) {
+  .brand-name { font-size: 24px; }
+  .brand-emblem { width: 29px; }
+  .brand-tagline { font-size: 4px; }
+  .collection-mosaic { grid-template-rows: 320px 230px; }
+  .collection-tile h3 { font-size: 19px; }
+  .collection-tile-large h3 { font-size: 29px; }
 }

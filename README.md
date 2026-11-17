@@ -122,3 +122,19 @@ Có lọc danh mục, tìm kiếm không phân biệt dấu, xem nhanh bằng di
 Giao diện được nâng cấp với bảng màu ngà/olive, ảnh riêng cho từng loại sản phẩm, hero mới, các lối chọn theo góc sống, bộ sưu tập Slow Sunday và câu chuyện tạo hình gốm. Có lưu/bỏ lưu yêu thích trong phiên xem, menu mobile, animation nhẹ và hỗ trợ giảm chuyển động.
 
 Bộ 7 ảnh mới tạo bằng công cụ image_gen được lưu tại `frontend/public/images/slow-living/`; prompt tại `prompts.json` trong cùng thư mục. Đây là ảnh AI minh họa, không phải ảnh hàng hoặc xưởng thật. Mỗi sản phẩm có một ảnh khác nhau và nội dung khớp chủ thể ảnh. Ảnh JPEG được tối ưu; tổng bộ ảnh khoảng 1,9 MB.
+
+### Trang chủ tinh gọn và trang sản phẩm
+
+Trang chủ hiện gồm banner ngang toàn chiều rộng với slogan HTML trên ảnh, sản phẩm nổi bật và đoạn giới thiệu thương hiệu. Đã bỏ các badge, dấu tròn, thẻ nổi, dải thông điệp và khối nội dung lặp.
+
+Nút “Xem tất cả”, menu “Sản phẩm” và nút trên banner dẫn tới `/products`. Trang này có tìm kiếm không dấu, lọc danh mục, sắp xếp theo giá và trạng thái rỗng. Bộ lọc được lưu vào query string; routing giữ giỏ hàng trong phiên điều hướng. Đường dẫn lạ hiển thị trang không tìm thấy. Khi triển khai static hosting, cấu hình fallback về `index.html` để mở trực tiếp hoặc refresh `/products` (Vite dev/preview đã hỗ trợ).
+
+Ảnh banner AI mới: `frontend/public/images/slow-living/banner-wide.jpg`; prompt kèm `banner-prompt.json`. `.env.example` tiếp tục được Git bỏ qua.
+
+### Nàng Gốm — thương hiệu và câu chuyện
+
+Tên hiển thị của cửa hàng đổi thành **Nàng Gốm**, với logo chữ, biểu tượng bình gốm và favicon SVG. Tên kỹ thuật repository/backend vẫn giữ theo dự án ClayNest.
+
+Trang chủ được mở rộng thành 9 phần: banner ngang, lời chào thương hiệu, sản phẩm nổi bật, cảm hứng bộ sưu tập, câu chuyện Nàng Gốm, hành trình của gốm, gợi ý quà tặng, nhật ký và lời mời khám phá. Ảnh mới tại `frontend/public/images/nang-gom/`; prompt gốc nằm trong cùng thư mục.
+
+`/stories` là trang nhật ký; `/stories/:slug` có 3 bài viết hoàn chỉnh về buổi sáng chậm, cắm hoa cho góc nhà và quà tặng. Các nút đọc tiếp mở bài viết, các bộ sưu tập dẫn tới `/products?category=...`. Footer có liên kết tới các phần và trang tương ứng. Tất cả hình ảnh và nội dung giới thiệu là bản minh họa; không tạo thông tin nghệ nhân, số liệu kinh doanh hoặc cam kết dịch vụ chưa xác minh.
