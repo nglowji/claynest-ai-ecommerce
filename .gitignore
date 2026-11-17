@@ -1,0 +1,33 @@
+# Keep local Markdown documents out of version control, except README files.
+*.[mM][dD]
+![rR][eE][aA][dD][mM][eE].[mM][dD]
+
+# Local credentials and configuration
+.env
+.env.*
+!.env.example
+.aws/
+.codex/
+.agents/
+*.pem
+*.key
+
+# Dependencies and generated files
+node_modules/
+dist/
+build/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+.coverage
+
+# Editor and operating system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
