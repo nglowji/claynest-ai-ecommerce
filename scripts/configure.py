@@ -15,6 +15,8 @@ def configure() -> None:
             values[key.strip()] = value.strip().strip("\"'")
     defaults = {
         "POSTGRES_USER": "claynest", "POSTGRES_DB": "claynest", "POSTGRES_PORT": "5432",
+        "ADMIN_EMAIL": "admin@nanggom.local", "ADMIN_PASSWORD": secrets.token_urlsafe(20) + "aA1!",
+        "ADMIN_DISPLAY_NAME": "Quản trị Nàng Gốm",
         "COMMERCE_API_PORT": "8000", "VITE_API_BASE_URL": "http://localhost:8000",
         "POSTGRES_PASSWORD": secrets.token_hex(24),
         "COMMERCE_DB_PASSWORD": secrets.token_hex(24), "AI_DB_PASSWORD": secrets.token_hex(24),

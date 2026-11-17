@@ -1,6 +1,9 @@
 import type { CSSProperties } from 'react'
-type Name = 'search' | 'bag' | 'arrow' | 'close' | 'menu' | 'leaf' | 'gift' | 'hand' | 'plus' | 'minus' | 'heart' | 'cup' | 'vase' | 'tea'
+type Name = 'search' | 'bag' | 'arrow' | 'close' | 'menu' | 'leaf' | 'gift' | 'hand' | 'plus' | 'minus' | 'heart' | 'cup' | 'vase' | 'tea' | 'user' | 'eye' | 'eye-off'
 const paths: Record<Name, React.ReactNode> = {
+  user: <><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></>,
+  eye: <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></>,
+  'eye-off': <><path d="m3 3 18 18M10.5 5.1 12 5c6.5 0 10 7 10 7s-1 2-3 3.8M6 6.6C3.4 8.7 2 12 2 12s3.5 7 10 7a11 11 0 0 0 5-1.3M9.9 9.9a3 3 0 0 0 4.2 4.2"/></>,
   heart: <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>,
   cup: <><path d="M4 8h12v8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8ZM16 9h2a3 3 0 0 1 0 6h-2M7 3v2M11 2v3M3 23h15"/></>,
   vase: <><path d="M10 8H8c0 4-4 6-4 10s16 4 16 0-4-6-4-10h-2M8 8h8M12 8V1M12 5c-4 0-5-3-5-3 4 0 5 3 5 3ZM12 4c4 0 5-3 5-3-4 0-5 3-5 3Z"/></>,

@@ -45,7 +45,10 @@ services:
       target: runtime
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      DataProtection__KeysPath: /app/keys
       ConnectionStrings__Commerce: Host=db;Port=5432;Database=${POSTGRES_DB:-claynest};Username=commerce_app;Password=${COMMERCE_DB_PASSWORD}
+    volumes:
+      - api_keys:/app/keys
     ports:
       - "127.0.0.1:${COMMERCE_API_PORT:-8000}:8080"
     depends_on:
@@ -57,6 +60,23 @@ services:
       timeout: 6s
       retries: 5
     restart: unless-stopped
+
+  auth-bootstrap:
+    profiles: ["setup"]
+    image: claynest-ai-ecommerce-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Commerce: Host=db;Port=5432;Database=${POSTGRES_DB:-claynest};Username=commerce_app;Password=${COMMERCE_DB_PASSWORD}
+      DataProtection__KeysPath: /app/keys
+      Bootstrap__Email: ${ADMIN_EMAIL}
+      Bootstrap__Password: ${ADMIN_PASSWORD}
+      Bootstrap__DisplayName: ${ADMIN_DISPLAY_NAME:-Quản trị Nàng Gốm}
+    volumes:
+      - api_keys:/app/keys
+    command: ["--bootstrap-auth"]
+    depends_on:
+      db:
+        condition: service_healthy
 
   ai-service:
     profiles: ["app"]
@@ -100,3 +120,4 @@ services:
 
 volumes:
   postgres_data:
+  api_keys:
