@@ -3,5 +3,6 @@
     <ProjectReference Include="../ClayNest.Application/ClayNest.Application.csproj" />
     <ProjectReference Include="../ClayNest.Infrastructure/ClayNest.Infrastructure.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design"><PrivateAssets>all</PrivateAssets></PackageReference>
   </ItemGroup>
 </Project>

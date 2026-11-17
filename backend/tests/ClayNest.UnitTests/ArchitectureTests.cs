@@ -31,6 +31,6 @@ public sealed class ArchitectureTests
             .UseNpgsql("Host=localhost;Database=unused;Username=unused").Options;
         using var context = new CommerceDbContext(options);
         Assert.Equal("commerce", context.Model.GetDefaultSchema());
-        Assert.Empty(context.Model.GetEntityTypes());
+        Assert.All(context.Model.GetEntityTypes(), entity => Assert.Equal("commerce", entity.GetSchema()));
     }
 }

@@ -1,4 +1,7 @@
 using ClayNest.Application.Abstractions;
+using ClayNest.Application.Identity;
+using ClayNest.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using ClayNest.Infrastructure.Health;
 using ClayNest.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +38,20 @@ public static class DependencyInjection
             options.UseNpgsql(provider.GetRequiredService<NpgsqlDataSource>(), postgres =>
                 postgres.MigrationsHistoryTable("__EFMigrationsHistory", CommerceDbContext.Schema)));
         services.AddSingleton<IReadinessProbe, PostgresReadinessProbe>();
+        services.AddIdentityCore<AdminUser>(options =>
+        {
+            options.User.RequireUniqueEmail = true;
+            options.Password.RequiredLength = 12;
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+            options.Lockout.AllowedForNewUsers = true;
+        }).AddRoles<IdentityRole<Guid>>().AddEntityFrameworkStores<CommerceDbContext>().AddSignInManager();
+        services.AddScoped<IAdminAuthenticationService, AdminAuthenticationService>();
+        services.AddScoped<AdminProvisioner>();
         return services;
     }
 }
