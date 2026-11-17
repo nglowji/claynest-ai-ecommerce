@@ -31,3 +31,7 @@ coverage/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Track the phase learning guide; keep local specifications ignored.
+!docs/LEARNING_P0.md
+*.egg-info/
