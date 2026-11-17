@@ -23,21 +23,21 @@ public sealed class AdminAuthenticationService(
             return null;
         }
         var result = await signIn.CheckPasswordSignInAsync(user, command.Password, lockoutOnFailure: true);
-        if (!result.Succeeded || !await users.IsInRoleAsync(user, CommerceRoles.Admin)) return null;
+        if (!result.Succeeded) return null;
         await signIn.SignInAsync(user, new AuthenticationProperties
         {
             IsPersistent = command.RememberMe,
             ExpiresUtc = DateTimeOffset.UtcNow.Add(command.RememberMe ? TimeSpan.FromDays(7) : TimeSpan.FromHours(8)),
             AllowRefresh = true
         });
-        return Profile(user);
+        return await ProfileAsync(user);
     }
 
     public async Task<AdminProfile?> GetProfileAsync(string? userId)
     {
         if (!Guid.TryParse(userId, out _)) return null;
         var user = await users.FindByIdAsync(userId!);
-        return user is not null && await users.IsInRoleAsync(user, CommerceRoles.Admin) ? Profile(user) : null;
+        return user is not null ? await ProfileAsync(user) : null;
     }
 
     public async Task LogoutAsync(string userId)
@@ -52,5 +52,14 @@ public sealed class AdminAuthenticationService(
         await signIn.SignOutAsync();
     }
 
-    private static AdminProfile Profile(AdminUser user) => new(user.Id, user.Email!, user.DisplayName, CommerceRoles.Admin);
+    public async Task<RegistrationResult> RegisterAsync(RegisterCommand command)
+    {
+        var user = new AdminUser { Id = Guid.NewGuid(), UserName = command.Email.Trim(), Email = command.Email.Trim(), DisplayName = command.DisplayName.Trim() };
+        // Public registration never assigns administrative roles.
+        var result = await users.CreateAsync(user, command.Password);
+        return new RegistrationResult(result.Succeeded);
+    }
+
+    private async Task<AdminProfile> ProfileAsync(AdminUser user) => new(user.Id, user.Email!, user.DisplayName,
+        await users.IsInRoleAsync(user, CommerceRoles.Admin) ? CommerceRoles.Admin : CommerceRoles.Customer);
 }

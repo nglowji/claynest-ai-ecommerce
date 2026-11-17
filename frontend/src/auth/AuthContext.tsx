@@ -5,7 +5,7 @@ type Status = 'loading' | 'authenticated' | 'anonymous' | 'unavailable'
 type Auth = {
   user: AdminUser | null
   status: Status
-  login: (email: string, password: string, rememberMe: boolean) => Promise<void>
+  login: (email: string, password: string, rememberMe: boolean) => Promise<AdminUser>
   logout: () => Promise<void>
 }
 const AuthContext = createContext<Auth | null>(null)
@@ -20,7 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
   async function login(email: string, password: string, rememberMe: boolean) {
     const value = await signIn(email, password, rememberMe)
-    setUser(value); setStatus('authenticated')
+    setUser(value); setStatus('authenticated'); return value
   }
   async function logout() {
     await signOut()

@@ -1,42 +1,62 @@
 import { useState, type FormEvent } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
+import { register } from '../auth/api'
 import Icon from './Icon'
 
 export default function LoginPage() {
   const auth = useAuth()
   const navigate = useNavigate()
+  const signingUp = useLocation().pathname === '/register'
   const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmation, setConfirmation] = useState('')
   const [remember, setRemember] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const [show, setShow] = useState(false)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState('')
-  if (auth.status === 'authenticated') return <Navigate to="/account" replace />
+  const [notice, setNotice] = useState('')
+  if (auth.user) return <Navigate to={auth.user.role === 'Admin' ? '/admin' : '/account'} replace />
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (pending) return
-    setError(''); setPending(true)
+    setError(''); setNotice('')
+    if (signingUp && password !== confirmation) { setError('Mật khẩu xác nhận chưa khớp.'); return }
+    setPending(true)
     try {
-      await auth.login(email.trim(), password, remember)
-      setPassword('')
-      navigate('/account', { replace: true })
-    } catch (failure) {
-      setError(failure instanceof Error ? failure.message : 'Chưa thể đăng nhập. Vui lòng thử lại.')
-    } finally { setPending(false) }
+      if (signingUp) {
+        await register(name.trim(), email.trim(), password)
+        setPassword(''); setConfirmation('')
+        setNotice('Tài khoản đã sẵn sàng. Đăng nhập để ghé góc nhỏ của bạn.')
+        navigate('/login', { replace: true })
+      } else {
+        const user = await auth.login(email.trim(), password, remember)
+        setPassword('')
+        navigate(user.role === 'Admin' ? '/admin' : '/account', { replace: true })
+      }
+    } catch (failure) { setError(failure instanceof Error ? failure.message : 'Vui lòng thử lại sau.') }
+    finally { setPending(false) }
   }
+  function switchMode() { setError(''); setNotice(''); setPassword(''); setConfirmation('') }
   return <section className="auth-page container" aria-labelledby="login-title">
-    <div className="auth-layout"><div className="auth-photo"><img src="/images/nang-gom/flowers.jpg" alt="Bình gốm và nhành hoa bên góc nhà yên tĩnh" width="1536" height="1024" /><div><span>Nàng Gốm</span><p>Một chút chăm chút.<br />Một nhà đầy thương.</p></div></div>
-    <div className="auth-form-panel"><Link className="auth-back" to="/">← Về nhà Nàng</Link><p className="eyebrow">KHÔNG GIAN QUẢN TRỊ</p><h1 id="login-title">Chào bạn,<br /><em>mừng trở về.</em></h1><p className="auth-intro">Đăng nhập để tiếp tục chăm chút cho Nàng Gốm.</p>
-      {auth.status === 'loading' ? <p className="auth-session-check" role="status">Đang kiểm tra phiên đăng nhập…</p> : <form onSubmit={submit}>
-        {auth.status === 'unavailable' && !error && <p className="auth-connection-note">Dịch vụ đăng nhập chưa kết nối được. Bạn có thể thử lại bên dưới.</p>}
-        <label className="auth-field">Email quản trị<input type="email" name="email" autoComplete="username" autoCapitalize="none" spellCheck={false} value={email} onChange={event => setEmail(event.target.value)} required maxLength={254} placeholder="Email của bạn" disabled={pending} aria-describedby={error ? 'login-error' : undefined} /></label>
-        <label className="auth-field">Mật khẩu<span className="password-field"><input type={showPassword ? 'text' : 'password'} name="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} required maxLength={256} placeholder="Nhập mật khẩu" disabled={pending} aria-describedby={error ? 'login-error' : undefined} /><button type="button" className="password-toggle" aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'} aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)}><Icon name={showPassword ? 'eye-off' : 'eye'} /></button></span></label>
-        <label className="remember-field"><input type="checkbox" checked={remember} onChange={event => setRemember(event.target.checked)} disabled={pending} />Giữ đăng nhập trên thiết bị này</label>
-        {error && <p id="login-error" className="auth-error" role="alert">{error}</p>}
-        <button className="auth-submit" type="submit" disabled={pending}>{pending ? 'Đang đăng nhập…' : 'Đăng nhập'}{!pending && <Icon name="arrow" />}</button>
-        <p className="auth-access-note">Dành cho tài khoản quản trị được cấp. Bạn vẫn có thể khám phá cửa hàng mà không cần đăng nhập.</p>
-      </form>}
-    </div></div>
+    <div className="auth-layout auth-redesign">
+      <aside className="auth-photo"><img src="/images/nang-gom/flowers.jpg" alt="Một bình hoa, một góc nhà bình yên" width="1536" height="1024" /><div><span>Gốm mộc & chuyện nhà</span><p>Những điều nhỏ.<br />Một niềm vui riêng.</p><small>Nơi những món gốm tìm thấy người thương.</small></div></aside>
+      <div className="auth-form-panel"><Link className="auth-back" to="/">← Ghé nhà Nàng Gốm</Link>
+        <nav className="auth-tabs" aria-label="Tài khoản"><Link to="/login" onClick={switchMode} aria-current={!signingUp ? 'page' : undefined}>Đăng nhập</Link><Link to="/register" onClick={switchMode} aria-current={signingUp ? 'page' : undefined}>Đăng ký</Link></nav>
+        <h1 id="login-title">{signingUp ? 'Làm quen nhé,' : 'Chào bạn,'}<br /><em>{signingUp ? 'người thương gốm.' : 'mừng trở về.'}</em></h1>
+        <p className="auth-intro">{signingUp ? 'Tạo một tài khoản, giữ một góc nhỏ dành riêng cho bạn.' : 'Một chút gốm, một chút an yên. Nhà Nàng vẫn ở đây.'}</p>
+        {auth.status === 'loading' ? <p role="status">Đang kiểm tra phiên đăng nhập…</p> : <form onSubmit={submit}>
+          {notice && <p className="auth-success" role="status">{notice}</p>}
+          {signingUp && <label className="auth-field">Tên của bạn<input name="name" autoComplete="name" value={name} onChange={e => setName(e.target.value)} required maxLength={100} disabled={pending} placeholder="Nàng gọi bạn là…" /></label>}
+          <label className="auth-field">Email<input type="email" name="email" autoComplete="username" autoCapitalize="none" value={email} onChange={e => setEmail(e.target.value)} required maxLength={254} disabled={pending} placeholder="ban@email.com" /></label>
+          <label className="auth-field">Mật khẩu<span className="password-field"><input type={show ? 'text' : 'password'} name="password" autoComplete={signingUp ? 'new-password' : 'current-password'} value={password} onChange={e => setPassword(e.target.value)} required minLength={signingUp ? 12 : undefined} maxLength={256} disabled={pending} aria-describedby={signingUp ? 'password-hint' : undefined} placeholder="Mật khẩu của bạn" /><button type="button" className="password-toggle" aria-label={show ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'} aria-pressed={show} onClick={() => setShow(!show)}><Icon name={show ? 'eye-off' : 'eye'} /></button></span></label>
+          {signingUp ? <><p id="password-hint" className="auth-password-hint">Từ 12 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.</p><label className="auth-field">Nhập lại mật khẩu<input type={show ? 'text' : 'password'} autoComplete="new-password" value={confirmation} onChange={e => setConfirmation(e.target.value)} required maxLength={256} disabled={pending} placeholder="Thêm một lần để chắc nhé" /></label></> : <label className="remember-field"><input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} disabled={pending} />Giữ đăng nhập</label>}
+          {error && <p className="auth-error" role="alert">{error}</p>}
+          <button className="auth-submit" type="submit" disabled={pending}>{pending ? 'Đang xử lý…' : signingUp ? 'Tạo tài khoản' : 'Đăng nhập'}<Icon name="arrow" /></button>
+          <p className="auth-access-note">{signingUp ? 'Đã có một góc nhỏ?' : 'Lần đầu ghé Nàng?'} <Link to={signingUp ? '/login' : '/register'} onClick={switchMode}>{signingUp ? 'Đăng nhập' : 'Tạo tài khoản'}</Link></p>
+        </form>}
+      </div>
+    </div>
   </section>
 }

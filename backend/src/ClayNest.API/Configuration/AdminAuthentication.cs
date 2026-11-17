@@ -1,6 +1,5 @@
 using System.Threading.RateLimiting;
 using ClayNest.Domain.Identity;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -16,8 +15,8 @@ public static class AdminAuthentication
         services.AddDataProtection().SetApplicationName("ClayNest.Commerce")
             .PersistKeysToFileSystem(new DirectoryInfo(configuration["DataProtection:KeysPath"]
                 ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NangGom", "Keys")));
-        services.AddAuthentication(IdentityConstants.ApplicationScheme)
-            .AddCookie(IdentityConstants.ApplicationScheme, options =>
+        services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
+        services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = "nang_gom.admin";
                 options.Cookie.Path = "/api";

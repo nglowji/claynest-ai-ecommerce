@@ -33,6 +33,8 @@ public sealed class AuthenticationTests
         var profile = await me.Content.ReadFromJsonAsync<AdminProfile>();
         Assert.Equal(session.Email, profile?.Email);
         Assert.Equal(CommerceRoles.Admin, profile?.Role);
+        using var adminSession = await session.Client.GetAsync("/api/v1/admin/session");
+        Assert.Equal(HttpStatusCode.OK, adminSession.StatusCode);
         Assert.DoesNotContain("password", await me.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
         using var logout = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/logout");
         logout.Headers.Add("X-CSRF-TOKEN", await session.CsrfAsync());
@@ -79,13 +81,55 @@ public sealed class AuthenticationTests
     }
 
     [DatabaseFact]
-    public async Task Non_admin_cannot_obtain_admin_session()
+    public async Task Customer_can_sign_in_but_cannot_access_admin_api()
     {
         await using var session = await Session.CreateAsync(admin: false);
         using var login = await session.LoginAsync();
-        Assert.Equal(HttpStatusCode.Unauthorized, login.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+        Assert.Equal(CommerceRoles.Customer, (await login.Content.ReadFromJsonAsync<AdminProfile>())?.Role);
         using var me = await session.Client.GetAsync("/api/v1/auth/me");
-        Assert.Equal(HttpStatusCode.Unauthorized, me.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, me.StatusCode);
+        using var admin = await session.Client.GetAsync("/api/v1/admin/session");
+        Assert.Equal(HttpStatusCode.Forbidden, admin.StatusCode);
+    }
+
+    [DatabaseFact]
+    public async Task Registration_creates_only_customer_and_rejects_duplicate_or_weak_password()
+    {
+        await using var session = await Session.CreateAsync(admin: false);
+        await using (var scope = session.Factory.Services.CreateAsyncScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<AdminUser>>();
+            var user = await users.FindByEmailAsync(session.Email);
+            Assert.True((await users.DeleteAsync(user!)).Succeeded);
+        }
+        async Task<HttpResponseMessage> Register(string password, bool csrf = true)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/register")
+            { Content = JsonContent.Create(new { displayName = "Customer test", email = session.Email, password, role = "Admin" }) };
+            if (csrf) request.Headers.Add("X-CSRF-TOKEN", await session.CsrfAsync());
+            return await session.Client.SendAsync(request);
+        }
+        using var missingCsrf = await Register(session.Password, false);
+        Assert.Equal(HttpStatusCode.BadRequest, missingCsrf.StatusCode);
+        using var weak = await Register("weak-password");
+        Assert.Equal(HttpStatusCode.BadRequest, weak.StatusCode);
+        using var created = await Register(session.Password);
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        await using (var scope = session.Factory.Services.CreateAsyncScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<AdminUser>>();
+            var user = await users.FindByEmailAsync(session.Email);
+            session.userId = user!.Id.ToString();
+            Assert.False(await users.IsInRoleAsync(user, CommerceRoles.Admin));
+        }
+        using var duplicate = await Register(session.Password);
+        Assert.Equal(HttpStatusCode.BadRequest, duplicate.StatusCode);
+        using var login = await session.LoginAsync();
+        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+        Assert.Equal(CommerceRoles.Customer, (await login.Content.ReadFromJsonAsync<AdminProfile>())?.Role);
+        using var admin = await session.Client.GetAsync("/api/v1/admin/session");
+        Assert.Equal(HttpStatusCode.Forbidden, admin.StatusCode);
     }
 
     [DatabaseFact]
@@ -145,7 +189,7 @@ public sealed class AuthenticationTests
         public HttpClient Client { get; private set; } = null!;
         public string Email { get; } = $"auth-test-{Guid.NewGuid():N}@example.test";
         public string Password { get; } = $"Test-{Guid.NewGuid():N}-Aa1!";
-        private string userId = string.Empty;
+        public string userId = string.Empty;
 
         public static async Task<Session> CreateAsync(bool admin = true)
         {

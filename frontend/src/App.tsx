@@ -4,6 +4,7 @@ import Icon from './components/Icon'
 import Brand from './components/Brand'
 import SiteLocation from './components/SiteLocation'
 import LoginPage from './components/LoginPage'
+import AdminPage from './components/AdminPage'
 import AccountPage from './components/AccountPage'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import ProductPrice from './components/ProductPrice'
@@ -75,7 +76,7 @@ function StoreApp() {
   }, [location.pathname, location.hash])
   useEffect(() => {
     const story = stories.find(item => location.pathname === `/stories/${item.slug}`)
-    document.title = location.pathname === '/login' ? 'Đăng nhập | Nàng Gốm' : location.pathname === '/account' ? 'Tài khoản quản trị | Nàng Gốm' : story ? `${story.title} | Nàng Gốm` : location.pathname === '/products' ? 'Tất cả sản phẩm | Nàng Gốm' : location.pathname.startsWith('/stories') ? 'Chuyện của gốm | Nàng Gốm' : 'Nàng Gốm | Gốm mộc & chuyện nhà'
+    document.title = location.pathname === '/admin' ? 'Quản trị | Nàng Gốm' : location.pathname === '/register' ? 'Đăng ký | Nàng Gốm' : location.pathname === '/login' ? 'Đăng nhập | Nàng Gốm' : location.pathname === '/account' ? 'Tài khoản | Nàng Gốm' : story ? `${story.title} | Nàng Gốm` : location.pathname === '/products' ? 'Tất cả sản phẩm | Nàng Gốm' : location.pathname.startsWith('/stories') ? 'Chuyện của gốm | Nàng Gốm' : 'Nàng Gốm | Gốm mộc & chuyện nhà'
   }, [location.pathname])
   useEffect(() => { if (!notice) return; const id = window.setTimeout(() => setNotice(''), 3000); return () => window.clearTimeout(id) }, [notice])
   function add(product: Product) {
@@ -99,13 +100,15 @@ function StoreApp() {
         <NavLink to="/stories" className={({ isActive }) => isActive ? 'nav-active' : ''}>Chuyện của gốm</NavLink>
       </nav>
       <div className="header-actions"><Link className="icon-button" aria-label="Tìm kiếm sản phẩm" to="/products?search=1"><Icon name="search" /></Link>
-        <Link className="icon-button account-link" aria-label={auth.user ? 'Tài khoản quản trị' : 'Đăng nhập'} to={auth.user ? '/account' : '/login'}><Icon name="user" /></Link>
+        <Link className="icon-button account-link" aria-label={auth.user ? 'Tài khoản quản trị' : 'Đăng nhập'} to={auth.user ? (auth.user.role === 'Admin' ? '/admin' : '/account') : '/login'}><Icon name="user" /></Link>
         <button className="icon-button bag-button" aria-label={`Giỏ hàng, ${count} sản phẩm`} onClick={() => setOverlay('cart')}><Icon name="bag" /><span className="bag-count">{count}</span></button>
         <button className="icon-button menu-button" aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'} aria-expanded={menuOpen} aria-controls="mobile-nav" onClick={() => setMenuOpen(!menuOpen)}><Icon name={menuOpen ? 'close' : 'menu'} /></button>
       </div>
     </div></header>
     <main id="main"><Routes>
       <Route path="/" element={<HomePage {...actions} />} />
+      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/register" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/account" element={<AccountPage />} />
       <Route path="/products" element={<ProductsPage {...actions} />} />

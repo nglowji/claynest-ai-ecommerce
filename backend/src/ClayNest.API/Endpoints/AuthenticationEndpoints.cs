@@ -10,10 +10,10 @@ public static class AuthenticationEndpoints
 {
     public static IEndpointRouteBuilder MapAuthenticationEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        var group = endpoints.MapGroup("/api/v1/auth").WithTags("Admin authentication")
+        var group = endpoints.MapGroup("/api/v1/auth").WithTags("Authentication")
             .AddEndpointFilter(async (context, next) =>
             {
-                context.HttpContext.Response.Headers.CacheControl = "no-store";
+                context.HttpContext.Response.Headers.CacheControl = "no-cache, no-store";
                 return await next(context);
             });
         group.MapGet("/csrf", (HttpContext context, IAntiforgery csrf) =>
@@ -23,13 +23,27 @@ public static class AuthenticationEndpoints
         {
             var profile = await auth.GetProfileAsync(context.User.FindFirstValue(ClaimTypes.NameIdentifier));
             return profile is null ? Results.Unauthorized() : Results.Ok(profile);
-        }).RequireAuthorization(AdminAuthentication.Policy);
+        }).RequireAuthorization();
         group.MapPost("/logout", async (HttpContext context, IAntiforgery csrf, IAdminAuthenticationService auth) =>
         {
             if (!await ValidCsrfAsync(context, csrf)) return CsrfFailure();
             await auth.LogoutAsync(context.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             return Results.NoContent();
-        }).RequireAuthorization(AdminAuthentication.Policy);
+        }).RequireAuthorization();
+        group.MapPost("/register", async (RegisterRequest request, HttpContext context, IAntiforgery csrf, IAdminAuthenticationService auth) =>
+        {
+            if (!await ValidCsrfAsync(context, csrf)) return CsrfFailure();
+            var errors = new List<ValidationResult>();
+            if (!Validator.TryValidateObject(request, new ValidationContext(request), errors, true)
+                || string.IsNullOrWhiteSpace(request.DisplayName))
+                return Results.BadRequest(new { code = "invalid_registration" });
+            var result = await auth.RegisterAsync(new RegisterCommand(request.DisplayName, request.Email, request.Password));
+            return result.Succeeded ? Results.StatusCode(201)
+                : Results.BadRequest(new { code = "registration_failed" });
+        }).RequireRateLimiting("admin-login");
+        endpoints.MapGet("/api/v1/admin/session", async (HttpContext context, IAdminAuthenticationService auth) =>
+            Results.Ok(await auth.GetProfileAsync(context.User.FindFirstValue(ClaimTypes.NameIdentifier))))
+            .RequireAuthorization(AdminAuthentication.Policy);
         return endpoints;
     }
 
@@ -53,6 +67,11 @@ public static class AuthenticationEndpoints
     }
 
     private static IResult CsrfFailure() => Results.Json(new { code = "invalid_csrf", detail = "Phiên bảo mật không hợp lệ. Vui lòng thử lại." }, statusCode: 400);
+
+    public sealed record RegisterRequest(
+        [property: Required, MaxLength(100)] string DisplayName,
+        [property: Required, EmailAddress, MaxLength(254)] string Email,
+        [property: Required, MinLength(12), MaxLength(256)] string Password);
 
     public sealed record LoginRequest(
         [property: Required, EmailAddress, MaxLength(254)] string Email,

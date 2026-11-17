@@ -1,4 +1,4 @@
-export type AdminUser = { id: string; email: string; displayName: string; role: 'Admin' }
+export type AdminUser = { id: string; email: string; displayName: string; role: 'Admin' | 'Customer' }
 export class AuthError extends Error {
   constructor(public status: number, message: string) { super(message) }
 }
@@ -11,7 +11,7 @@ async function request(path: string, options: RequestInit = {}) {
   }
 }
 function profile(value: unknown): AdminUser {
-  if (typeof value !== 'object' || value === null || !('id' in value) || !('email' in value) || !('displayName' in value) || !('role' in value) || typeof value.id !== 'string' || typeof value.email !== 'string' || typeof value.displayName !== 'string' || value.role !== 'Admin') throw new AuthError(500, 'Dữ liệu tài khoản chưa hợp lệ. Vui lòng thử lại.')
+  if (typeof value !== 'object' || value === null || !('id' in value) || !('email' in value) || !('displayName' in value) || !('role' in value) || typeof value.id !== 'string' || typeof value.email !== 'string' || typeof value.displayName !== 'string' || (value.role !== 'Admin' && value.role !== 'Customer')) throw new AuthError(500, 'Dữ liệu tài khoản chưa hợp lệ. Vui lòng thử lại.')
   return value as AdminUser
 }
 async function ensureSuccess(response: Response) {
@@ -44,4 +44,11 @@ export async function signOut() {
   const token = await csrf() // Tokens are tied to the currently signed-in principal.
   const response = await request('/logout', { method: 'POST', headers: { 'X-CSRF-TOKEN': token } })
   if (response.status !== 401) await ensureSuccess(response)
+}
+
+export async function register(displayName: string, email: string, password: string) {
+  const token = await csrf()
+  const response = await request('/register', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token }, body: JSON.stringify({ displayName, email, password }) })
+  if (response.status === 400) throw new AuthError(400, 'Chưa thể tạo tài khoản. Hãy dùng email khác và mật khẩu đủ 12 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.')
+  await ensureSuccess(response)
 }
