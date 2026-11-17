@@ -90,7 +90,7 @@ services:
   ai-tests:
     profiles: ["test"]
     build: ./ai-service
-    command: ["pytest", "-q"]
+    command: ["pytest", "-q", "-p", "no:cacheprovider"]
     environment:
       AI_DATABASE_URL: postgresql+psycopg://ai_app:${AI_DB_PASSWORD}@db:5432/${POSTGRES_DB:-claynest}
       AI_INTEGRATION_TESTS: "1"

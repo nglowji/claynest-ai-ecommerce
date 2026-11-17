@@ -1,3 +1,5 @@
+> Tài liệu lịch sử của v0.1. Kiến trúc hiện tại xem [P0 v0.2](learning/PHASE_0.md).
+
 # P0 — Nền tảng ClayNest AI
 
 ## What — Có gì?
