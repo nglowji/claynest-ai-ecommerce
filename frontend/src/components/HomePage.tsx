@@ -2,19 +2,15 @@ import { Link } from 'react-router-dom'
 import Icon from './Icon'
 import ProductGrid, { type ProductActions } from './ProductGrid'
 import { StoryCards } from './Stories'
-import { products, maxDiscount } from '../data/products'
+import { products } from '../data/products'
 
 const categoryLink = (category: string) => `/products?category=${encodeURIComponent(category)}`
 
 export default function HomePage(actions: ProductActions) {
   return <>
     <section className="banner" aria-labelledby="hero-title">
-      <img className="banner-collage-background" src="/images/slow-living/banner-wide.jpg" alt="Bình gốm và cành olive trong góc nhà ngập nắng" fetchPriority="high" width="2172" height="724" />
-      <div className="banner-shade" />
-      <div className="banner-collage-inner container"><div className="banner-manifesto"><p className="eyebrow">NÀNG GỐM / A LITTLE SLOW, A LITTLE SOUL</p><h1 id="hero-title">Nhẹ một nhịp.<br /><em>Thương nhà</em><br /><span>thêm chút nữa.</span></h1><p>Gom chút nắng. Chọn chút gốm.<br />Giữ lại những điều khiến mình thấy vui.</p><Link className="button primary" to="/products?sale=1">Ghé góc ưu đãi <Icon name="arrow" /></Link><span className="banner-smallprint">Ưu đãi & sản phẩm minh họa</span></div>
-        <div className="banner-collage-art"><span className="banner-handwritten">a little joy, everyday.</span><Link className="banner-sale-note" to="/products?sale=1"><small>THÊM GỐM, THÊM VUI</small><span>đến <strong>−{maxDiscount}%</strong></span><small>ƯU ĐÃI MINH HỌA ↗</small></Link><button className="banner-product-note" onClick={() => actions.onShow(products[0])}><img src={products[0].image} alt="Cốc Sương Mai men xanh" width="1254" height="1254" /><span><small>MỘT CHÚT XANH, MỘT NGÀY LÀNH</small><strong>Cốc Sương Mai</strong><span>Ghé xem món gốm <Icon name="arrow" /></span></span></button><span className="banner-spark" aria-hidden="true">✳</span></div>
-      </div>
-      <div className="banner-ticker" aria-hidden="true"><span>GỐM XINH</span><i>✧</i><span>NHÀ THƯƠNG</span><i>✧</i><span>NGÀY THẢNH THƠI</span><i>✧</i><span>GỐM XINH</span><i>✧</i><span>NHÀ THƯƠNG</span></div>
+      <img className="calm-hero-image" src="/images/nang-gom/banner-calm.jpg" alt="Bát xanh, hai cốc gốm và bình hoa trên kệ đá trong ánh nắng dịu" fetchPriority="high" width="2172" height="724" />
+      <div className="calm-hero-content container"><h1 id="hero-title">Bình yên, <em>ở ngay đây.</em></h1><p>Một chút gốm mộc, cho những ngày mình muốn chậm lại.</p><Link className="calm-hero-link" to="/products">Khám phá gốm của Nàng <Icon name="arrow" /></Link></div>
     </section>
 
     <section className="welcome-section container" aria-labelledby="welcome-title">
@@ -62,6 +58,7 @@ export default function HomePage(actions: ProductActions) {
 
     <section id="journal" className="journal-section container" aria-labelledby="journal-title"><div className="section-heading"><div><p className="eyebrow">NHẬT KÝ NHÀ NÀNG</p><h2 id="journal-title">Chuyện gốm.<br /><em>Chuyện mình.</em></h2></div><Link className="text-link" to="/stories">Đọc những câu chuyện <Icon name="arrow" /></Link></div><StoryCards variant="editorial" /></section>
 
-    <section className="nang-invitation" aria-labelledby="invitation-title"><div className="container invitation-inner"><span className="invitation-flower" aria-hidden="true">✳</span><p className="eyebrow">MÌNH KHÔNG CẦN THÊM QUÁ NHIỀU</p><h2 id="invitation-title">Chỉ cần vài điều<br /><em>thật sự muốn giữ lại.</em></h2><p>Một món gốm hợp ý. Một góc nhà ấm.<br />Và những ngày bình thường cũng đáng để nâng niu.</p><Link className="button primary" to="/products">Tìm món gốm của bạn <Icon name="arrow" /></Link><span className="invitation-signature">Nàng Gốm</span></div></section>
+    <section className="nang-invitation" aria-labelledby="invitation-title"><div className="container invitation-note"><div className="invitation-still"><img src="/images/slow-living/vase.jpg" alt="Bình gốm đất nung với vài nhành hoa khô" loading="lazy" width="1254" height="1254" /><span>một chút mộc.</span></div><div className="invitation-note-title"><h2 id="invitation-title">Một món gốm nhỏ.<br /><em>Một niềm vui ở lại.</em></h2></div><div className="invitation-note-action"><p>Chọn điều mình thật sự yêu.<br />Để mỗi lần trở về,<br />nhà lại có thêm một chút thương.</p><Link to="/products">Tìm món gốm của bạn <span><Icon name="arrow" /></span></Link></div></div></section>
+
   </>
 }
