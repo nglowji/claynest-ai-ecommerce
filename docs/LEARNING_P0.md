@@ -44,3 +44,9 @@ P0 đáp ứng nền tảng kiến trúc và một phần NFR-02 (health/readine
 Giữ quy tắc bỏ qua Markdown cục bộ, chỉ thêm ngoại lệ cho tài liệu học P0. Dùng Vite/CSS thuần cho shell. Không dùng API trả phí.
 
 Tham khảo: [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/), [Vite](https://vite.dev/guide/).
+
+## Kết quả thực hành và giới hạn môi trường
+
+Backend có thêm Dockerfile và service `api` trong profile `app` vì Windows Application Control chặn extension native của SQLAlchemy trong môi trường Python trực tiếp. Đây là cách chạy cùng code trên Linux container, không thay đổi chính sách Windows. Dependencies Docker được khóa bằng `requirements.lock` xuất từ `uv.lock`.
+
+Đã chạy 4 test đạt trong container; có 1 cảnh báo deprecation từ Starlette/httpx. Đã build frontend thành công và kiểm tra HTTP frontend/API. Đã thử dừng PostgreSQL: liveness 200, readiness 503; khôi phục: readiness 200. pgvector 0.8.7 đã được xác nhận bằng SQL. Chưa kiểm tra giao diện trực quan do công cụ browser lỗi khởi tạo.

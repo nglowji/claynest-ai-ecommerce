@@ -94,3 +94,17 @@ Tài liệu đặc tả Markdown cục bộ tiếp tục được Git bỏ qua t
 ## Lộ trình
 
 P1 catalog và auth → P2 đơn hàng/tồn kho → P3 storefront/admin → P4 AI tools → P5 RAG → P6 analytics → P7 bảo mật, đánh giá và đóng gói.
+
+## Kết quả xác minh P0 — 17/11/2026
+
+- `npm.cmd run build`: TypeScript và Vite build thành công.
+- `docker compose --profile app up -d --build --wait`: database và API healthy.
+- `docker compose exec -T api pytest -q`: 4 passed; 1 cảnh báo thư viện Starlette về TestClient dùng httpx.
+- HTTP thực tế: frontend, `/health`, `/ready` đều 200.
+- Khi dừng database: `/health` 200, `/ready` 503. Khôi phục database: `/ready` 200.
+- SQL xác nhận extension `vector` phiên bản 0.8.7.
+- `docker compose config --quiet` và `git diff --check`: đạt.
+- Python trực tiếp trên Windows bị Application Control chặn extension native SQLAlchemy; đã kiểm tra backend thành công trong Docker Linux. Dùng cách chạy Docker ở trên trên máy này.
+- Chưa xác minh hiển thị trực quan bằng trình duyệt do công cụ browser không khởi tạo được.
+
+Docker cài dependencies từ `backend/requirements.lock` được xuất từ `uv.lock` với hash. Sau khi thay dependencies, tạo lại bằng `uv export --frozen --extra dev --no-emit-project --no-dev --output-file requirements.lock` trong thư mục backend.
