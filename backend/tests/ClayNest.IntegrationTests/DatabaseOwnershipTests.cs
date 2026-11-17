@@ -29,7 +29,9 @@ public sealed class DatabaseOwnershipTests
     public async Task Ai_role_cannot_create_commerce_table()
     {
         await using var ai = NpgsqlDataSource.Create(Environment.GetEnvironmentVariable("TEST_AI_CONNECTION")!);
-        await using var command = ai.CreateCommand("CREATE TABLE commerce.__forbidden_probe (id integer)");
+        await using var connection = await ai.OpenConnectionAsync();
+        await using var transaction = await connection.BeginTransactionAsync();
+        await using var command = new NpgsqlCommand("CREATE TABLE commerce.__forbidden_probe (id integer)", connection, transaction);
         var failure = await Assert.ThrowsAsync<PostgresException>(() => command.ExecuteNonQueryAsync());
         Assert.Equal(PostgresErrorCodes.InsufficientPrivilege, failure.SqlState);
     }
@@ -38,7 +40,9 @@ public sealed class DatabaseOwnershipTests
     public async Task Commerce_role_cannot_create_ai_table()
     {
         await using var commerce = NpgsqlDataSource.Create(Environment.GetEnvironmentVariable("TEST_COMMERCE_CONNECTION")!);
-        await using var command = commerce.CreateCommand("CREATE TABLE ai.__forbidden_probe (id integer)");
+        await using var connection = await commerce.OpenConnectionAsync();
+        await using var transaction = await connection.BeginTransactionAsync();
+        await using var command = new NpgsqlCommand("CREATE TABLE ai.__forbidden_probe (id integer)", connection, transaction);
         var failure = await Assert.ThrowsAsync<PostgresException>(() => command.ExecuteNonQueryAsync());
         Assert.Equal(PostgresErrorCodes.InsufficientPrivilege, failure.SqlState);
     }

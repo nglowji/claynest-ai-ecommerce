@@ -14,7 +14,7 @@ public sealed class OperationalTests
     {
         await using var factory = new ApiFactory();
         using var client = factory.CreateClient();
-        using var response = await client.GetAsync(path, TestContextCancellation.Token);
+        using var response = await client.GetAsync(path, CancellationToken.None);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(expected, (await response.Content.ReadFromJsonAsync<OperationalEndpoints.HealthResponse>())?.Status);
         Assert.True(Guid.TryParse(response.Headers.GetValues("X-Correlation-ID").Single(), out _));
@@ -25,10 +25,10 @@ public sealed class OperationalTests
     {
         await using var factory = new ApiFactory(ready: false);
         using var client = factory.CreateClient();
-        using var ready = await client.GetAsync("/ready", TestContextCancellation.Token);
+        using var ready = await client.GetAsync("/ready", CancellationToken.None);
         Assert.Equal(HttpStatusCode.ServiceUnavailable, ready.StatusCode);
         Assert.Equal("unavailable", (await ready.Content.ReadFromJsonAsync<OperationalEndpoints.HealthResponse>())?.Status);
-        using var health = await client.GetAsync("/health", TestContextCancellation.Token);
+        using var health = await client.GetAsync("/health", CancellationToken.None);
         Assert.Equal(HttpStatusCode.OK, health.StatusCode);
     }
 
@@ -37,10 +37,10 @@ public sealed class OperationalTests
     {
         await using var factory = new ApiFactory(fail: true);
         using var client = factory.CreateClient();
-        using var response = await client.GetAsync("/ready", TestContextCancellation.Token);
+        using var response = await client.GetAsync("/ready", CancellationToken.None);
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
-        var content = await response.Content.ReadAsStringAsync(TestContextCancellation.Token);
+        var content = await response.Content.ReadAsStringAsync(CancellationToken.None);
         Assert.DoesNotContain("private-password-sentinel", content);
         using var document = JsonDocument.Parse(content);
         Assert.Equal(response.Headers.GetValues("X-Correlation-ID").Single(), document.RootElement.GetProperty("correlation_id").GetString());
@@ -55,7 +55,7 @@ public sealed class OperationalTests
         using var client = factory.CreateClient();
         using var request = new HttpRequestMessage(HttpMethod.Get, "/health");
         request.Headers.Add("Origin", origin);
-        using var response = await client.SendAsync(request, TestContextCancellation.Token);
+        using var response = await client.SendAsync(request, CancellationToken.None);
         Assert.Equal(allowed, response.Headers.Contains("Access-Control-Allow-Origin"));
     }
 
@@ -67,11 +67,11 @@ public sealed class OperationalTests
         var supplied = Guid.NewGuid();
         using var valid = new HttpRequestMessage(HttpMethod.Get, "/health");
         valid.Headers.Add("X-Correlation-ID", supplied.ToString());
-        using var validResponse = await client.SendAsync(valid, TestContextCancellation.Token);
+        using var validResponse = await client.SendAsync(valid, CancellationToken.None);
         Assert.Equal(supplied.ToString("N"), validResponse.Headers.GetValues("X-Correlation-ID").Single());
         using var invalid = new HttpRequestMessage(HttpMethod.Get, "/health");
         invalid.Headers.Add("X-Correlation-ID", "untrusted-input");
-        using var invalidResponse = await client.SendAsync(invalid, TestContextCancellation.Token);
+        using var invalidResponse = await client.SendAsync(invalid, CancellationToken.None);
         Assert.True(Guid.TryParse(invalidResponse.Headers.GetValues("X-Correlation-ID").Single(), out _));
     }
 
@@ -80,12 +80,8 @@ public sealed class OperationalTests
     {
         await using var factory = new ApiFactory();
         using var client = factory.CreateClient();
-        using var response = await client.PostAsJsonAsync("/api/v1/orders", new { }, TestContextCancellation.Token);
+        using var response = await client.PostAsJsonAsync("/api/v1/orders", new { }, CancellationToken.None);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }
 
-internal static class TestContextCancellation
-{
-    public static CancellationToken Token => CancellationToken.None;
-}

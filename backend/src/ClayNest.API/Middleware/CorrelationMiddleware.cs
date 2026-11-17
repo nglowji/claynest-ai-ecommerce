@@ -9,8 +9,12 @@ public sealed partial class CorrelationMiddleware(RequestDelegate next, ILogger<
         var correlationId = Guid.TryParse(context.Request.Headers["X-Correlation-ID"], out var supplied)
             ? supplied.ToString("N") : Guid.NewGuid().ToString("N");
         context.TraceIdentifier = correlationId;
-        context.Response.Headers["X-Correlation-ID"] = correlationId;
-        context.Response.Headers["X-Request-ID"] = correlationId;
+        context.Response.OnStarting(() =>
+        {
+            context.Response.Headers["X-Correlation-ID"] = correlationId;
+            context.Response.Headers["X-Request-ID"] = correlationId;
+            return Task.CompletedTask;
+        });
         var started = Stopwatch.GetTimestamp();
         using var scope = logger.BeginScope(new Dictionary<string, object> { ["CorrelationId"] = correlationId });
         try

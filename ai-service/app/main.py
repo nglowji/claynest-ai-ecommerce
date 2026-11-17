@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-import logging
 from uuid import UUID, uuid4
 
 from fastapi import FastAPI, Request
@@ -8,9 +7,10 @@ from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.config import Settings
+from app.core.logging import application_logger
 from app.db.session import build_engine, check_database
 
-logger = logging.getLogger("claynest.ai")
+logger = application_logger()
 
 
 class HealthResponse(BaseModel):
@@ -39,8 +39,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             response = await call_next(request)
         except Exception as error:
             # Log the exception type, never raw messages/connection strings or request payloads.
-            logger.error("AI request failed: type=%s correlation_id=%s", type(error).__name__, correlation_id)
+            logger.error("request_failed", extra={"exception_type": type(error).__name__, "correlation_id": correlation_id})
             response = JSONResponse(status_code=500, content={"detail": "Service unavailable", "correlation_id": correlation_id})
+        logger.info("http_request", extra={"correlation_id": correlation_id, "method": request.method, "path": request.url.path, "status_code": response.status_code})
         response.headers["X-Correlation-ID"] = correlation_id
         response.headers["X-Request-ID"] = correlation_id
         return response
