@@ -4,7 +4,7 @@ Website bán gốm thủ công với trợ lý mua sắm AI, RAG và báo cáo k
 
 ## Trạng thái
 
-P0: khung FastAPI + React/TypeScript, PostgreSQL/pgvector, cấu hình và kiểm thử vận hành. Chưa có catalog, đặt hàng, đăng nhập, AI hay dữ liệu mẫu. Không cần API key hoặc dịch vụ trả phí.
+Backend ở P0: FastAPI, PostgreSQL/pgvector, cấu hình và kiểm thử vận hành. Frontend đã có trang chủ cửa hàng gốm với dữ liệu minh họa, chưa nối nghiệp vụ backend. Chưa có đặt hàng, đăng nhập hay AI. Không cần API key hoặc dịch vụ trả phí.
 
 ## Yêu cầu
 
@@ -56,7 +56,7 @@ npm.cmd run dev
 - Liveness: http://127.0.0.1:8000/health → `200 {"status":"ok"}` (không phụ thuộc database).
 - Readiness: http://127.0.0.1:8000/ready → `200 {"status":"ready"}` khi `SELECT 1` thành công; `503 {"status":"unavailable"}` khi database lỗi. Endpoint này chưa kiểm tra schema nghiệp vụ.
 
-Frontend đọc biến `VITE_API_BASE_URL` từ `.env` ở gốc, giới hạn chờ API 5 giây và có nút thử lại. Chỉ đặt cấu hình công khai vào `VITE_*`; những giá trị này có thể được đưa vào bundle trình duyệt. Khởi động lại Vite khi sửa `.env`. API chỉ cho phép CORS từ hai origin local đã cấu hình.
+Trang chủ hiện chạy độc lập với backend. Vite đọc cấu hình công khai từ `.env` ở gốc; `VITE_API_BASE_URL` dành cho tích hợp API sau này. Chỉ đặt cấu hình công khai vào `VITE_*`; những giá trị này có thể được đưa vào bundle trình duyệt. Khởi động lại Vite khi sửa `.env`. API chỉ cho phép CORS từ hai origin local đã cấu hình.
 
 ## Kiểm tra
 
@@ -83,7 +83,7 @@ backend/app/db/           engine và kiểm tra kết nối
 backend/app/modules/      các package nghiệp vụ rỗng cho giai đoạn sau
 backend/tests/            smoke test và lỗi vận hành
 backend/db-init/          khởi tạo extension pgvector
-frontend/src/            React shell, kết nối health và CSS responsive
+frontend/src/            trang chủ, danh mục demo, xem nhanh, giỏ minh họa
 docs/LEARNING_P0.md       giải thích kiến trúc và đối chiếu ASP.NET Core
 ```
 
@@ -108,3 +108,17 @@ P1 catalog và auth → P2 đơn hàng/tồn kho → P3 storefront/admin → P4 
 - Chưa xác minh hiển thị trực quan bằng trình duyệt do công cụ browser không khởi tạo được.
 
 Docker cài dependencies từ `backend/requirements.lock` được xuất từ `uv.lock` với hash. Sau khi thay dependencies, tạo lại bằng `uv export --frozen --extra dev --no-emit-project --no-dev --output-file requirements.lock` trong thư mục backend.
+
+## Giao diện trang chủ cửa hàng gốm
+
+Trang chủ tiếng Việt với tông kem/nâu đất, ảnh gốm lưu cục bộ, bố cục cho điện thoại và máy tính. Chạy `npm.cmd run dev` trong `frontend`, mở http://127.0.0.1:5173. Không cần backend để xem giao diện.
+
+Có lọc danh mục, tìm kiếm không phân biệt dấu, xem nhanh bằng dialog, thêm/xóa/đổi số lượng trong giỏ minh họa và menu điện thoại. Giỏ tồn tại trong bộ nhớ trang và đặt lại khi tải lại; không tạo đơn hay giữ hàng. Tên và giá là dữ liệu hư cấu, được ghi rõ trên giao diện. Nguồn ảnh trong `frontend/public/images/README.md`.
+
+Đã kiểm tra TypeScript và Vite production build. Chưa kiểm tra trực quan/tương tác bằng browser vì công cụ trình duyệt lỗi khởi tạo trên máy hiện tại. Phông Google Fonts có font dự phòng khi không có mạng. Backend P1 tạm hoãn để ưu tiên giao diện theo yêu cầu.
+
+### Thiết kế Slow Living
+
+Giao diện được nâng cấp với bảng màu ngà/olive, ảnh riêng cho từng loại sản phẩm, hero mới, các lối chọn theo góc sống, bộ sưu tập Slow Sunday và câu chuyện tạo hình gốm. Có lưu/bỏ lưu yêu thích trong phiên xem, menu mobile, animation nhẹ và hỗ trợ giảm chuyển động.
+
+Bộ 7 ảnh mới tạo bằng công cụ image_gen được lưu tại `frontend/public/images/slow-living/`; prompt tại `prompts.json` trong cùng thư mục. Đây là ảnh AI minh họa, không phải ảnh hàng hoặc xưởng thật. Mỗi sản phẩm có một ảnh khác nhau và nội dung khớp chủ thể ảnh. Ảnh JPEG được tối ưu; tổng bộ ảnh khoảng 1,9 MB.
