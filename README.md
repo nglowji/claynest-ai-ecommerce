@@ -24,6 +24,17 @@ docker compose up -d --wait
 
 `.env.example` chỉ chứa mật khẩu demo cục bộ. Nếu thay tài khoản/cổng/mật khẩu PostgreSQL, cập nhật cả `DATABASE_URL`. Mật khẩu có ký tự đặc biệt phải URL-encode trong URL. PostgreSQL chỉ mở cổng loopback. Script `backend/db-init/001-vector.sql` kích hoạt extension khi khởi tạo volume mới. Thay POSTGRES_* không đổi tài khoản trong volume đã tồn tại.
 
+### Backend qua Docker (hỗ trợ máy Windows chặn thư viện native)
+
+```powershell
+docker compose --profile app up -d --build --wait
+docker compose run --rm --no-deps api pytest -q
+```
+
+Sau đó chạy frontend như dưới đây. Không chạy backend Python đồng thời trên cổng 8000.
+
+### Backend Python trực tiếp
+
 Terminal backend:
 
 ```powershell
