@@ -6,16 +6,15 @@ export type Product = {
   price: number
   image: string
   imageClass?: string
-  badge: string
   note: string
   description: string
 }
 export const categories: Category[] = ['Tất cả', 'Cốc & tách', 'Bình hoa', 'Bát & đĩa', 'Bộ sưu tập']
 export const products: Product[] = [
-  { id: 1, name: 'Cốc Sương Mai', category: 'Cốc & tách', price: 280000, image: '/images/slow-living/cup.jpg', badge: 'Một sáng dịu dàng', note: 'Xanh sage · Dáng tròn', description: 'Một chiếc cốc xanh dịu với quai tròn và bề mặt men chấm nhẹ. Gợi nhớ tách cà phê ấm trong một buổi sáng không vội.' },
-  { id: 2, name: 'Bình Nắng Nhẹ', category: 'Bình hoa', price: 420000, image: '/images/slow-living/vase.jpg', badge: 'Cho góc nhà xinh', note: 'Đất nung · Dáng bầu', description: 'Sắc đất ấm, một vệt xanh ngẫu hứng và dáng bình mềm mại. Chỉ cần thêm vài cành hoa khô, góc nhà đã có một câu chuyện riêng.' },
-  { id: 3, name: 'Bát Mây Ngà', category: 'Bát & đĩa', price: 240000, image: '/images/slow-living/bowl.jpg', badge: 'Vẻ đẹp giản dị', note: 'Men ngà · Viền tự nhiên', description: 'Chiếc bát nông màu ngà, viền hơi lượn và những chấm men nâu nhỏ. Một gợi ý nhẹ nhàng cho chiếc bàn bạn yêu.' },
-  { id: 4, name: 'Bộ trà Thảnh Thơi', category: 'Bộ sưu tập', price: 790000, image: '/images/slow-living/tea.jpg', badge: 'Gửi một lời thương', note: 'Một ấm & hai tách · Men kem', description: 'Một ấm tròn có quai tre và hai tách nhỏ trên khay gỗ. Gợi ý cho những buổi chuyện trò chậm rãi hoặc một lời quan tâm gửi người thân.' },
+  { id: 1, name: 'Cốc Sương Mai', category: 'Cốc & tách', price: 280000, image: '/images/slow-living/cup.jpg', note: 'Xanh sage · Dáng tròn', description: 'Một chiếc cốc xanh dịu với quai tròn và bề mặt men chấm nhẹ. Gợi nhớ tách cà phê ấm trong một buổi sáng không vội.' },
+  { id: 2, name: 'Bình Nắng Nhẹ', category: 'Bình hoa', price: 420000, image: '/images/slow-living/vase.jpg', note: 'Đất nung · Dáng bầu', description: 'Sắc đất ấm, một vệt xanh ngẫu hứng và dáng bình mềm mại. Chỉ cần thêm vài cành hoa khô, góc nhà đã có một câu chuyện riêng.' },
+  { id: 3, name: 'Bát Mây Ngà', category: 'Bát & đĩa', price: 240000, image: '/images/slow-living/bowl.jpg', note: 'Men ngà · Viền tự nhiên', description: 'Chiếc bát nông màu ngà, viền hơi lượn và những chấm men nâu nhỏ. Một gợi ý nhẹ nhàng cho chiếc bàn bạn yêu.' },
+  { id: 4, name: 'Bộ trà Thảnh Thơi', category: 'Bộ sưu tập', price: 790000, image: '/images/slow-living/tea.jpg', note: 'Một ấm & hai tách · Men kem', description: 'Một ấm tròn có quai tre và hai tách nhỏ trên khay gỗ. Gợi ý cho những buổi chuyện trò chậm rãi hoặc một lời quan tâm gửi người thân.' },
 ]
 
 export const money = (value: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
