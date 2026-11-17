@@ -2,7 +2,21 @@ import { Link, useParams } from 'react-router-dom'
 import Icon from './Icon'
 import { stories } from '../data/stories'
 
-export function StoryCards() {
+export function StoryCards({ variant = 'grid' }: { variant?: 'grid' | 'editorial' }) {
+  if (variant === 'editorial') {
+    const [featured, ...others] = stories
+    if (!featured) return null
+    return <div className="journal-editorial">
+      <article className="journal-feature">
+        <Link to={`/stories/${featured.slug}`} className="journal-editorial-image journal-feature-image"><img src={featured.image} alt={featured.alt} loading="lazy" width="1536" height="1024" /><span className="journal-photo-caption">MỘT KHOẢNG NGHỈ TRONG NGÀY</span></Link>
+        <div className="journal-feature-copy"><p className="eyebrow">{featured.category}</p><h3><Link to={`/stories/${featured.slug}`}>{featured.title}</Link></h3><p>{featured.excerpt}</p><Link className="text-link" to={`/stories/${featured.slug}`}>Mở một trang chuyện <Icon name="arrow" /></Link></div>
+      </article>
+      <div className="journal-side-stories"><p className="journal-side-note">Có những câu chuyện chỉ cần một góc nhỏ.</p>{others.map((story, index) => <article className="journal-compact-story" key={story.slug}>
+        <Link to={`/stories/${story.slug}`} className="journal-editorial-image journal-thumb"><img src={story.image} alt={story.alt} loading="lazy" width="1536" height="1024" /></Link>
+        <div><p className="eyebrow"><span>{String(index + 2).padStart(2, '0')}</span> / {story.category}</p><h3><Link to={`/stories/${story.slug}`}>{story.title}</Link></h3><p className="journal-compact-excerpt">{story.excerpt}</p><Link className="journal-read-link" to={`/stories/${story.slug}`}>Đọc tiếp <Icon name="arrow" /></Link></div>
+      </article>)}</div>
+    </div>
+  }
   return <div className="journal-grid">{stories.map(story => <article className="journal-card" key={story.slug}>
     <Link to={`/stories/${story.slug}`} className="journal-image"><img src={story.image} alt={story.alt} loading="lazy" width="1536" height="1024" /></Link>
     <p className="eyebrow">{story.category}</p><h3><Link to={`/stories/${story.slug}`}>{story.title}</Link></h3><p>{story.excerpt}</p><Link className="text-link" to={`/stories/${story.slug}`}>Đọc câu chuyện <Icon name="arrow" /></Link>
