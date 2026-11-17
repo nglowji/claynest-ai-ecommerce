@@ -1,14 +1,16 @@
 from contextlib import asynccontextmanager
-from uuid import uuid4
+import logging
+from uuid import UUID, uuid4
 
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.config import Settings
 from app.db.session import build_engine, check_database
+
+logger = logging.getLogger("claynest.ai")
 
 
 class HealthResponse(BaseModel):
@@ -24,19 +26,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         yield
         engine.dispose()
 
-    app = FastAPI(title=config.app_name, version="0.1.0", lifespan=lifespan)
+    app = FastAPI(title=config.app_name, version="0.2.0", lifespan=lifespan)
     app.state.engine = engine
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=config.cors_origins,
-        allow_methods=["GET"],
-        allow_headers=["Content-Type"],
-    )
 
     @app.middleware("http")
-    async def request_id(request: Request, call_next):
-        response = await call_next(request)
-        response.headers["X-Request-ID"] = str(uuid4())
+    async def correlation(request: Request, call_next):
+        try:
+            correlation_id = UUID(request.headers.get("X-Correlation-ID", "")).hex
+        except ValueError:
+            correlation_id = uuid4().hex
+        try:
+            response = await call_next(request)
+        except Exception as error:
+            # Log the exception type, never raw messages/connection strings or request payloads.
+            logger.error("AI request failed: type=%s correlation_id=%s", type(error).__name__, correlation_id)
+            response = JSONResponse(status_code=500, content={"detail": "Service unavailable", "correlation_id": correlation_id})
+        response.headers["X-Correlation-ID"] = correlation_id
+        response.headers["X-Request-ID"] = correlation_id
         return response
 
     @app.get("/health", response_model=HealthResponse, tags=["operations"])
