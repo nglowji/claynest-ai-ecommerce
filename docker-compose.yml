@@ -51,6 +51,11 @@ services:
     depends_on:
       db-bootstrap:
         condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--max-time", "5", "http://localhost:8080/ready"]
+      interval: 10s
+      timeout: 6s
+      retries: 5
     restart: unless-stopped
 
   ai-service:

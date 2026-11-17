@@ -43,8 +43,8 @@ wheels = [
 ]
 
 [[package]]
-name = "claynest-api"
-version = "0.1.0"
+name = "claynest-ai-service"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
