@@ -1083,3 +1083,9 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .catalog-table th,.catalog-table td { padding: 17px 12px; border-bottom: 1px solid #e4e8dc; }
 .catalog-table td button { margin-right: 12px; text-decoration: underline; }
 @media(max-width: 700px) { .catalog-filter-fields,.editor-fields { grid-template-columns: 1fr 1fr; } .image-editor { grid-template-columns: 60px 1fr; } .catalog-editor,.category-editor,.admin-list-section { padding: 18px; } .editor-heading { flex-wrap: wrap; } .product-page .product-detail { grid-template-columns: 1fr; } .product-page h1 { font-size: 33px; } .admin-topbar nav { flex-wrap: wrap; } }
+
+.source-product .product-image-button img { object-fit: contain; padding: 8px; background: #f7f5ef; }
+.source-detail .product-gallery>img { object-fit: contain; background: #f7f5ef; }
+.price-unit { font-size: .65em; font-weight: 400; color: #7b8271; }
+
+.product-page h1 { white-space: normal; overflow-wrap: break-word; }

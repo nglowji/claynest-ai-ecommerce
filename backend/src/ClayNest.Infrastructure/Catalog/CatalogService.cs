@@ -148,41 +148,82 @@ public sealed class CatalogService(CommerceDbContext db) : ICatalogService
         return new(p.Id, p.CategoryId, p.Category.Name, p.Name, p.Slug, p.Description, p.CraftStory, p.Material,
             p.HandmadeNote, p.Label, p.Published, p.Archived, p.IsDemo, p.Revision, p.UpdatedAt, variants,
             p.Images.Where(i => admin || i.VariantId is null || variants.Any(v => v.Id == i.VariantId))
-                .OrderBy(i => i.SortOrder).ThenBy(i => i.Id).Select(i => new ImageDto(i.Id, i.Url, i.Alt, i.SortOrder, i.VariantId)).ToList());
+                .OrderBy(i => i.SortOrder).ThenBy(i => i.Id).Select(i => new ImageDto(i.Id, i.Url, i.Alt, i.SortOrder, i.VariantId)).ToList(), p.SourceUrl, p.SourceName, p.SourceDimensions, p.SourceAvailability, p.PriceUnit);
     }
 
     public async Task SeedAsync(CancellationToken ct)
     {
-        var categories = new[] { ("Cốc & tách", "coc-tach"), ("Bình hoa", "binh-hoa"), ("Bát & đĩa", "bat-dia"), ("Bộ sưu tập", "bo-suu-tap") };
-        foreach (var (name, slug) in categories)
-            if (!await db.Categories.AnyAsync(c => c.Slug == slug, ct)) db.Categories.Add(new Category(name, slug, true));
+        var entries = CatalogContent.Load();
+        foreach (var entry in entries.DistinctBy(e => e.CategorySlug))
+            if (!await db.Categories.AnyAsync(c => c.Slug == entry.CategorySlug, ct)) db.Categories.Add(new Category(entry.CategoryName, entry.CategorySlug, true));
         await SaveAsync(ct);
-        var data = new[] {
-            ("Cốc Sương Mai", "coc-suong-mai", "coc-tach", "NG-CUP-001", 280000L, (long?)350000L, "cup", "Xanh sage", "Cốc uống nước", "HOT SALE"),
-            ("Bình Nắng Nhẹ", "binh-nang-nhe", "binh-hoa", "NG-VASE-001", 420000L, (long?)560000L, "vase", "Đất nung", "Cắm hoa", "NÀNG CHỌN"),
-            ("Bát Mây Ngà", "bat-may-nga", "bat-dia", "NG-BOWL-001", 240000L, (long?)null, "bowl", "Men ngà", "Trang trí bàn", "MỚI"),
-            ("Bộ trà Thảnh Thơi", "bo-tra-thanh-thoi", "bo-suu-tap", "NG-TEA-001", 790000L, (long?)1000000L, "tea", "Men kem", "Quà tặng", "HOT SALE") };
-        foreach (var (name, slug, categorySlug, sku, price, original, image, glaze, use, label) in data)
+        foreach (var entry in entries)
         {
-            if (await db.Products.AnyAsync(p => p.Slug == slug, ct)) continue;
-            var category = await db.Categories.SingleAsync(c => c.Slug == categorySlug, ct);
-            var product = new Product(isDemo: true);
-            product.Update(category.Id, name, slug, "Một món gốm mang sắc màu mộc mạc, dành cho góc nhà bình yên. Dữ liệu DEMO, ảnh AI minh họa.",
-                "Câu chuyện minh họa về những điều giản dị trong nhà.", "Gốm thủ công (minh họa)", "Màu men và kích thước có thể khác giữa các sản phẩm thủ công.", label, true);
+            if (await db.Products.AnyAsync(p => p.Slug == entry.Slug, ct)) continue;
+            var category = await db.Categories.SingleAsync(c => c.Slug == entry.CategorySlug, ct);
+            var product = new Product(isDemo: entry.IsAuthored);
+            product.Update(category.Id, entry.Name, entry.Slug, entry.Description, entry.CraftStory,
+                entry.Material, entry.HandmadeNote, entry.Label, entry.Images.Count > 0);
+            if (!string.IsNullOrEmpty(entry.SourceUrl))
+                product.RecordSource(entry.SourceUrl, entry.SourceName, entry.SourceDimensions, entry.SourceAvailability, entry.PriceUnit);
             var variant = new ProductVariant(product.Id);
-            variant.Update(sku, "Tiêu chuẩn", glaze, use, null, null, null, null, price, original, true, "", "", false);
-            product.Variants.Add(variant); product.Images.Add(new ProductImage(product.Id, $"/images/slow-living/{image}.jpg", name, 0));
+            variant.Update(entry.Sku, entry.VariantName, entry.Glaze, entry.IntendedUse,
+                entry.CapacityMl, entry.WidthCm, entry.HeightCm, entry.WeightG, entry.PriceVnd, entry.OriginalPriceVnd, true, "", "", false);
+            product.Variants.Add(variant);
+            for (var i = 0; i < entry.Images.Count; i++)
+                product.Images.Add(new ProductImage(product.Id, entry.Images[i].Path, entry.Name, i));
             product.ValidatePublication(); db.Products.Add(product);
         }
-        // A deliberately hidden, inactive example exercises publication boundaries.
-        if (!await db.Products.AnyAsync(p => p.Slug == "ban-nhap-demo", ct))
+        await SaveAsync(ct);
+    }
+
+    public async Task RemoveSourceImagesAsync(CancellationToken ct)
+    {
+        var products = await db.Products.Include(p => p.Images).Include(p => p.Variants)
+            .Where(p => p.SourceUrl.StartsWith("https://www.bienhoaceramic.com/")
+                || p.SourceUrl.StartsWith("https://bienhoaceramic.com/")
+                || p.Images.Any(i => i.Url.StartsWith("/images/catalog/"))).ToListAsync(ct);
+        foreach (var product in products)
         {
-            var category = await db.Categories.SingleAsync(c => c.Slug == "coc-tach", ct);
-            var hidden = new Product(isDemo: true);
-            hidden.Update(category.Id, "Bản nháp DEMO", "ban-nhap-demo", "Mẫu chưa xuất bản.", "", "Gốm minh họa", "", "", false);
-            var inactive = new ProductVariant(hidden.Id);
-            inactive.Update("NG-DRAFT-DEMO", "Chưa hoạt động", "", "", null, null, null, null, 100000, null, false, "", "", false);
-            hidden.Variants.Add(inactive); hidden.ValidatePublication(); db.Products.Add(hidden);
+            var removed = product.Images.RemoveAll(i => i.Url.StartsWith("/images/catalog/"));
+            if (product.Published && product.Images.Count == 0)
+                product.Update(product.CategoryId, product.Name, product.Slug, product.Description, product.CraftStory,
+                    product.Material, product.HandmadeNote, product.Label, false);
+            else if (removed > 0) product.Touch();
+            product.ValidatePublication();
+        }
+        await SaveAsync(ct);
+    }
+
+    public async Task RefreshContentAsync(CancellationToken ct)
+    {
+        var retiredCategories = new[] { "do-gia-dung", "den-gom", "tuong-gom", "don-gom", "don-voi" };
+        var categories = await db.Categories.Where(c => retiredCategories.Contains(c.Slug) && c.Active).ToListAsync(ct);
+        foreach (var category in categories)
+            if (!await db.Products.AnyAsync(p => p.CategoryId == category.Id && p.Published && !p.Archived, ct))
+                category.Update(category.Name, category.Slug, false);
+        var legacy = CatalogContent.Legacy().ToDictionary(e => e.Slug);
+        var products = await db.Products.Include(p => p.Variants).Include(p => p.Images)
+            .Where(p => p.IsDemo).ToListAsync(ct);
+        foreach (var product in products)
+        {
+            var starter = product.Description == "Một món gốm mang sắc màu mộc mạc, dành cho góc nhà bình yên. Dữ liệu DEMO, ảnh AI minh họa.";
+            var authored = legacy.TryGetValue(product.Slug, out var entry) && product.Description == entry.Description;
+            if (starter || authored)
+            {
+                // Retire only our exact starter copy; no deletion, no price/stock changes or merchant text overwrite.
+                product.Update(product.CategoryId, product.Name, product.Slug, "Thiết kế đang ngừng trưng bày.", "", "Gốm", product.HandmadeNote, "", false);
+                product.Archive(); product.ValidatePublication();
+            }
+            if (product.Slug == "ban-nhap-demo" && product.Name == "Bản nháp DEMO")
+            {
+                product.Update(product.CategoryId, "Bộ sưu tập sắp ra mắt", "bo-suu-tap-sap-ra-mat", "Những thiết kế đang được hoàn thiện.", "", "Gốm", "", "", false);
+                foreach (var variant in product.Variants)
+                    variant.Update(variant.Sku == "NG-DRAFT-DEMO" ? "NG-PREVIEW-001" : variant.Sku, "Đang hoàn thiện", variant.Glaze, variant.IntendedUse,
+                        variant.CapacityMl, variant.WidthCm, variant.HeightCm, variant.WeightG, variant.PriceVnd, variant.OriginalPriceVnd,
+                        variant.Active, variant.CareNote, variant.CareSource, variant.CareVerified);
+                product.ValidatePublication();
+            }
         }
         await SaveAsync(ct);
     }

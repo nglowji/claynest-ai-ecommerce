@@ -7,4 +7,5 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
+  <ItemGroup><EmbeddedResource Include="Catalog/catalog.json" /><EmbeddedResource Include="Catalog/legacy-content.json" /></ItemGroup>
 </Project>

@@ -41,7 +41,7 @@ export const stories: Story[] = [
     sections: [
       { title: 'Nhớ về người nhận, trước khi chọn món quà', text: 'Người ấy có thích pha trà vào cuối tuần không? Có thường mang một nhành hoa về nhà, hay luôn tìm một chiếc cốc vừa tay? Bắt đầu từ những điều như thế sẽ giúp mình chọn món đồ có cơ hội trở thành một phần trong cuộc sống của họ, thay vì chỉ là một vật trang trí đẹp trong ngày nhận quà.' },
       { title: 'Chọn vừa đủ, và để lại một lời riêng', text: 'Một chiếc cốc có thể là món quà tự dành cho bản thân. Một cặp tách gợi một cuộc hẹn ngồi lại. Một chiếc bình nhỏ có thể mang theo lời chúc cho một ngôi nhà mới. Thêm vài dòng viết tay: vì sao mình nhớ đến người ấy khi nhìn thấy món gốm này. Những lời thật thường không cần dài.' },
-      { title: 'Nâng niu cả hành trình đến tay người nhận', text: 'Gốm cần được bảo vệ phù hợp trong quá trình vận chuyển. Khi chọn mua, hãy hỏi rõ cách đóng gói, điều kiện giao nhận và cách xử lý khi hàng gặp vấn đề, thay vì tự suy đoán từ ảnh hộp quà. Trong bản giới thiệu này, hình ảnh và cách gói chỉ là cảm hứng minh họa; chưa phải cam kết dịch vụ của cửa hàng.' },
+      { title: 'Nâng niu cả hành trình đến tay người nhận', text: 'Gốm cần được bảo vệ phù hợp trong quá trình vận chuyển. Khi chọn mua, hãy hỏi rõ cách đóng gói, điều kiện giao nhận và cách xử lý khi hàng gặp vấn đề, thay vì tự suy đoán từ ảnh hộp quà.' },
     ], productCategory: 'Bộ sưu tập',
   },
 ]

@@ -1,0 +1,216 @@
+{
+  "tool": "built-in image_gen",
+  "created": "2026-11-18",
+  "assets": [
+    {
+      "key": "coc-suong-mai",
+      "file": "coc-suong-mai.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One handmade rounded sage green ceramic coffee mug with one generous C-shaped handle, fine brown speckles and a narrow exposed natural clay foot. Empty mug, no beverage. Design proportions: primary object approximately 9.5 cm high and 8.5 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/coc-suong-mai.png",
+      "sha256": "c3a018095e52ccc1e0c8a38b0a098b7e08a7c4623e8004805d1ecd8d6721b283"
+    },
+    {
+      "key": "coc-nau-mat",
+      "file": "coc-nau-mat.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One squat round-bellied honey brown stoneware coffee mug, one thick rounded handle, glossy caramel reactive glaze, small exposed clay foot. Empty. Design proportions: primary object approximately 8.5 cm high and 9 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/coc-nau-mat.png",
+      "sha256": "17a47a27658afdfa4458f14ffe5b86fed9b4eb72971b2e86953853123a4ae7cf"
+    },
+    {
+      "key": "coc-troi-lam",
+      "file": "coc-troi-lam.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One tall blue-gray ceramic mug with a long slim loop handle, deep ocean blue glaze flowing subtly into blue-gray and a sandy clay base. Empty. Design proportions: primary object approximately 11 cm high and 8.5 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/coc-troi-lam.png",
+      "sha256": "feb624f20b5ea10894578f6e825f4bdb395e34dff9eed377968d6cafb9b96130"
+    },
+    {
+      "key": "coc-kem-may",
+      "file": "coc-kem-may.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One warm ivory ceramic mug with soft vertical fluting, broad rounded body, slightly flared lip and one round handle, matte cream glaze. Empty. Design proportions: primary object approximately 9 cm high and 10 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/coc-kem-may.png",
+      "sha256": "57c1fc0016a0f9153aa1f98e7132868c994609c3d995d3d3a65e9809eeccf34a"
+    },
+    {
+      "key": "tach-binh-minh",
+      "file": "tach-binh-minh.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: Exactly one petite peach-pink ceramic espresso teacup with a delicate handle sitting on one matching scalloped saucer. Two pieces total. Empty cup. Design proportions: primary object approximately 6.5 cm high and 9 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/tach-binh-minh.png",
+      "sha256": "17335b212dbc447eae611583d8e71382871398e3c6d8c23e033a16751b0e865f"
+    },
+    {
+      "key": "ly-gio-nui",
+      "file": "ly-gio-nui.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One handleless slender cylindrical handmade ceramic tumbler, muted dark teal jade matte glaze, small unglazed brown foot, simple refined silhouette. Empty. Design proportions: primary object approximately 9 cm high and 7.5 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/ly-gio-nui.png",
+      "sha256": "470475d5ed101d67dfa064a4c0d3ca64851536d6bd82845c4a6111a136d08f84"
+    },
+    {
+      "key": "binh-nang-nhe",
+      "file": "binh-nang-nhe.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One warm earthy terracotta ceramic vase with a rounded pear-shaped body and a narrow small neck, subtle thin amber glaze and natural clay texture. Vase empty, no flowers. Design proportions: primary object approximately 22 cm high and 17 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/binh-nang-nhe.png",
+      "sha256": "4bd13392b2f44e6dd1ca028aed98f46b1cc6ddfe96194bc461c480e75ddee969"
+    },
+    {
+      "key": "binh-may-trang",
+      "file": "binh-may-trang.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One sculptural asymmetrical warm ivory ceramic vase, narrow neck, taller organic oval body, fine horizontal wheel-thrown lines, matte off-white glaze. Empty. Design proportions: primary object approximately 26 cm high and 14 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/binh-may-trang.png",
+      "sha256": "70c71c39e4e0414654d09ef095d9e8acdf3cd1fe073e2eb41235136a44999a62"
+    },
+    {
+      "key": "binh-reu-xanh",
+      "file": "binh-reu-xanh.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One round globular ceramic vase with short open neck, richly variegated olive and moss green glossy reactive glaze, subtle brown clay showing through near foot. Empty. Design proportions: primary object approximately 18 cm high and 18 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/binh-reu-xanh.png",
+      "sha256": "3af56b8121cc2cfac89553409e167374829a2ab9de77ffd82371e0e3f7378fc7"
+    },
+    {
+      "key": "binh-song-cat",
+      "file": "binh-song-cat.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One tall slender sand-ivory ceramic vase with sculptural flowing vertical ribs and a subtly flared opening, satin oatmeal glaze, elegant column silhouette. Empty. Design proportions: primary object approximately 32 cm high and 12 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/binh-song-cat.png",
+      "sha256": "c687af924e61e9f936fa5d45558d1a6b4408bf823b50bf75aaa8f1b92a49658a"
+    },
+    {
+      "key": "binh-trang-non",
+      "file": "binh-trang-non.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One sculptural crescent-ring ceramic vase in warm ivory satin glaze, asymmetric rounded donut body with a large open center and one small functional opening at the upper end. Empty. Design proportions: primary object approximately 24 cm high and 22 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/binh-trang-non.png",
+      "sha256": "684f327d9670adbd3bb0cd8133c1fca28a7adc19e6d8b8c6a2ca1f28ad50667d"
+    },
+    {
+      "key": "binh-giot-suong",
+      "file": "binh-giot-suong.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One small blue-gray ceramic bud vase, teardrop-shaped body with a very slender short neck, subtle speckled satin glaze, compact delicate silhouette. Empty. Design proportions: primary object approximately 14 cm high and 8 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/binh-giot-suong.png",
+      "sha256": "a1c6c07a830fefa6a32278d73b81befe5fcb303f6327394c7c27dac84588407a"
+    },
+    {
+      "key": "bat-may-nga",
+      "file": "bat-may-nga.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One deep handmade ivory stoneware bowl with tiny brown iron speckles, gently uneven rounded rim, simple small foot, empty interior clearly visible at three-quarter angle. Design proportions: primary object approximately 7 cm high and 16 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/bat-may-nga.png",
+      "sha256": "0c101a5138323543c815e4e54b2f957f58b2bc77e20c0a60793f8a7a43f5ec27"
+    },
+    {
+      "key": "bat-rung-thong",
+      "file": "bat-rung-thong.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One wide forest green ceramic bowl, generous deep curved form, rich glossy pine-green glaze pooling darker inside, subtle terracotta foot, empty. Design proportions: primary object approximately 8 cm high and 20 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/bat-rung-thong.png",
+      "sha256": "b5512f077e6b8f536512dac6ad2fe59cd80247203a85050490e695509898fc8b"
+    },
+    {
+      "key": "dia-song-bien",
+      "file": "dia-song-bien.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One broad shallow handmade ceramic plate, navy and ocean blue center blending into a sandy cream irregular rim, glossy reactive glaze, entire empty plate visible from above at gentle three-quarter angle. Design proportions: primary object approximately 2.5 cm high and 24 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/dia-song-bien.png",
+      "sha256": "b921b0891fef86d4cfac1043d14568d7889d9c271eeea76dc57a56fc31b1379e"
+    },
+    {
+      "key": "dia-canh-hoa",
+      "file": "dia-canh-hoa.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One pale blush pink ceramic plate with a soft six-petal scalloped rim, shallow curved form, delicate satin pink glaze with fine clay texture, empty, no floral decorations or food. Design proportions: primary object approximately 3 cm high and 21 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/dia-canh-hoa.png",
+      "sha256": "440d9cbe1c6fa3f3bddd9c8d5b4105dea0a92cc4c3f210ca8bad41c6be78ef47"
+    },
+    {
+      "key": "khay-bo-cat",
+      "file": "khay-bo-cat.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One elongated oval ceramic tray, about 28 by 14 cm, shallow gently scalloped raised rim, warm oatmeal glaze with tiny brown speckles. Empty tray viewed at three-quarter top angle. Design proportions: primary object approximately 2.5 cm high and 28 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/khay-bo-cat.png",
+      "sha256": "2713eb4aad6c10780f47cd73260b1eca87b4db14695dc122883b23a3ca49db55"
+    },
+    {
+      "key": "dia-moc-tron",
+      "file": "dia-moc-tron.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One large flat round chestnut brown ceramic dinner plate with a low smooth lip, subtle concentric wheel-thrown rings and a natural clay-colored outer edge, satin brown glaze, empty. Design proportions: primary object approximately 2 cm high and 26 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/dia-moc-tron.png",
+      "sha256": "422af3719ea18eea9f397d300c5124c86008de3b83155cf690e259109de93237"
+    },
+    {
+      "key": "bo-tra-thanh-thoi",
+      "file": "bo-tra-thanh-thoi.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: Exactly one rounded ivory speckled ceramic teapot with a curved bamboo top handle and exactly two matching small ceramic teacups. Three ceramic pieces total, no extra tray, all fully visible. Empty cups. Design proportions: primary object approximately 12 cm high and 18 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/bo-tra-thanh-thoi.png",
+      "sha256": "f3b570367b2d2a5ac22218861d58d9f1cf12ed0058f252dd2ef94d37e61fe262"
+    },
+    {
+      "key": "bo-tra-dem-an",
+      "file": "bo-tra-dem-an.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: Exactly one squat charcoal black ceramic teapot with a horizontal wooden side handle, exactly three small matching black tea cups and exactly one round walnut tray underneath. Five pieces total including tray. Design proportions: primary object approximately 13 cm high and 18 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/bo-tra-dem-an.png",
+      "sha256": "e8de9089ca4dfaf81a8cc35fad9da1ea9acf305e58676eed6d47366b77abefea"
+    },
+    {
+      "key": "bo-am-chen-thanh-truc",
+      "file": "bo-am-chen-thanh-truc.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: Exactly one celadon sage green ceramic teapot with ceramic handle, exactly four small matching cups and exactly one matching oval ceramic tray. Six pieces total, refined bamboo-green satin glaze. Design proportions: primary object approximately 13 cm high and 22 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/bo-am-chen-thanh-truc.png",
+      "sha256": "dfa63d11e7a7e013e479f08f29f85f9a9a658ff3e049b2bf18fb68adf625855f"
+    },
+    {
+      "key": "bo-doi-sang-em",
+      "file": "bo-doi-sang-em.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: Exactly two matching rounded ceramic coffee mugs with curved handles side by side: one warm ivory and one muted sage green, subtle fine speckles. Two pieces total, empty. Design proportions: primary object approximately 9 cm high and 8.5 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/bo-doi-sang-em.png",
+      "sha256": "baeaa1e4a9a5809adada239b68e6985fcb942e5db47e27f3cc823fbf289d8474"
+    },
+    {
+      "key": "bo-bat-gia-dinh",
+      "file": "bo-bat-gia-dinh.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: Exactly four small ivory speckled ceramic rice bowls, two neatly stacked and two beside them, four bowls total, no plates or chopsticks, simple rounded rims, empty. Design proportions: primary object approximately 6 cm high and 12 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/bo-bat-gia-dinh.png",
+      "sha256": "82c2e477fab69af75cf7c3c60ea08151567156ef6c705fbec12fd8b89cca3868"
+    },
+    {
+      "key": "bo-ban-an-an-nhien",
+      "file": "bo-ban-an-an-nhien.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: Exactly three coordinated oatmeal glazed ceramic pieces: one large 26 cm dinner plate, one smaller 18 cm side plate and one deep bowl. Three pieces total arranged with each fully visible, empty. Design proportions: primary object approximately 7 cm high and 26 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/bo-ban-an-an-nhien.png",
+      "sha256": "480c60945a67a4c12d69120dd30541250ec989156596517123356f5c73131de5"
+    },
+    {
+      "key": "lo-huong-moc",
+      "file": "lo-huong-moc.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: Exactly one small round warm ivory ceramic decorative lidded vessel with a domed lid containing a few neat small circular perforations. Vessel and matching lid assembled, no incense, fire, smoke or candles. Design proportions: primary object approximately 10 cm high and 12 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/lo-huong-moc.png",
+      "sha256": "12c0c0b7e408c6907d39adf39c1d26f923580f17c88cf9447ea86531c7155ea5"
+    },
+    {
+      "key": "hu-tra-dat-am",
+      "file": "hu-tra-dat-am.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One cylindrical warm terracotta ceramic tea storage jar with one flat natural oak wooden lid fitted on top, subtle wheel-thrown lines, small rounded shoulder, no tea leaves or lettering. Design proportions: primary object approximately 12 cm high and 11 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/hu-tra-dat-am.png",
+      "sha256": "4dd5e42b06977521b9228867a3cf0df857014d8c2967118e0d4ddba6638dd7c8"
+    },
+    {
+      "key": "khay-trang-suc-la",
+      "file": "khay-trang-suc-la.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One sage green leaf-shaped ceramic trinket dish, elongated 18 cm organic leaf form with subtle raised central vein and gently curled shallow edges. Empty, no jewelry or extra objects. Design proportions: primary object approximately 2 cm high and 18 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/khay-trang-suc-la.png",
+      "sha256": "352013e1fabbdef9f825c7f27bd8d626e078635f8e0a9be5bc4f02ebf5c86ed5"
+    },
+    {
+      "key": "chan-nen-trang",
+      "file": "chan-nen-trang.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One sculptural ivory ceramic taper candle holder, arched crescent-like solid body with one circular candle socket at the top, wide stable rounded base, no candle and no flame. Design proportions: primary object approximately 16 cm high and 10 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/chan-nen-trang.png",
+      "sha256": "2534a6643963fc2ad99f486de7f58eb7b5f03ef3a7c97dcd81088556fdf27499"
+    },
+    {
+      "key": "chau-binh-yen",
+      "file": "chau-binh-yen.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: Exactly one small unglazed terracotta plant pot with a gently flared rim and visible drainage hole inside, sitting on exactly one matching shallow terracotta saucer. Two pieces total, no plant, no soil. Design proportions: primary object approximately 10 cm high and 13 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/chau-binh-yen.png",
+      "sha256": "639b22adc14c9d49939b3c8d57c56ee3e0fe0e455fea1dc835b63415f54dad3c"
+    },
+    {
+      "key": "tuong-meo-ngu",
+      "file": "tuong-meo-ngu.png",
+      "prompt": "Use case: product-mockup. Asset: square 1:1 product catalog photograph-style visualization for Nàng Gốm, a Vietnamese ceramics shop. Subject: One minimalist curled sleeping cat ceramic sculpture, warm ivory matte glaze with a few tiny brown speckles, eyes closed as simple incised curved lines, tail wrapped around body. No real animal, no extra figurines. Design proportions: primary object approximately 7 cm high and 14 cm across. Visualize the stated design faithfully, not an existing manufacturer's product. Scene: warm off-white plaster background, pale stone or natural oak tabletop, subtle oatmeal linen fold only if it helps the composition. Consistent gentle natural window light, soft organic shadows, tactile ceramic glaze, elegant calm contemporary slow-living art direction. Entire product or complete set fully visible in central 75 percent, coherent realistic geometry, true-to-life materials, generous space around object. No text, logos, watermark, price labels, measurements, certification marks, people, hands, image collage or borders. Exactly the specified object count; no extra matching mugs or bowls unless included in subject.",
+      "output": "frontend/public/images/nang-gom-catalog/tuong-meo-ngu.png",
+      "sha256": "8f99ae20495d577e709a98d6ed818000362651573185be23de26f8d768160149"
+    }
+  ]
+}

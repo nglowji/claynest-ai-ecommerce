@@ -8,7 +8,10 @@ import { useCatalog } from '../catalog/useCatalog'
 const categoryLink = (category: string) => `/products?category=${encodeURIComponent(category)}`
 
 export default function HomePage(actions: ProductActions) {
-  const catalog = useCatalog('pageSize=4&sort=newest')
+  const catalog = useCatalog('pageSize=48&sort=default')
+  const items = catalog.data?.items || []
+  const categoryPicks = Array.from(new Map(items.map(p => [p.categoryId, p])).values())
+  const featured = [...categoryPicks, ...items.filter(p => categoryPicks.every(pick => pick.id !== p.id))].slice(0, 8)
   return <>
     <section className="banner" aria-labelledby="hero-title">
       <img className="calm-hero-image" src="/images/nang-gom/banner-calm.jpg" alt="Bát xanh, hai cốc gốm và bình hoa trên kệ đá trong ánh nắng dịu" fetchPriority="high" width="2172" height="724" />
@@ -22,17 +25,17 @@ export default function HomePage(actions: ProductActions) {
     </section>
 
     <section className="products-section container" aria-labelledby="featured-title">
-      <div className="section-heading sale-section-heading"><div><p className="eyebrow"><span className="sale-heading-label">HOT SALE</span> MỘT CHÚT ƯU ĐÃI, THÊM MỘT CHÚT THƯƠNG</p><h2 id="featured-title">Gốm xinh.<br /><em>Giá thêm thương.</em></h2></div><div className="sale-heading-aside"><span>Góc ưu đãi của Nàng</span><Link className="text-link" to="/products">Xem tất cả <Icon name="arrow" /></Link></div></div>
-      {catalog.loading && <p role="status">Đang chọn những món gốm cho bạn…</p>}{catalog.error && <p role="alert">{catalog.error} <button onClick={catalog.retry}>Thử lại</button></p>}{catalog.data && <ProductGrid items={catalog.data.items.map(p => productView(p))} {...actions} />}<p className="sale-demo-note">Giá và ưu đãi lấy từ catalog. Sản phẩm có nhãn DEMO là dữ liệu minh họa.</p>
+      <div className="section-heading sale-section-heading"><div><p className="eyebrow">NHỮNG THIẾT KẾ ĐƯỢC NÀNG CHỌN</p><h2 id="featured-title">Gốm xinh.<br /><em>Chạm vào nếp nhà.</em></h2></div><div className="sale-heading-aside"><span>Một chút gốm cho nhà</span><Link className="text-link" to="/products">Xem tất cả <Icon name="arrow" /></Link></div></div>
+      {catalog.loading && <p role="status">Đang chọn những món gốm cho bạn…</p>}{catalog.error && <p role="alert">{catalog.error} <button onClick={catalog.retry}>Thử lại</button></p>}{catalog.data && <ProductGrid items={featured.map(p => productView(p))} {...actions} />}{catalog.data?.totalCount === 0 && <p>Các sản phẩm đang được cập nhật.</p>}
     </section>
 
     <section id="collections" className="collections-section container" aria-labelledby="collections-title">
       <div className="section-heading"><div><p className="eyebrow">CHỌN THEO MỘT CHÚT CẢM HỨNG</p><h2 id="collections-title">Ba góc nhỏ.<br /><em>Ba cách thương nhà.</em></h2></div><div className="collection-heading-note"><p>Không cần thay đổi cả căn nhà.<br />Bắt đầu từ một góc mình yêu.</p><Link className="text-link" to="/products">Ghé cửa hàng <Icon name="arrow" /></Link></div></div>
       <div className="collection-edits">
         {[
-          { category: 'Bộ sưu tập', title: 'Chủ nhật ở nhà.', note: 'CHO NHỮNG NGÀY THẬT CHẬM', description: 'Bày một bữa sáng. Dành một khoảng riêng. Để ngày nghỉ được thong thả thêm chút nữa.', image: '/images/slow-living/lifestyle.jpg', alt: 'Bàn ăn sáng với gốm, bánh và cuốn sách', label: 'Khám phá bộ sưu tập', shape: 'landscape' },
-          { category: 'Bình hoa', title: 'Nắng ghé, hoa về.', note: 'CHO MỘT GÓC NHÀ XANH', description: 'Một chiếc bình, vài nhành hoa. Những điều nhỏ đủ làm căn phòng dịu lại.', image: '/images/nang-gom/flowers.jpg', alt: 'Bình hoa trắng bên góc đọc sách có nắng', label: 'Ghé xem bình hoa', shape: 'arch' },
-          { category: 'Cốc & tách', title: 'Một tách, thật chậm.', note: 'CHO MỘT KHOẢNG RIÊNG MÌNH', description: 'Chọn chiếc cốc vừa tay, pha một điều mình thích. Hôm nay, dành cho mình vài phút.', image: '/images/slow-living/cup.jpg', alt: 'Cốc men xanh có cà phê trên khăn vải mộc', label: 'Chọn cốc & tách', shape: 'postcard' },
+          { category: 'Bộ sưu tập', title: 'Chủ nhật ở nhà.', note: 'CHO NHỮNG NGÀY THẬT CHẬM', description: 'Bày một bữa sáng. Dành một khoảng riêng. Để ngày nghỉ được thong thả thêm chút nữa.', image: '/images/nang-gom-catalog/bo-ban-an-an-nhien.png', alt: 'Bộ bàn ăn An Nhiên của Nàng Gốm', label: 'Khám phá bộ sưu tập', shape: 'landscape' },
+          { category: 'Bình hoa', title: 'Nắng ghé, hoa về.', note: 'CHO MỘT GÓC NHÀ XANH', description: 'Một chiếc bình, vài nhành hoa. Những điều nhỏ đủ làm căn phòng dịu lại.', image: '/images/nang-gom-catalog/binh-may-trang.png', alt: 'Bình Mây Trắng màu ngà', label: 'Ghé xem bình hoa', shape: 'arch' },
+          { category: 'Cốc & tách', title: 'Một tách, thật chậm.', note: 'CHO MỘT KHOẢNG RIÊNG MÌNH', description: 'Chọn chiếc cốc vừa tay, pha một điều mình thích. Hôm nay, dành cho mình vài phút.', image: '/images/nang-gom-catalog/coc-suong-mai.png', alt: 'Cốc Sương Mai men xanh sage', label: 'Chọn cốc & tách', shape: 'postcard' },
         ].map((collection, index) => <Link className={`collection-edit collection-edit-${collection.shape}`} key={collection.category} to={categoryLink(collection.category)}>
           <div className="collection-edit-image"><img src={collection.image} alt={collection.alt} loading="lazy" width="1536" height="1024" /></div>
           <div className="collection-edit-copy"><p className="collection-edit-kicker"><span>{String(index + 1).padStart(2, '0')}</span>{collection.note}</p><h3>{collection.title}</h3><p className="collection-edit-description">{collection.description}</p><span className="collection-edit-link">{collection.label}<Icon name="arrow" /></span></div>
@@ -41,7 +44,7 @@ export default function HomePage(actions: ProductActions) {
     </section>
 
     <section id="story" className="nang-story-section" aria-labelledby="story-title"><div className="container nang-story-inner">
-      <div className="nang-story-image"><img src="/images/nang-gom/studio.jpg" alt="Kệ gỗ trưng bày nhiều dáng gốm trong không gian ngập nắng — ảnh AI minh họa" loading="lazy" width="1536" height="1024" /><span>MỘT NƠI CHỐN CHO NHỮNG ĐIỀU MỘC MẠC</span></div>
+      <div className="nang-story-image"><img src="/images/nang-gom/studio.jpg" alt="Kệ gỗ trưng bày nhiều dáng gốm trong không gian ngập nắng" loading="lazy" width="1536" height="1024" /><span>MỘT NƠI CHỐN CHO NHỮNG ĐIỀU MỘC MẠC</span></div>
       <div className="nang-story-copy"><p className="eyebrow">VÌ SAO LÀ NÀNG GỐM?</p><h2 id="story-title">Nàng không chỉ<br />kể chuyện <em>về gốm.</em></h2><p>Nàng kể chuyện về một căn bếp có người chờ. Về buổi chiều mình cắm vội vài nhành hoa. Về chiếc cốc quen, cầm lên là thấy ngày bớt vội.</p><p>Chúng mình yêu những sắc màu gần với đất, những đường nét mềm và cảm giác chân thật khi một món đồ được đặt vào đúng góc nhà. Không cần cầu kỳ để đẹp. Không cần thật nhiều để đủ.</p><p>Ở Nàng Gốm, mỗi gợi ý đều bắt đầu bằng một câu hỏi nhỏ: món đồ này sẽ làm ngày của bạn dễ thương hơn như thế nào?</p><Link className="text-link" to="/stories">Nghe Nàng kể tiếp <Icon name="arrow" /></Link><span className="nang-signature">Thương, Nàng.</span></div>
     </div></section>
 
@@ -56,7 +59,7 @@ export default function HomePage(actions: ProductActions) {
       </div>
     </section>
 
-    <section className="gift-section container" aria-labelledby="gift-title"><div className="gift-copy"><p className="eyebrow">CÓ NHỮNG LỜI THƯƠNG KHÔNG CẦN NÓI LỚN</p><h2 id="gift-title">Tặng một món gốm.<br />Gửi <em>một chút mình.</em></h2><p>Cho người vừa có một căn nhà mới. Cho người hay pha trà mỗi tối. Hoặc cho chính bạn, sau một tuần đã thật cố gắng.</p><p>Đôi khi, món quà đáng nhớ nhất là món đồ khiến người nhận nghĩ: “À, người ấy nhớ mình thích điều này.”</p><Link className="button primary" to={categoryLink('Bộ sưu tập')}>Chọn một món quà <Icon name="arrow" /></Link><Link className="gift-story-link" to="/stories/mon-qua-mang-theo-loi-thuong">Một chút cảm hứng tặng quà ↗</Link></div><div className="gift-image"><img src="/images/nang-gom/gift.jpg" alt="Hộp quà cốc gốm, ruy băng vải và thiệp trắng — ý tưởng đóng gói minh họa" loading="lazy" width="1536" height="1024" /></div></section>
+    <section className="gift-section container" aria-labelledby="gift-title"><div className="gift-copy"><p className="eyebrow">CÓ NHỮNG LỜI THƯƠNG KHÔNG CẦN NÓI LỚN</p><h2 id="gift-title">Tặng một món gốm.<br />Gửi <em>một chút mình.</em></h2><p>Cho người vừa có một căn nhà mới. Cho người hay pha trà mỗi tối. Hoặc cho chính bạn, sau một tuần đã thật cố gắng.</p><p>Đôi khi, món quà đáng nhớ nhất là món đồ khiến người nhận nghĩ: “À, người ấy nhớ mình thích điều này.”</p><Link className="button primary" to={categoryLink('Bộ sưu tập')}>Chọn một món quà <Icon name="arrow" /></Link><Link className="gift-story-link" to="/stories/mon-qua-mang-theo-loi-thuong">Một chút cảm hứng tặng quà ↗</Link></div><div className="gift-image"><img src="/images/nang-gom/gift.jpg" alt="Hộp quà cốc gốm, ruy băng vải và thiệp trắng" loading="lazy" width="1536" height="1024" /></div></section>
 
     <section id="journal" className="journal-section container" aria-labelledby="journal-title"><div className="section-heading"><div><p className="eyebrow">NHẬT KÝ NHÀ NÀNG</p><h2 id="journal-title">Chuyện gốm.<br /><em>Chuyện mình.</em></h2></div><Link className="text-link" to="/stories">Đọc những câu chuyện <Icon name="arrow" /></Link></div><StoryCards variant="editorial" /></section>
 

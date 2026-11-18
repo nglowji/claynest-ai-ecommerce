@@ -21,6 +21,8 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         b.Property(x => x.Slug).HasMaxLength(140); b.HasIndex(x => x.Slug).IsUnique();
         b.Property(x => x.Description).HasMaxLength(6000); b.Property(x => x.CraftStory).HasMaxLength(6000);
         b.Property(x => x.Material).HasMaxLength(160); b.Property(x => x.HandmadeNote).HasMaxLength(1000); b.Property(x => x.Label).HasMaxLength(32);
+        b.Property(x => x.SourceUrl).HasMaxLength(500); b.Property(x => x.SourceName).HasMaxLength(120);
+        b.Property(x => x.SourceDimensions).HasMaxLength(300); b.Property(x => x.SourceAvailability).HasMaxLength(160); b.Property(x => x.PriceUnit).HasMaxLength(60);
         b.Property(x => x.Revision).IsConcurrencyToken(); b.HasIndex(x => new { x.Published, x.Archived, x.CategoryId });
         b.HasOne(x => x.Category).WithMany().HasForeignKey(x => x.CategoryId).OnDelete(DeleteBehavior.Restrict);
         b.HasMany(x => x.Variants).WithOne().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);

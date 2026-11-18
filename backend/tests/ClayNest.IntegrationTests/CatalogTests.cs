@@ -116,10 +116,19 @@ public sealed class CatalogTests
         var service = scope.ServiceProvider.GetRequiredService<ICatalogService>();
         await service.SeedAsync(CancellationToken.None);
         var db = scope.ServiceProvider.GetRequiredService<CommerceDbContext>();
-        var before = await db.Products.AsNoTracking().Where(p => p.IsDemo).OrderBy(p => p.Id).Select(p => new { p.Id, p.Revision }).ToListAsync();
+        var before = await db.Products.AsNoTracking().Where(p => p.Variants.Any(v => v.Sku.StartsWith("NG-STUDIO-"))).OrderBy(p => p.Id).Select(p => new { p.Id, p.Revision }).ToListAsync();
         await service.SeedAsync(CancellationToken.None);
-        var after = await db.Products.AsNoTracking().Where(p => p.IsDemo).OrderBy(p => p.Id).Select(p => new { p.Id, p.Revision }).ToListAsync();
+        var after = await db.Products.AsNoTracking().Where(p => p.Variants.Any(v => v.Sku.StartsWith("NG-STUDIO-"))).OrderBy(p => p.Id).Select(p => new { p.Id, p.Revision }).ToListAsync();
+        Assert.True(before.Count >= 30);
         Assert.Equal(before, after);
+        var studio = await service.FindAsync("nang-coc-suong-mai", false, CancellationToken.None);
+        Assert.NotNull(studio); Assert.True(studio.Published); Assert.Single(studio.Images);
+        Assert.StartsWith("/images/nang-gom-catalog/", studio.Images.Single().Url);
+        Assert.Empty(studio.SourceUrl); Assert.Equal(260000, studio.Variants.Single().PriceVnd);
+        Assert.Equal(310000, studio.Variants.Single().OriginalPriceVnd);
+        Assert.Equal(300, studio.Variants.Single().CapacityMl); Assert.Equal(9.5m, studio.Variants.Single().HeightCm);
+        Assert.Equal(8.5m, studio.Variants.Single().WidthCm); Assert.Equal(320, studio.Variants.Single().WeightG);
+        Assert.False(studio.Variants.Single().CareVerified); Assert.Equal(0, studio.Variants.Single().StockQty);
         using var hidden = await s.Client.GetAsync("/api/v1/products/ban-nhap-demo");
         Assert.Equal(HttpStatusCode.NotFound, hidden.StatusCode);
         var product = await s.Save(s.Input()); var id = product.Variants.Single().Id;
@@ -127,6 +136,59 @@ public sealed class CatalogTests
         Assert.Equal(Npgsql.PostgresErrorCodes.CheckViolation, invalid.SqlState);
         using var badPagination = await s.Client.GetAsync("/api/v1/products?pageSize=1000");
         Assert.Equal(HttpStatusCode.BadRequest, badPagination.StatusCode);
+    }
+
+    [DatabaseFact]
+    public async Task Refresh_retires_only_legacy_content_and_preserves_merchant_edits_and_prices()
+    {
+        await using var s = await Session.Create();
+        await using var scope = s.Factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<CommerceDbContext>();
+        Product Create(string suffix, string description)
+        {
+            var product = new Product(isDemo: true);
+            product.Update(s.Category.Id, s.Key + suffix, s.Key + suffix, description, "", "Gốm", "", "", true);
+            var variant = new ProductVariant(product.Id);
+            variant.Update(s.Key.ToUpperInvariant() + suffix.ToUpperInvariant(), "Cup", "", "", null, null, null, null, 333000, null, true, "", "", false);
+            product.Variants.Add(variant); product.Images.Add(new ProductImage(product.Id, "/images/slow-living/cup.jpg", "Cup", 0));
+            product.ValidatePublication(); db.Products.Add(product); return product;
+        }
+        var starter = Create("-starter", "Một món gốm mang sắc màu mộc mạc, dành cho góc nhà bình yên. Dữ liệu DEMO, ảnh AI minh họa.");
+        var merchant = Create("-merchant", "Nội dung sản phẩm đã được chủ cửa hàng sửa.");
+        await db.SaveChangesAsync(); var revision = merchant.Revision;
+        var service = scope.ServiceProvider.GetRequiredService<ICatalogService>();
+        await service.RefreshContentAsync(CancellationToken.None);
+        Assert.True(starter.Archived); Assert.False(starter.Published);
+        Assert.Equal(333000, starter.Variants.Single().PriceVnd);
+        Assert.True(merchant.Published); Assert.False(merchant.Archived); Assert.Equal(revision, merchant.Revision);
+        var archivedRevision = starter.Revision;
+        await service.RefreshContentAsync(CancellationToken.None);
+        Assert.Equal(archivedRevision, starter.Revision); Assert.Equal(revision, merchant.Revision);
+    }
+
+    [DatabaseFact]
+    public async Task Removing_supplier_images_unpublishes_only_affected_products_and_is_idempotent()
+    {
+        await using var s = await Session.Create();
+        var owned = await s.Save(s.Input() with { Published = true });
+        await using var scope = s.Factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<CommerceDbContext>();
+        var source = new Product();
+        source.Update(s.Category.Id, "Imported", s.Key + "-imported", "Imported product", "", "Gốm", "", "", true);
+        source.RecordSource("https://www.bienhoaceramic.com/san-pham/ly-co-quai/", "Gốm Biên Hòa", "", "", "");
+        var v = new ProductVariant(source.Id);
+        v.Update(s.Key.ToUpperInvariant() + "-IMPORTED", "Cup", "", "", null, null, null, null, 100000, null, true, "", "", false);
+        source.Variants.Add(v); source.Images.Add(new ProductImage(source.Id, "/images/catalog/supplier-photo.jpg", "Cup", 0));
+        source.ValidatePublication(); db.Products.Add(source); await db.SaveChangesAsync();
+        var service = scope.ServiceProvider.GetRequiredService<ICatalogService>();
+        await service.RemoveSourceImagesAsync(CancellationToken.None);
+        Assert.False(source.Published); Assert.Empty(source.Images);
+        Assert.Equal(100000, source.Variants.Single().PriceVnd);
+        var untouched = await service.FindAsync(owned.Slug, false, CancellationToken.None);
+        Assert.NotNull(untouched); Assert.Single(untouched.Images);
+        var revision = source.Revision;
+        await service.RemoveSourceImagesAsync(CancellationToken.None);
+        Assert.Equal(revision, source.Revision);
     }
 
     private sealed class Factory : WebApplicationFactory<Program>

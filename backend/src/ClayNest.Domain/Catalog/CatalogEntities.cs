@@ -51,6 +51,11 @@ public sealed class Product
     public string Label { get; private set; } = string.Empty;
     public bool Published { get; private set; }
     public bool Archived { get; private set; }
+    public string SourceUrl { get; private set; } = string.Empty;
+    public string SourceName { get; private set; } = string.Empty;
+    public string SourceDimensions { get; private set; } = string.Empty;
+    public string SourceAvailability { get; private set; } = string.Empty;
+    public string PriceUnit { get; private set; } = string.Empty;
     public bool IsDemo { get; private set; }
     public Guid Revision { get; private set; } = Guid.NewGuid();
     public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
@@ -72,6 +77,16 @@ public sealed class Product
     public static string NormalizeSearch(string value) => new string(value.Normalize(System.Text.NormalizationForm.FormD)
         .Where(c => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark)
         .ToArray()).ToLowerInvariant().Replace('đ', 'd');
+    public void RecordSource(string url, string name, string dimensions, string availability, string priceUnit)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var parsed) || parsed.Scheme != "https")
+            throw new CatalogRuleException("Đường dẫn nguồn sản phẩm không hợp lệ.");
+        SourceUrl = CatalogRules.Text(url, 500, "Nguồn sản phẩm", true);
+        SourceName = CatalogRules.Text(name, 120, "Tên nguồn", true);
+        SourceDimensions = CatalogRules.Text(dimensions, 300, "Kích thước từ nguồn");
+        SourceAvailability = CatalogRules.Text(availability, 160, "Tình trạng từ nguồn");
+        PriceUnit = CatalogRules.Text(priceUnit, 60, "Đơn vị giá"); Touch();
+    }
     public void Touch() { Revision = Guid.NewGuid(); UpdatedAt = DateTimeOffset.UtcNow; }
     public void Archive() { Archived = true; Published = false; Touch(); }
     public void ValidatePublication()
@@ -115,7 +130,7 @@ public sealed class ProductVariant
         Name = CatalogRules.Text(name, 120, "Tên biến thể", true); Glaze = CatalogRules.Text(glaze, 120, "Màu men");
         IntendedUse = CatalogRules.Text(intendedUse, 160, "Công dụng");
         if (priceVnd <= 0 || priceVnd > 1_000_000_000 || originalPriceVnd is not null && (originalPriceVnd <= priceVnd || originalPriceVnd > 1_000_000_000))
-            throw new CatalogRuleException("Giá bán phải dương; giá tham chiếu phải cao hơn giá bán, tối đa 1 tỷ VND.");
+            throw new CatalogRuleException("Giá bán phải dương; giá niêm yết phải cao hơn giá bán, tối đa 1 tỷ VND.");
         if (capacityMl is <= 0 or > 100000 || widthCm is < 0.01m or > 1000 || heightCm is < 0.01m or > 1000 || weightG is <= 0 or > 1000000)
             throw new CatalogRuleException("Thông số phải dương và trong giới hạn cho phép.");
         if (widthCm.HasValue && decimal.Round(widthCm.Value, 2) != widthCm.Value || heightCm.HasValue && decimal.Round(heightCm.Value, 2) != heightCm.Value)

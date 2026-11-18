@@ -16,7 +16,7 @@ public sealed record ImageDto(Guid Id, string Url, string Alt, int SortOrder, Gu
 public sealed record ProductDto(Guid Id, Guid CategoryId, string Category, string Name, string Slug,
     string Description, string CraftStory, string Material, string HandmadeNote, string Label,
     bool Published, bool Archived, bool IsDemo, Guid Revision, DateTimeOffset UpdatedAt,
-    List<VariantDto> Variants, List<ImageDto> Images);
+    List<VariantDto> Variants, List<ImageDto> Images, string SourceUrl, string SourceName, string SourceDimensions, string SourceAvailability, string PriceUnit);
 public sealed record PageResult<T>(List<T> Items, int Page, int PageSize, int TotalCount);
 public sealed record CatalogQuery(string? Q = null, string? Category = null, long? MinPrice = null,
     long? MaxPrice = null, string? Glaze = null, string? Use = null, bool InStock = false,
@@ -31,6 +31,8 @@ public interface ICatalogService
     Task<ProductDto> SaveProductAsync(Guid? id, ProductInput input, CancellationToken ct);
     Task ArchiveAsync(Guid id, Guid revision, CancellationToken ct);
     Task SeedAsync(CancellationToken ct);
+    Task RefreshContentAsync(CancellationToken ct);
+    Task RemoveSourceImagesAsync(CancellationToken ct);
 }
 public sealed record StoredImage(string Url);
 public interface ICatalogImageStorage

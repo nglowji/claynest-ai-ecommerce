@@ -8,6 +8,7 @@ export type Image = { id?: string; url: string; alt: string; sortOrder?: number;
 export type CatalogProduct = {
   id: string; categoryId: string; category: string; name: string; slug: string; description: string
   craftStory: string; material: string; handmadeNote: string; label: string; published: boolean
+  sourceUrl: string; sourceName: string; sourceDimensions: string; sourceAvailability: string; priceUnit: string
   archived: boolean; isDemo: boolean; revision: string; updatedAt: string; variants: Variant[]; images: Image[]
 }
 export type Product = CatalogProduct & { price: number; originalPrice?: number; image: string; note: string; variantId: string; stockQty: number; discount: number }

@@ -102,6 +102,11 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                         .HasMaxLength(180)
                         .HasColumnType("character varying(180)");
 
+                    b.Property<string>("PriceUnit")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
                     b.Property<bool>("Published")
                         .HasColumnType("boolean");
 
@@ -117,6 +122,26 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(140)
                         .HasColumnType("character varying(140)");
+
+                    b.Property<string>("SourceAvailability")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)");
+
+                    b.Property<string>("SourceDimensions")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("SourceName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
