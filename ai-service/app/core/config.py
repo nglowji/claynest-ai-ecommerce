@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=ROOT / ".env", env_prefix="AI_", extra="ignore", hide_input_in_errors=True)
+    model_config = SettingsConfigDict(env_file=ROOT / ".env", env_prefix="AI_", extra="ignore", populate_by_name=True, hide_input_in_errors=True)
 
     app_name: str = "ClayNest AI Service"
     database_url: str

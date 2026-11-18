@@ -76,11 +76,11 @@ public sealed class OperationalTests
     }
 
     [Fact]
-    public async Task Unimplemented_ai_mutations_are_not_exposed()
+    public async Task Unimplemented_knowledge_mutations_are_not_exposed()
     {
         await using var factory = new ApiFactory();
         using var client = factory.CreateClient();
-        using var response = await client.PostAsJsonAsync("/api/v1/chat", new { }, CancellationToken.None);
+        using var response = await client.PostAsJsonAsync("/api/v1/admin/knowledge", new { }, CancellationToken.None);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

@@ -15,7 +15,7 @@ public sealed class ChatService(IChatGateway gateway,IChatCatalog catalog) : ICh
     {
         text = Regex.Replace(text,@"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}","[email đã ẩn]");
         text = Regex.Replace(text,@"(?<!\w)(?:\+84|0)[0-9 .-]{8,14}[0-9](?!\w)","[số điện thoại đã ẩn]");
-        return Regex.Replace(text,@"(?<![\w-])[A-Za-z0-9_-]{40,}(?![\w-])","[mã riêng đã ẩn]");
+        return Regex.Replace(text,@"(?<![\w-])(?:AIza[A-Za-z0-9_-]{20,}|[A-Za-z0-9_-]{40,})(?![\w-])","[mã riêng đã ẩn]");
     }
     public async Task<ChatResponse> AskAsync(ChatRequest request,CancellationToken ct)
     {
@@ -25,8 +25,8 @@ public sealed class ChatService(IChatGateway gateway,IChatCatalog catalog) : ICh
         if (request.Filters is not null) ChatCatalog.Validate(request.Filters);
         var safe = request with { Message = Redact(request.Message), History = request.History?.Select(t => t with { Content = Redact(t.Content) }).ToList() };
         var result = await gateway.AskAsync(safe,ct);
-        if (result.Filters is null || result.Choices is null || result.Choices.Count > 3 || result.Choices.Any(c => !Reasons.ContainsKey(c.Reason))) throw new ChatUnavailableException();
-        ChatCatalog.Validate(result.Filters);
+        if (result.Filters is null || result.Choices is null || result.Choices.Count > 3 || result.Choices.Any(c => c is null || string.IsNullOrEmpty(c.Reason) || !Reasons.ContainsKey(c.Reason))) throw new ChatUnavailableException();
+        try { ChatCatalog.Validate(result.Filters); } catch (ChatValidationException) { throw new ChatUnavailableException(); }
         if (result.Topic == "order") return new("Mình không tra cứu hoặc thay đổi đơn trong cuộc trò chuyện. Bạn hãy dùng trang tra cứu riêng nhé.",[],[new("Tra cứu đơn hàng","/orders")]);
         if (result.Topic == "safety") return new("Nàng chưa có đủ thông tin kiểm chứng để khẳng định độ an toàn thực phẩm, khả năng dùng lò vi sóng, máy rửa bát hoặc chịu nhiệt. Bạn xem thông tin đã được xác minh ở trang chi tiết hoặc nhờ Nàng kiểm tra thêm nhé.",[],[new("Xem sản phẩm","/products")]);
         if (result.Topic == "policy") return new(CommercePolicy.ShippingDescription + " " + CommercePolicy.PackingDescription,[],[]);
@@ -40,7 +40,7 @@ public sealed class ChatService(IChatGateway gateway,IChatCatalog catalog) : ICh
         var ids = result.Choices.Select(c => c.VariantId).Distinct().ToList();
         var live = await catalog.ResolveAsync(ids,filters,ct);
         var products = result.Choices.DistinctBy(c => c.VariantId).Where(c => live.Any(v => v.VariantId == c.VariantId))
-            .Select(c => new ChatProduct(live.Single(v => v.VariantId == c.VariantId),Reasons[c.Reason])).ToList();
+            .Select(c => new ChatProduct(live.Single(v => v.VariantId == c.VariantId),Reasons[c.Reason == "budget" && filters.MaxPrice is null && filters.MinPrice is null || c.Reason == "size" && filters.MaxHeightCm is null && filters.MinCapacityMl is null ? "match" : c.Reason])).ToList();
         return new(products.Count > 0 ? "Nàng chọn được vài món để bạn xem thử. Giá và số lượng dưới đây vừa được kiểm tra lại ở cửa hàng." : "Nàng chưa tìm được món còn phù hợp bộ lọc hiện tại. Bạn thử đổi ngân sách hoặc sắc men nhé.",products,[new("Khám phá cửa hàng","/products")]);
     }
 }

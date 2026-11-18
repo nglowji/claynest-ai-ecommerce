@@ -31,7 +31,7 @@ class ReplayGuard:
             return False
         expected = signature(secret,path,"chat:public",stamp,nonce,body)
         provided = supplied.get("x-service-signature", "")
-        if not isinstance(provided,str) or not hmac.compare_digest(expected,provided):
+        if not isinstance(provided,str) or len(provided) != 64 or any(c not in "0123456789abcdef" for c in provided) or not hmac.compare_digest(expected,provided):
             return False
         with self.lock:
             self.nonces = {key: expiry for key,expiry in self.nonces.items() if expiry >= now}

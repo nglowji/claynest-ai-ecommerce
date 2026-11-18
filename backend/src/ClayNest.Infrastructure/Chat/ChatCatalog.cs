@@ -35,7 +35,7 @@ public sealed class ChatCatalog(CommerceDbContext db) : IChatCatalog
     public async Task<List<ChatFact>> SearchAsync(ChatFilters filters,CancellationToken ct) => await Facts(filters).OrderBy(v => v.PriceVnd).ThenBy(v => v.Sku).Take(8).ToListAsync(ct);
     public async Task<List<ChatFact>> DetailAsync(string slug,CancellationToken ct)
     {
-        if (slug.Length > 140 || !System.Text.RegularExpressions.Regex.IsMatch(slug,"^[a-z0-9-]+$")) throw new ChatValidationException("Đường dẫn sản phẩm không hợp lệ.");
+        if (string.IsNullOrWhiteSpace(slug) || slug.Length > 140 || !System.Text.RegularExpressions.Regex.IsMatch(slug,"^[a-z0-9-]+$")) throw new ChatValidationException("Đường dẫn sản phẩm không hợp lệ.");
         return await Facts(new(InStock:false)).Where(v => v.Slug == slug).OrderBy(v => v.Sku).Take(8).ToListAsync(ct);
     }
     public async Task<List<ChatFact>> ResolveAsync(List<Guid> ids,ChatFilters filters,CancellationToken ct) => await Facts(filters with { Q = null }).Where(v => ids.Contains(v.VariantId)).ToListAsync(ct);

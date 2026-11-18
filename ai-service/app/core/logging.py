@@ -1,6 +1,9 @@
 from datetime import datetime, timezone
 import json
 import logging
+from contextvars import ContextVar
+
+correlation_context = ContextVar("correlation_id",default="")
 
 
 class JsonFormatter(logging.Formatter):
@@ -11,9 +14,11 @@ class JsonFormatter(logging.Formatter):
             "service": "claynest-ai",
             "event": record.getMessage(),
         }
-        for key in ("correlation_id", "exception_type", "method", "path", "status_code"):
+        for key in ("correlation_id", "exception_type", "method", "path", "status_code", "model", "input_tokens", "output_tokens", "total_tokens"):
             if hasattr(record, key):
                 data[key] = getattr(record, key)
+        if "correlation_id" not in data and correlation_context.get():
+            data["correlation_id"] = correlation_context.get()
         return json.dumps(data, ensure_ascii=False)
 
 

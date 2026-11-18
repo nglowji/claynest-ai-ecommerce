@@ -11,6 +11,7 @@ import AdminOrdersPage, { AdminOrderDetailPage } from './components/AdminOrdersP
 import AccountPage from './components/AccountPage'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import CartPage from './components/CartPage'
+import ChatAssistant from './components/ChatAssistant'
 import CheckoutPage from './components/CheckoutPage'
 import OrderStatusPage from './components/OrderStatusPage'
 import { useCart } from './features/cart/useCart'
@@ -90,6 +91,7 @@ function StoreApp() {
       <Route path="*" element={<section className="container empty-state not-found"><h1>Không tìm thấy trang</h1><Link className="button primary" to="/">Về trang chủ <Icon name="arrow" /></Link></section>} />
     </Routes></main>
     <footer className="site-footer">{location.pathname === '/' && <SiteLocation />}<div className="container footer-main"><div className="footer-brand"><Brand /><p>Một chút mộc cho nhà.<br />Một chút thương cho những ngày bình thường.</p></div><div className="footer-column"><h2>Ghé nhà Nàng</h2><Link to="/orders">Tra cứu đơn hàng</Link><Link to="/products">Tất cả sản phẩm</Link><Link to="/#collections">Những bộ sưu tập</Link><Link to="/#story">Câu chuyện Nàng Gốm</Link><Link to="/#location">Địa chỉ & bản đồ</Link></div><div className="footer-column"><h2>Ở lại một chút</h2><Link to="/stories">Chuyện của gốm</Link><Link to="/#craft">Từ đất đến gốm</Link><Link to="/products?category=B%E1%BB%99%20s%C6%B0u%20t%E1%BA%ADp">Một món quà nhỏ</Link></div><div className="footer-message"><p className="eyebrow">THƯƠNG NHÀ, THƯƠNG MÌNH</p><p>Nhà không cần thật lớn.<br />Chỉ cần có những điều mình yêu.</p><span>Nàng Gốm</span></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Nàng Gốm</span><span>Crafted with care by nglowji.</span><Link to="/">Về nhà Nàng ↑</Link></div></footer>
+    {!['/login','/register','/checkout','/account'].includes(location.pathname) && !location.pathname.startsWith('/orders') && <ChatAssistant />}
     <div className={notice ? 'toast visible' : 'toast'} role="status" aria-live="polite">{notice}</div>
 
   </>

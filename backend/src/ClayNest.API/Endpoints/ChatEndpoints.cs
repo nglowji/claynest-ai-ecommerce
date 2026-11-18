@@ -46,6 +46,7 @@ public static class ChatEndpoints
                     var json = new JsonSerializerOptions(JsonSerializerDefaults.Web) { UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow };
                     if (name == "search") return Results.Ok(await catalog.SearchAsync(JsonSerializer.Deserialize<ChatFilters>(body,json) ?? throw new JsonException(),ct));
                     if (name == "detail") return Results.Ok(await catalog.DetailAsync((JsonSerializer.Deserialize<DetailRequest>(body,json) ?? throw new JsonException()).Slug,ct));
+                    if (JsonSerializer.Deserialize<Dictionary<string,JsonElement>>(body,json)?.Count != 0) throw new JsonException();
                     return Results.Ok(new { shipping = CommercePolicy.ShippingDescription, packing = CommercePolicy.PackingDescription });
                 }
                 catch (Exception ex) when (ex is JsonException or ChatValidationException or ArgumentException)

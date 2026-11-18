@@ -36,6 +36,10 @@ class Advisor:
             filters = intent.filters
             if request.filters:
                 overrides = request.filters.model_dump(exclude_none=True)
+                if request.filters.max_price is not None and filters.min_price is not None and filters.min_price > request.filters.max_price:
+                    overrides["min_price"] = request.filters.min_price
+                if request.filters.min_price is not None and filters.max_price is not None and filters.max_price < request.filters.min_price:
+                    overrides["max_price"] = request.filters.max_price
                 filters = filters.model_copy(update=overrides)
                 filters = type(filters).model_validate(filters.model_dump())
             if intent.topic in {"safety","order","other"}:

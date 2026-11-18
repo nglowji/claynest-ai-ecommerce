@@ -3,6 +3,7 @@ from typing import TypeVar
 import httpx
 from pydantic import BaseModel, ValidationError
 from app.core.config import Settings
+from app.core.logging import application_logger
 
 class ProviderUnavailable(Exception):
     pass
@@ -30,6 +31,12 @@ class GeminiProvider:
             if response.status_code != 200 or len(response.content) > 65536:
                 raise ProviderUnavailable()
             data = response.json()
+            usage = data.get("usageMetadata",{})
+            def count(name):
+                value = usage.get(name,0)
+                return value if type(value) is int and 0 <= value <= 10000000 else 0
+            application_logger().info("gemini_usage",extra={"model":self.config.gemini_model,
+                "input_tokens":count("promptTokenCount"),"output_tokens":count("candidatesTokenCount"),"total_tokens":count("totalTokenCount")})
             candidate = data.get("candidates",[])[0]
             if candidate.get("finishReason") != "STOP":
                 raise ProviderUnavailable()

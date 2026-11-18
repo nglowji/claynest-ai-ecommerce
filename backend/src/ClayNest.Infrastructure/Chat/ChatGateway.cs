@@ -4,7 +4,7 @@ using ClayNest.Application.Chat;
 using Microsoft.Extensions.Options;
 namespace ClayNest.Infrastructure.Chat;
 
-public sealed class ChatGateway(HttpClient http,IOptions<ChatOptions> options,TimeProvider clock) : IChatGateway
+public sealed class ChatGateway(HttpClient http,IOptions<ChatOptions> options,TimeProvider clock, Microsoft.AspNetCore.Http.IHttpContextAccessor context) : IChatGateway
 {
     public async Task<AiDecision> AskAsync(ChatRequest request,CancellationToken ct)
     {
@@ -15,6 +15,7 @@ public sealed class ChatGateway(HttpClient http,IOptions<ChatOptions> options,Ti
         var nonce = Guid.NewGuid().ToString("N"); const string path = "/internal/chat"; const string scope = "chat:public";
         using var message = new HttpRequestMessage(HttpMethod.Post,new Uri(new Uri(config.BaseUrl),path)) { Content = new ByteArrayContent(body) };
         message.Content.Headers.ContentType = new("application/json");
+        message.Headers.Add("X-Correlation-ID",context.HttpContext?.TraceIdentifier ?? Guid.NewGuid().ToString("N"));
         message.Headers.Add("X-Service-Time",timestamp); message.Headers.Add("X-Service-Nonce",nonce); message.Headers.Add("X-Service-Scope",scope);
         message.Headers.Add("X-Service-Signature",ServiceSignature.Sign(config.GatewaySecret,path,scope,timestamp,nonce,body));
         using var response = await http.SendAsync(message,ct);

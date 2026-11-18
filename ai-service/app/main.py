@@ -15,7 +15,7 @@ from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.config import Settings
-from app.core.logging import application_logger
+from app.core.logging import application_logger, correlation_context
 from app.db.session import build_engine, check_database
 
 logger = application_logger()
@@ -48,6 +48,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             correlation_id = UUID(request.headers.get("X-Correlation-ID", "")).hex
         except ValueError:
             correlation_id = uuid4().hex
+        token = correlation_context.set(correlation_id)
         try:
             response = await call_next(request)
         except Exception as error:
@@ -57,6 +58,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         logger.info("http_request", extra={"correlation_id": correlation_id, "method": request.method, "path": request.url.path, "status_code": response.status_code})
         response.headers["X-Correlation-ID"] = correlation_id
         response.headers["X-Request-ID"] = correlation_id
+        correlation_context.reset(token)
         return response
 
     @app.post("/internal/chat", include_in_schema=False)
