@@ -1089,3 +1089,128 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .price-unit { font-size: .65em; font-weight: 400; color: #7b8271; }
 
 .product-page h1 { white-space: normal; overflow-wrap: break-word; }
+/* Shop, basket and personal space */
+.catalog-editorial { display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; align-items: center; padding: 32px 0 42px}
+.catalog-editorial .catalog-heading { padding: 24px 0}
+.catalog-editorial h1 { font-size: clamp(42px,5vw,70px); line-height: 1.12}
+.catalog-editorial figure { margin: 0; position: relative; padding: 0 0 20px 25px}
+.catalog-editorial figure img { width: 100%; height: 240px; object-fit: cover; border-radius: 110px 4px 4px 4px}
+.catalog-editorial figcaption { position: absolute; bottom: 0; left: 0; background: #faf9f5; padding: 14px 24px 0 0; font: italic 23px var(--serif); color: var(--olive)}
+
+.catalog-discovery { border-top: 1px solid var(--line); padding-top: 25px; margin-bottom: 30px}
+.catalog-controls .search-panel { border-radius: 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding-left: 0; gap: 12px}
+.catalog-controls .search-panel input { background: transparent}
+.catalog-refine { border-block: 1px solid var(--line); margin: 22px 0}
+.catalog-refine summary { display: flex; align-items: center; justify-content: space-between; padding: 17px 0; cursor: pointer; font-size: 12px; list-style: none}
+.catalog-refine summary: : -webkit-details-marker { display: none}
+.catalog-refine[open] summary svg { transform: rotate(45deg)}
+.catalog-toolbar { flex-wrap: wrap; font-size: 12px}
+.catalog-toolbar>span { margin-left: auto}
+.clear-filters { font-size: 11px; text-decoration: underline; text-underline-offset: 4px; color: var(--muted)}
+.catalog-page .product-grid { gap: 35px 22px}
+.catalog-page .shop-product-visual { border-radius: 3px}
+.catalog-pagination button { border-radius: 24px}
+
+.basket-page { padding-block: 28px 90px; min-height: 70vh}
+.basket-heading { display: flex; justify-content: space-between; align-items: end; padding: 45px 0 35px; gap: 25px}
+.basket-heading h1,.personal-heading h1 { font: 400 clamp(38px,4vw,58px)/1.2 var(--serif); margin-top: 16px}
+.basket-heading h1 em,.personal-heading h1 em { color: var(--olive)}
+.basket-empty { display: grid; grid-template-columns: 1fr 1.1fr; background: #efeee5; border-radius: 4px; overflow: hidden}
+.basket-empty-photo img { width: 100%; height: 100%; min-height: 420px; object-fit: cover}
+.basket-empty>div: last-child { padding: 50px; align-self: center}
+.basket-empty-icon { display: flex; width: 48px; height: 48px; border: 1px solid #b9bfaa; border-radius: 50%; align-items: center; justify-content: center; margin-bottom: 25px}
+.basket-empty h2 { font: 400 clamp(30px,3vw,45px)/1.2 var(--serif); margin: 18px 0}
+.basket-empty h2 em { color: var(--olive)}
+.basket-empty p: not(.eyebrow) { font-size: 12px; color: var(--muted); line-height: 1.9; margin-bottom: 28px}
+
+.basket-layout { display: grid; grid-template-columns: minmax(0,1.7fr) minmax(280px,1fr); gap: 50px; align-items: start}
+.basket-list-heading { display: flex; justify-content: space-between; font-size: 12px; padding: 15px 0; border-bottom: 1px solid var(--line)}
+.basket-items { list-style: none; padding: 0; margin: 0}
+.basket-items li { display: flex; gap: 22px; padding: 26px 0; border-bottom: 1px solid var(--line)}
+.basket-items img { width: 115px; height: 140px; object-fit: cover; border-radius: 3px}
+.basket-item-info { flex: 1; min-width: 0}
+.basket-item-info h2 { font: 25px var(--serif); margin: 10px 0}
+.basket-item-info .quantity { margin-top: 18px}
+.basket-line-end { display: flex; flex-direction: column; justify-content: space-between; align-items: end; font-size: 13px}
+.basket-note { display: flex; gap: 10px; align-items: center; font-size: 11px; color: var(--muted); margin-top: 20px}
+.basket-summary { background: #eeefe5; padding: 30px; position: sticky; top: 105px}
+.basket-summary h2 { font: 29px var(--serif); margin: 18px 0 28px}
+.basket-summary>div { display: flex; justify-content: space-between; gap: 15px; font-size: 12px; margin: 18px 0}
+.basket-summary .basket-grand { border-top: 1px solid #cdd2bf; padding-top: 23px; margin-top: 25px}
+.basket-grand strong { font-size: 19px}
+.basket-summary>p: not(.eyebrow) { font-size: 11px; color: var(--muted); margin: 25px 0}
+.basket-summary .button { width: 100%}
+
+.personal-page { padding-top: 28px}
+.personal-heading { padding: 40px 0}
+.personal-heading>p: last-child { color: var(--muted); margin-top: 16px; font-size: 12px}
+.personal-layout { display: grid; grid-template-columns: 260px minmax(0,1fr); gap: 35px; align-items: start}
+.personal-sidebar { background: #eeefe5; padding: 30px 22px; border-radius: 4px}
+.personal-identity { display: flex; align-items: center; flex-direction: column; padding-bottom: 28px; margin-bottom: 15px; border-bottom: 1px solid #d6d9ca; text-align: center}
+.personal-identity .account-avatar { background: #dce1cd; color: var(--olive); font: 30px var(--serif); width: 65px; height: 65px; margin-bottom: 14px}
+.personal-identity strong { font-size: 14px; overflow-wrap: anywhere}
+.personal-identity>span { font-size: 10px; color: var(--muted); margin-top: 7px}
+.personal-nav { display: flex; align-items: center; gap: 13px; padding: 15px 12px; font-size: 12px; width: 100%; text-align: left; border-radius: 3px}
+.personal-nav.active { background: #fffefa; color: var(--olive)}
+.profile-panel { padding: 32px; border: 1px solid var(--line); border-radius: 4px; background: #fffefa; scroll-margin-top: 110px}
+.profile-title { display: flex; align-items: center; justify-content: space-between}
+.profile-title h2 { font: 30px var(--serif); margin-top: 12px}
+.profile-title>svg { width: 30px; height: 30px; color: var(--olive)}
+.profile-intro { color: var(--muted); font-size: 12px; margin-top: 15px}
+.profile-panel .account-details { margin-bottom: 0}
+.profile-panel .account-details>div { padding: 16px 0; border-bottom: 1px solid #eeeee6; font-size: 12px}
+.profile-panel .account-details>div: last-child { border: 0}
+.personal-inspiration { margin-top: 24px; display: grid; grid-template-columns: 190px 1fr; background: #f0e9de; min-height: 220px; overflow: hidden; border-radius: 4px}
+.personal-inspiration img { height: 100%; width: 100%; object-fit: cover; max-height: 270px}
+.personal-inspiration>div { padding: 30px; align-self: center}
+.personal-inspiration h2 { font: 30px/1.25 var(--serif); margin: 15px 0}
+.personal-inspiration span { display: flex; gap: 22px; align-items: center; font-size: 11px}
+
+@media(max-width: 800px) { .catalog-editorial { gap: 25px}
+.personal-layout { grid-template-columns: 210px minmax(0,1fr); gap: 20px}
+.personal-inspiration { grid-template-columns: 110px 1fr}
+.personal-inspiration>div { padding: 22px}
+.basket-layout { gap: 25px}
+.basket-summary { padding: 22px}
+.basket-items img { width: 80px; height: 110px}
+.basket-items li { gap: 12px}
+.basket-empty>div: last-child { padding: 30px}
+}
+
+@media(max-width: 600px) { .catalog-editorial { grid-template-columns: 1fr; gap: 5px; padding-top: 5px}
+.catalog-editorial .catalog-heading { padding-bottom: 20px}
+.catalog-editorial figure { padding-left: 0}
+.catalog-editorial figure img { height: 175px; border-radius: 65px 3px 3px 3px}
+.catalog-editorial figcaption { font-size: 20px}
+.catalog-toolbar { flex-direction: row; gap: 15px}
+.catalog-toolbar>span { margin-left: 0}
+.catalog-toolbar .clear-filters { margin-left: auto}
+.catalog-page .product-grid { gap: 25px 12px}
+.basket-heading { padding: 30px 0; align-items: start; flex-direction: column; gap: 20px}
+.basket-heading h1 { font-size: 38px}
+.basket-empty { grid-template-columns: 1fr}
+.basket-empty-photo img { min-height: 0; height: 190px}
+.basket-empty>div: last-child { padding: 30px 24px}
+.basket-empty-icon { display: none}
+.basket-layout { grid-template-columns: 1fr}
+.basket-summary { position: static}
+.basket-line-end { max-width: 90px; text-align: right}
+.basket-item-info h2 { font-size: 22px}
+.basket-line-end strong { font-size: 11px}
+.personal-heading { padding: 30px 0}
+.personal-layout { grid-template-columns: 1fr}
+.personal-sidebar { padding: 20px}
+.personal-identity { flex-direction: row; gap: 12px; flex-wrap: wrap; justify-content: start; text-align: left; padding-bottom: 15px}
+.personal-identity .account-avatar { width: 42px; height: 42px; margin: 0; font-size: 23px}
+.personal-identity>span { margin: 0}
+.personal-nav { padding: 12px}
+.profile-panel { padding: 24px}
+.personal-inspiration { grid-template-columns: 100px 1fr}
+.personal-inspiration h2 { font-size: 26px}
+.profile-panel .account-details>div { flex-direction: column; gap: 8px}
+}
+
+
+.personal-nav, .clear-filters { background: transparent; border: 0; cursor: pointer; color: inherit; font-family: inherit; }
+.personal-nav.active { background: #fffefa; }
+.clear-filters { color: var(--muted); }
