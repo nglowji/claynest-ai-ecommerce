@@ -46,9 +46,11 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       DataProtection__KeysPath: /app/keys
+      Catalog__ImagePath: /app/media/catalog
       ConnectionStrings__Commerce: Host=db;Port=5432;Database=${POSTGRES_DB:-claynest};Username=commerce_app;Password=${COMMERCE_DB_PASSWORD}
     volumes:
       - api_keys:/app/keys
+      - catalog_images:/app/media/catalog
     ports:
       - "127.0.0.1:${COMMERCE_API_PORT:-8000}:8080"
     depends_on:
@@ -68,12 +70,14 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Commerce: Host=db;Port=5432;Database=${POSTGRES_DB:-claynest};Username=commerce_app;Password=${COMMERCE_DB_PASSWORD}
       DataProtection__KeysPath: /app/keys
+      Catalog__ImagePath: /app/media/catalog
       Bootstrap__Email: ${ADMIN_EMAIL}
       Bootstrap__Password: ${ADMIN_PASSWORD}
       Bootstrap__DisplayName: ${ADMIN_DISPLAY_NAME:-Quản trị Nàng Gốm}
     volumes:
       - api_keys:/app/keys
-    command: ["--bootstrap-auth"]
+      - catalog_images:/app/media/catalog
+    command: ["--bootstrap-auth", "--seed-catalog"]
     depends_on:
       db:
         condition: service_healthy
@@ -145,11 +149,12 @@ services:
     environment: &e2e-api-env
       ASPNETCORE_ENVIRONMENT: Development
       DataProtection__KeysPath: /app/keys
+      Catalog__ImagePath: /app/media/catalog
       ConnectionStrings__Commerce: Host=db-test;Port=5432;Database=claynest_test;Username=commerce_app;Password=${TEST_COMMERCE_DB_PASSWORD}
       Bootstrap__Email: ${E2E_ADMIN_EMAIL}
       Bootstrap__Password: ${E2E_ADMIN_PASSWORD}
       Bootstrap__DisplayName: E2E administrator
-    command: ["--bootstrap-auth"]
+    command: ["--bootstrap-auth", "--seed-catalog"]
     depends_on:
       db-test:
         condition: service_healthy
@@ -189,3 +194,4 @@ services:
 volumes:
   postgres_data:
   api_keys:
+  catalog_images:

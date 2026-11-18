@@ -28,7 +28,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 COPY --from=publish /out ./
-RUN mkdir -p /app/keys && chown $APP_UID:$APP_UID /app/keys
+RUN mkdir -p /app/keys /app/media/catalog && chown -R $APP_UID:$APP_UID /app/keys /app/media
 USER $APP_UID
 ENV ASPNETCORE_HTTP_PORTS=8080
 EXPOSE 8080

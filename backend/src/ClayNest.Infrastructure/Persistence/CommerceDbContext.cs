@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ClayNest.Domain.Catalog;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using ClayNest.Infrastructure.Identity;
@@ -7,6 +8,8 @@ namespace ClayNest.Infrastructure.Persistence;
 
 public sealed class CommerceDbContext(DbContextOptions<CommerceDbContext> options) : IdentityDbContext<AdminUser, IdentityRole<Guid>, Guid>(options)
 {
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Product> Products => Set<Product>();
     public const string Schema = "commerce";
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Options;
 
+var seedCatalog = args.Contains("--seed-catalog");
 var bootstrapAuth = args.Contains("--bootstrap-auth");
-var builder = WebApplication.CreateBuilder(args.Where(arg => arg != "--bootstrap-auth").ToArray());
+var builder = WebApplication.CreateBuilder(args.Where(arg => arg != "--bootstrap-auth" && arg != "--seed-catalog").ToArray());
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole(options => options.IncludeScopes = true);
 builder.Services.AddOpenApi();
@@ -29,15 +30,16 @@ builder.Services.AddOptions<CorsOptions>().Configure<IOptions<ClientOptions>>((o
         .WithExposedHeaders("X-Correlation-ID", "X-Request-ID")));
 
 var app = builder.Build();
-if (bootstrapAuth)
+if (bootstrapAuth || seedCatalog)
 {
     await using var scope = app.Services.CreateAsyncScope();
     var database = scope.ServiceProvider.GetRequiredService<ClayNest.Infrastructure.Persistence.CommerceDbContext>();
     await Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.MigrateAsync(database.Database);
-    await scope.ServiceProvider.GetRequiredService<ClayNest.Infrastructure.Identity.AdminProvisioner>().EnsureCreatedAsync(
+    if (bootstrapAuth) await scope.ServiceProvider.GetRequiredService<ClayNest.Infrastructure.Identity.AdminProvisioner>().EnsureCreatedAsync(
         builder.Configuration["Bootstrap:Email"] ?? string.Empty,
         builder.Configuration["Bootstrap:Password"] ?? string.Empty,
         builder.Configuration["Bootstrap:DisplayName"] ?? "Quản trị Nàng Gốm");
+    if (seedCatalog) await scope.ServiceProvider.GetRequiredService<ClayNest.Application.Catalog.ICatalogService>().SeedAsync(CancellationToken.None);
     return;
 }
 app.UseMiddleware<CorrelationMiddleware>();
@@ -51,12 +53,20 @@ app.UseStatusCodePages(async status =>
         404 => "not_found", 405 => "method_not_allowed", _ => "request_failed"
     }, "Yêu cầu không thể thực hiện. Vui lòng kiểm tra và thử lại.");
 });
+var imageRoot = ClayNest.Infrastructure.Catalog.LocalCatalogImageStorage.Root(builder.Configuration);
+Directory.CreateDirectory(imageRoot);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(imageRoot), RequestPath = "/media/catalog",
+    OnPrepareResponse = context => context.Context.Response.Headers["X-Content-Type-Options"] = "nosniff"
+});
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.MapOperationalEndpoints();
 app.MapAuthenticationEndpoints();
+app.MapCatalogEndpoints();
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.Run();
 

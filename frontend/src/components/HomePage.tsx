@@ -2,11 +2,13 @@ import { Link } from 'react-router-dom'
 import Icon from './Icon'
 import ProductGrid, { type ProductActions } from './ProductGrid'
 import { StoryCards } from './Stories'
-import { products } from '../data/products'
+import { productView } from '../data/products'
+import { useCatalog } from '../catalog/useCatalog'
 
 const categoryLink = (category: string) => `/products?category=${encodeURIComponent(category)}`
 
 export default function HomePage(actions: ProductActions) {
+  const catalog = useCatalog('pageSize=4&sort=newest')
   return <>
     <section className="banner" aria-labelledby="hero-title">
       <img className="calm-hero-image" src="/images/nang-gom/banner-calm.jpg" alt="Bát xanh, hai cốc gốm và bình hoa trên kệ đá trong ánh nắng dịu" fetchPriority="high" width="2172" height="724" />
@@ -21,7 +23,7 @@ export default function HomePage(actions: ProductActions) {
 
     <section className="products-section container" aria-labelledby="featured-title">
       <div className="section-heading sale-section-heading"><div><p className="eyebrow"><span className="sale-heading-label">HOT SALE</span> MỘT CHÚT ƯU ĐÃI, THÊM MỘT CHÚT THƯƠNG</p><h2 id="featured-title">Gốm xinh.<br /><em>Giá thêm thương.</em></h2></div><div className="sale-heading-aside"><span>Góc ưu đãi của Nàng</span><Link className="text-link" to="/products">Xem tất cả <Icon name="arrow" /></Link></div></div>
-      <ProductGrid items={products.slice(0, 4)} {...actions} /><p className="sale-demo-note">Giá gốc, giá ưu đãi và nhãn Hot Sale là dữ liệu minh họa cho giao diện, chưa phải chương trình khuyến mãi thực tế.</p>
+      {catalog.loading && <p role="status">Đang chọn những món gốm cho bạn…</p>}{catalog.error && <p role="alert">{catalog.error} <button onClick={catalog.retry}>Thử lại</button></p>}{catalog.data && <ProductGrid items={catalog.data.items.map(p => productView(p))} {...actions} />}<p className="sale-demo-note">Giá và ưu đãi lấy từ catalog. Sản phẩm có nhãn DEMO là dữ liệu minh họa.</p>
     </section>
 
     <section id="collections" className="collections-section container" aria-labelledby="collections-title">

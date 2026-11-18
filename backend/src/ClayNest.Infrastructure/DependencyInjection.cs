@@ -50,6 +50,8 @@ public static class DependencyInjection
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
             options.Lockout.AllowedForNewUsers = true;
         }).AddRoles<IdentityRole<Guid>>().AddEntityFrameworkStores<CommerceDbContext>().AddSignInManager();
+        services.AddScoped<ClayNest.Application.Catalog.ICatalogService, ClayNest.Infrastructure.Catalog.CatalogService>();
+        services.AddScoped<ClayNest.Application.Catalog.ICatalogImageStorage, ClayNest.Infrastructure.Catalog.LocalCatalogImageStorage>();
         services.AddScoped<IAdminAuthenticationService, AdminAuthenticationService>();
         services.AddScoped<AdminProvisioner>();
         return services;
