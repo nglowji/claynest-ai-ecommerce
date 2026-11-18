@@ -115,6 +115,17 @@ public sealed class ProductVariant
     public long PriceVnd { get; private set; }
     public long? OriginalPriceVnd { get; private set; }
     public int StockQty { get; private set; }
+    public int LowStockThreshold { get; private set; } = 5;
+    public Guid StockRevision { get; private set; } = Guid.NewGuid();
+    public void ChangeStock(int delta, int? threshold = null)
+    {
+        var next = (long)StockQty + delta;
+        if (next < 0 || next > 1000000 || threshold is < 0 or > 1000000)
+            throw new ClayNest.Domain.Inventory.StockRuleException("Tồn kho phải từ 0–1.000.000; không thể trừ quá số lượng hiện có.");
+        StockQty = (int)next;
+        if (threshold.HasValue) LowStockThreshold = threshold.Value;
+        StockRevision = Guid.NewGuid();
+    }
     public bool Active { get; private set; }
     public string CareNote { get; private set; } = string.Empty;
     public string CareSource { get; private set; } = string.Empty;

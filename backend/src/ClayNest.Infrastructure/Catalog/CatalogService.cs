@@ -170,6 +170,9 @@ public sealed class CatalogService(CommerceDbContext db) : ICatalogService
             variant.Update(entry.Sku, entry.VariantName, entry.Glaze, entry.IntendedUse,
                 entry.CapacityMl, entry.WidthCm, entry.HeightCm, entry.WeightG, entry.PriceVnd, entry.OriginalPriceVnd, true, "", "", false);
             product.Variants.Add(variant);
+            if (variant.StockQty > 0)
+                db.StockMovements.Add(new ClayNest.Domain.Inventory.StockMovement(variant.Id, "opening", variant.StockQty,
+                    variant.StockQty, variant.LowStockThreshold, "Khởi tạo tồn kho bộ sưu tập Nàng Gốm", null, "Hệ thống"));
             for (var i = 0; i < entry.Images.Count; i++)
                 product.Images.Add(new ProductImage(product.Id, entry.Images[i].Path, entry.Name, i));
             product.ValidatePublication(); db.Products.Add(product);

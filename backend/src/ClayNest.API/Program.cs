@@ -71,6 +71,7 @@ app.UseRateLimiter();
 app.MapOperationalEndpoints();
 app.MapAuthenticationEndpoints();
 app.MapCatalogEndpoints();
+app.MapInventoryEndpoints();
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.Run();
 

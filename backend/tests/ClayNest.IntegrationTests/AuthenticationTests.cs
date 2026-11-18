@@ -102,16 +102,11 @@ public sealed class AuthenticationTests
     public async Task Registration_creates_only_customer_and_rejects_duplicate_or_weak_password()
     {
         await using var session = await Session.CreateAsync(admin: false);
-        await using (var scope = session.Factory.Services.CreateAsyncScope())
-        {
-            var users = scope.ServiceProvider.GetRequiredService<UserManager<AdminUser>>();
-            var user = await users.FindByEmailAsync(session.Email);
-            Assert.True((await users.DeleteAsync(user!)).Succeeded);
-        }
+        var registeredEmail = "new-" + session.Email;
         async Task<HttpResponseMessage> Register(string password, bool csrf = true)
         {
             using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/register")
-            { Content = JsonContent.Create(new { displayName = "Customer test", email = session.Email, password, role = "Admin" }) };
+            { Content = JsonContent.Create(new { displayName = "Customer test", email = registeredEmail, password, role = "Admin" }) };
             if (csrf) request.Headers.Add("X-CSRF-TOKEN", await session.CsrfAsync());
             return await session.Client.SendAsync(request);
         }
@@ -124,17 +119,20 @@ public sealed class AuthenticationTests
         await using (var scope = session.Factory.Services.CreateAsyncScope())
         {
             var users = scope.ServiceProvider.GetRequiredService<UserManager<AdminUser>>();
-            var user = await users.FindByEmailAsync(session.Email);
-            session.userId = user!.Id.ToString();
+            var user = await users.FindByEmailAsync(registeredEmail);
+            Assert.NotNull(user);
             Assert.False(await users.IsInRoleAsync(user, CommerceRoles.Admin));
         }
         using var duplicate = await Register(session.Password);
         Assert.Equal(HttpStatusCode.BadRequest, duplicate.StatusCode);
-        using var login = await session.LoginAsync();
+        using var login = await session.LoginAsync(email: registeredEmail);
         Assert.Equal(HttpStatusCode.OK, login.StatusCode);
         Assert.Equal(CommerceRoles.Customer, (await login.Content.ReadFromJsonAsync<AdminProfile>())?.Role);
         using var admin = await session.Client.GetAsync("/api/v1/admin/session");
         Assert.Equal(HttpStatusCode.Forbidden, admin.StatusCode);
+        await using var cleanup = session.Factory.Services.CreateAsyncScope();
+        var manager = cleanup.ServiceProvider.GetRequiredService<UserManager<AdminUser>>();
+        Assert.True((await manager.DeleteAsync((await manager.FindByEmailAsync(registeredEmail))!)).Succeeded);
     }
 
     [DatabaseFact]
@@ -174,7 +172,7 @@ public sealed class AuthenticationTests
         Assert.Equal(HttpStatusCode.TooManyRequests, rejected.StatusCode);
     }
 
-    private sealed class AuthFactory : WebApplicationFactory<Program>
+    internal sealed class AuthFactory : WebApplicationFactory<Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {

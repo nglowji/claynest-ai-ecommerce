@@ -10,6 +10,7 @@ public sealed class CommerceDbContext(DbContextOptions<CommerceDbContext> option
 {
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();
+    public DbSet<ClayNest.Domain.Inventory.StockMovement> StockMovements => Set<ClayNest.Domain.Inventory.StockMovement>();
     public const string Schema = "commerce";
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

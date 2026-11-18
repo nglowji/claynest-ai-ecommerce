@@ -128,7 +128,7 @@ public sealed class CatalogTests
         Assert.Equal(310000, studio.Variants.Single().OriginalPriceVnd);
         Assert.Equal(300, studio.Variants.Single().CapacityMl); Assert.Equal(9.5m, studio.Variants.Single().HeightCm);
         Assert.Equal(8.5m, studio.Variants.Single().WidthCm); Assert.Equal(320, studio.Variants.Single().WeightG);
-        Assert.False(studio.Variants.Single().CareVerified); Assert.Equal(0, studio.Variants.Single().StockQty);
+        Assert.False(studio.Variants.Single().CareVerified); Assert.Equal(30, studio.Variants.Single().StockQty);
         using var hidden = await s.Client.GetAsync("/api/v1/products/ban-nhap-demo");
         Assert.Equal(HttpStatusCode.NotFound, hidden.StatusCode);
         var product = await s.Save(s.Input()); var id = product.Variants.Single().Id;

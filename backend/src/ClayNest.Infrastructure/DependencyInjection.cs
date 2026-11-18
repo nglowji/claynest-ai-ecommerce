@@ -54,6 +54,7 @@ public static class DependencyInjection
         services.AddScoped<ClayNest.Application.Catalog.ICatalogImageStorage, ClayNest.Infrastructure.Catalog.LocalCatalogImageStorage>();
         services.AddScoped<IAdminAuthenticationService, AdminAuthenticationService>();
         services.AddScoped<AdminProvisioner>();
+        services.AddScoped<ClayNest.Application.Inventory.IInventoryService, ClayNest.Infrastructure.Inventory.InventoryService>();
         return services;
     }
 }

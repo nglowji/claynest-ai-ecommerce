@@ -1,4 +1,6 @@
 using ClayNest.Application.Identity;
+using ClayNest.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using ClayNest.Domain.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -7,7 +9,7 @@ namespace ClayNest.Infrastructure.Identity;
 
 public sealed class AdminAuthenticationService(
     UserManager<AdminUser> users, SignInManager<AdminUser> signIn,
-    IPasswordHasher<AdminUser> passwords) : IAdminAuthenticationService
+    IPasswordHasher<AdminUser> passwords, CommerceDbContext db, RoleManager<IdentityRole<Guid>> roles) : IAdminAuthenticationService
 {
     private static readonly AdminUser DummyUser = new();
     private static readonly string DummyHash = new PasswordHasher<AdminUser>()
@@ -55,9 +57,24 @@ public sealed class AdminAuthenticationService(
     public async Task<RegistrationResult> RegisterAsync(RegisterCommand command)
     {
         var user = new AdminUser { Id = Guid.NewGuid(), UserName = command.Email.Trim(), Email = command.Email.Trim(), DisplayName = command.DisplayName.Trim() };
-        // Public registration never assigns administrative roles.
+        // Serialize registration and configured bootstrap across API instances.
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        await db.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(742019001)");
+        var firstAccount = !await users.Users.AnyAsync();
         var result = await users.CreateAsync(user, command.Password);
-        return new RegistrationResult(result.Succeeded);
+        if (!result.Succeeded) return new RegistrationResult(false);
+        if (firstAccount)
+        {
+            if (!await roles.RoleExistsAsync(CommerceRoles.Admin))
+            {
+                var role = await roles.CreateAsync(new IdentityRole<Guid>(CommerceRoles.Admin));
+                if (!role.Succeeded) throw new InvalidOperationException("Cannot initialize admin role.");
+            }
+            if (!(await users.AddToRoleAsync(user, CommerceRoles.Admin)).Succeeded)
+                throw new InvalidOperationException("Cannot initialize first administrator.");
+        }
+        await transaction.CommitAsync();
+        return new RegistrationResult(true);
     }
 
     private async Task<AdminProfile> ProfileAsync(AdminUser user) => new(user.Id, user.Email!, user.DisplayName,

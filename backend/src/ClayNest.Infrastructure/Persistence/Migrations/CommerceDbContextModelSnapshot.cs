@@ -229,6 +229,9 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                         .HasMaxLength(160)
                         .HasColumnType("character varying(160)");
 
+                    b.Property<int>("LowStockThreshold")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)
@@ -250,6 +253,10 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("StockQty")
                         .HasColumnType("integer");
+
+                    b.Property<Guid>("StockRevision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid");
 
                     b.Property<int?>("WeightG")
                         .HasColumnType("integer");
@@ -277,7 +284,60 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("CK_Variant_Stock", "\"StockQty\" >= 0");
 
+                            t.HasCheckConstraint("CK_Variant_Threshold", "\"LowStockThreshold\" BETWEEN 0 AND 1000000");
+
                             t.HasCheckConstraint("CK_Variant_VerifiedCare", "NOT \"CareVerified\" OR (length(trim(\"CareNote\")) > 0 AND length(trim(\"CareSource\")) > 0)");
+                        });
+                });
+
+            modelBuilder.Entity("ClayNest.Domain.Inventory.StockMovement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ActorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ActorName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("BalanceAfter")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("QuantityDelta")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("ThresholdAfter")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("VariantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VariantId", "CreatedAt", "Id");
+
+                    b.ToTable("StockMovements", "commerce", t =>
+                        {
+                            t.HasCheckConstraint("CK_Movement_Balance", "\"BalanceAfter\" >= 0 AND \"ThresholdAfter\" BETWEEN 0 AND 1000000");
+
+                            t.HasCheckConstraint("CK_Movement_Kind", "(\"Kind\" = 'receipt' AND \"QuantityDelta\" > 0) OR (\"Kind\" = 'adjustment' AND \"QuantityDelta\" <> 0) OR (\"Kind\" = 'threshold' AND \"QuantityDelta\" = 0) OR (\"Kind\" = 'opening' AND \"QuantityDelta\" >= 0)");
                         });
                 });
 
@@ -512,6 +572,15 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                     b.HasOne("ClayNest.Domain.Catalog.Product", null)
                         .WithMany("Variants")
                         .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ClayNest.Domain.Inventory.StockMovement", b =>
+                {
+                    b.HasOne("ClayNest.Domain.Catalog.ProductVariant", null)
+                        .WithMany()
+                        .HasForeignKey("VariantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
