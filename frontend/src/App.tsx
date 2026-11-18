@@ -10,6 +10,9 @@ import AdminInventoryPage from './components/AdminInventoryPage'
 import AccountPage from './components/AccountPage'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import CartPage from './components/CartPage'
+import CheckoutPage from './components/CheckoutPage'
+import OrderStatusPage from './components/OrderStatusPage'
+import { useCart } from './features/cart/useCart'
 import ProductsPage from './components/ProductsPage'
 import ProductPage from './components/ProductPage'
 import AdminCatalogPage from './components/AdminCatalogPage'
@@ -18,7 +21,6 @@ import { StoriesPage, StoryPage } from './components/Stories'
 import { stories } from './data/stories'
 import { type Product } from './data/products'
 
-type Cart = Record<string, number>
 export default function App() { return <AuthProvider><Routes>
   <Route path="/admin" element={<AdminLayout />}><Route index element={<AdminPage />} /><Route path="products" element={<AdminCatalogPage />} /><Route path="inventory" element={<AdminInventoryPage />} /><Route path="*" element={<section className="container account-page"><h1>Không tìm thấy trang quản trị</h1><Link to="/admin">Về tổng quan</Link></section>} /></Route>
   <Route path="*" element={<StoreApp />} />
@@ -29,11 +31,10 @@ function StoreApp() {
   const location = useLocation()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [cart, setCart] = useState<Cart>({})
-  const [cartProducts, setCartProducts] = useState<Record<string, Product>>({})
+  const basket = useCart()
+  const cart = basket.quantities
   const [notice, setNotice] = useState('')
-  const count = Object.values(cart).reduce((sum, qty) => sum + qty, 0)
-  const products = Object.values(cartProducts)
+  const count = basket.count
   useEffect(() => {
     setMenuOpen(false)
     if (location.hash) {
@@ -44,17 +45,14 @@ function StoreApp() {
   }, [location.pathname, location.hash])
   useEffect(() => {
     const story = stories.find(item => location.pathname === `/stories/${item.slug}`)
-    document.title = location.pathname === '/cart' ? 'Giỏ hàng | Nàng Gốm' : location.pathname === '/admin' ? 'Quản trị | Nàng Gốm' : location.pathname === '/register' ? 'Đăng ký | Nàng Gốm' : location.pathname === '/login' ? 'Đăng nhập | Nàng Gốm' : location.pathname === '/account' ? 'Tài khoản | Nàng Gốm' : story ? `${story.title} | Nàng Gốm` : location.pathname === '/products' ? 'Tất cả sản phẩm | Nàng Gốm' : location.pathname.startsWith('/stories') ? 'Chuyện của gốm | Nàng Gốm' : 'Nàng Gốm | Gốm mộc & chuyện nhà'
+    document.title = location.pathname === '/checkout' ? 'Đặt hàng | Nàng Gốm' : location.pathname.startsWith('/orders') ? 'Đơn hàng | Nàng Gốm' : location.pathname === '/cart' ? 'Giỏ hàng | Nàng Gốm' : location.pathname === '/admin' ? 'Quản trị | Nàng Gốm' : location.pathname === '/register' ? 'Đăng ký | Nàng Gốm' : location.pathname === '/login' ? 'Đăng nhập | Nàng Gốm' : location.pathname === '/account' ? 'Tài khoản | Nàng Gốm' : story ? `${story.title} | Nàng Gốm` : location.pathname === '/products' ? 'Tất cả sản phẩm | Nàng Gốm' : location.pathname.startsWith('/stories') ? 'Chuyện của gốm | Nàng Gốm' : 'Nàng Gốm | Gốm mộc & chuyện nhà'
   }, [location.pathname])
   useEffect(() => { if (!notice) return; const id = window.setTimeout(() => setNotice(''), 3000); return () => window.clearTimeout(id) }, [notice])
   function add(product: Product) {
     if (product.stockQty <= 0) return
-    setCartProducts(current => ({ ...current, [product.variantId]: product }))
-    setCart(current => ({ ...current, [product.variantId]: Math.min(product.stockQty, (current[product.variantId] || 0) + 1) }))
+    if (!cart[product.variantId] && Object.keys(cart).length >= 30) { setNotice('Giỏ hàng tối đa 30 loại sản phẩm.'); return }
+    basket.add(product.variantId, product.stockQty)
     setNotice(`Đã thêm ${product.name} vào giỏ hàng`)
-  }
-  function change(id: string, delta: number) {
-    setCart(current => { const next = { ...current }; next[id] = Math.min(cartProducts[id]?.stockQty || 0, Math.max(0, (next[id] || 0) + delta)); if (!next[id]) delete next[id]; return next })
   }
   function showProduct(product: Product) { navigate('/products/' + product.slug + '?variant=' + product.variantId) }
   const actions = { onAdd: add, onShow: showProduct }
@@ -79,7 +77,10 @@ function StoreApp() {
       <Route path="/" element={<HomePage {...actions} />} />
       <Route path="/register" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/cart" element={<CartPage items={products} quantities={cart} onChange={change} onRemove={id => setCart(current => { const next = { ...current }; delete next[id]; return next })} />} />
+      <Route path="/cart" element={<CartPage quantities={cart} onChange={basket.change} onRemove={basket.remove} />} />
+      <Route path="/checkout" element={<CheckoutPage quantities={cart} onPlaced={basket.clear} />} />
+      <Route path="/orders" element={<OrderStatusPage />} />
+      <Route path="/orders/:reference" element={<OrderStatusPage />} />
       <Route path="/account" element={<AccountPage />} />
       <Route path="/products" element={<ProductsPage {...actions} />} />
       <Route path="/products/:slug" element={<ProductPage {...actions} />} />
@@ -87,7 +88,7 @@ function StoreApp() {
       <Route path="/stories/:slug" element={<StoryPage />} />
       <Route path="*" element={<section className="container empty-state not-found"><h1>Không tìm thấy trang</h1><Link className="button primary" to="/">Về trang chủ <Icon name="arrow" /></Link></section>} />
     </Routes></main>
-    <footer className="site-footer">{location.pathname === '/' && <SiteLocation />}<div className="container footer-main"><div className="footer-brand"><Brand /><p>Một chút mộc cho nhà.<br />Một chút thương cho những ngày bình thường.</p></div><div className="footer-column"><h2>Ghé nhà Nàng</h2><Link to="/products">Tất cả sản phẩm</Link><Link to="/#collections">Những bộ sưu tập</Link><Link to="/#story">Câu chuyện Nàng Gốm</Link><Link to="/#location">Địa chỉ & bản đồ</Link></div><div className="footer-column"><h2>Ở lại một chút</h2><Link to="/stories">Chuyện của gốm</Link><Link to="/#craft">Từ đất đến gốm</Link><Link to="/products?category=B%E1%BB%99%20s%C6%B0u%20t%E1%BA%ADp">Một món quà nhỏ</Link></div><div className="footer-message"><p className="eyebrow">THƯƠNG NHÀ, THƯƠNG MÌNH</p><p>Nhà không cần thật lớn.<br />Chỉ cần có những điều mình yêu.</p><span>Nàng Gốm</span></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Nàng Gốm</span><span>Crafted with care by nglowji.</span><Link to="/">Về nhà Nàng ↑</Link></div></footer>
+    <footer className="site-footer">{location.pathname === '/' && <SiteLocation />}<div className="container footer-main"><div className="footer-brand"><Brand /><p>Một chút mộc cho nhà.<br />Một chút thương cho những ngày bình thường.</p></div><div className="footer-column"><h2>Ghé nhà Nàng</h2><Link to="/orders">Tra cứu đơn hàng</Link><Link to="/products">Tất cả sản phẩm</Link><Link to="/#collections">Những bộ sưu tập</Link><Link to="/#story">Câu chuyện Nàng Gốm</Link><Link to="/#location">Địa chỉ & bản đồ</Link></div><div className="footer-column"><h2>Ở lại một chút</h2><Link to="/stories">Chuyện của gốm</Link><Link to="/#craft">Từ đất đến gốm</Link><Link to="/products?category=B%E1%BB%99%20s%C6%B0u%20t%E1%BA%ADp">Một món quà nhỏ</Link></div><div className="footer-message"><p className="eyebrow">THƯƠNG NHÀ, THƯƠNG MÌNH</p><p>Nhà không cần thật lớn.<br />Chỉ cần có những điều mình yêu.</p><span>Nàng Gốm</span></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Nàng Gốm</span><span>Crafted with care by nglowji.</span><Link to="/">Về nhà Nàng ↑</Link></div></footer>
     <div className={notice ? 'toast visible' : 'toast'} role="status" aria-live="polite">{notice}</div>
 
   </>

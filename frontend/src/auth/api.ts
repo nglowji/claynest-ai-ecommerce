@@ -1,6 +1,6 @@
 export type AdminUser = { id: string; email: string; displayName: string; role: 'Admin' | 'Customer' }
 export class AuthError extends Error {
-  constructor(public status: number, message: string) { super(message) }
+  constructor(public status: number, message: string, public code?: string) { super(message) }
 }
 
 async function request(path: string, options: RequestInit = {}) {

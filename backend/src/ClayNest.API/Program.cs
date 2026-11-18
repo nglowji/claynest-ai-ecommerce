@@ -28,7 +28,7 @@ builder.Services.AddCors();
 builder.Services.AddOptions<CorsOptions>().Configure<IOptions<ClientOptions>>((options, clients) =>
     options.AddDefaultPolicy(policy => policy.WithOrigins(clients.Value.AllowedOrigins)
         .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-        .WithHeaders("Content-Type", "Authorization", "Idempotency-Key", "X-Correlation-ID")
+        .WithHeaders("Content-Type", "Authorization", "Idempotency-Key", "X-Correlation-ID", "X-CSRF-TOKEN", "X-Order-Token")
         .WithExposedHeaders("X-Correlation-ID", "X-Request-ID")));
 
 var app = builder.Build();
@@ -72,6 +72,7 @@ app.MapOperationalEndpoints();
 app.MapAuthenticationEndpoints();
 app.MapCatalogEndpoints();
 app.MapInventoryEndpoints();
+app.MapOrderEndpoints();
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.Run();
 

@@ -12,7 +12,7 @@ export async function catalogRequest<T>(path: string, options: RequestInit = {})
   const response = await fetch('/api/v1/' + path, { ...options, headers, credentials: 'same-origin', cache: 'no-store', signal: options.signal || AbortSignal.timeout(15000) })
   if (!response.ok) {
     const body = await response.json().catch(() => ({}))
-    throw new AuthError(response.status, body.title || 'Chưa tải được dữ liệu. Vui lòng thử lại.')
+    throw new AuthError(response.status, body.title || 'Chưa tải được dữ liệu. Vui lòng thử lại.', body.code)
   }
   return response.status === 204 ? undefined as T : response.json()
 }

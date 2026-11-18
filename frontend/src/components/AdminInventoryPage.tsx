@@ -6,7 +6,7 @@ import Icon from './Icon'
 
 type StockItem = { variantId: string; productId: string; productName: string; variantName: string; sku: string; stockQty: number; lowStockThreshold: number; revision: string; active: boolean; image: string }
 type Movement = { id: string; kind: string; quantityDelta: number; balanceAfter: number; thresholdAfter: number; reason: string; actorName: string; createdAt: string }
-const kindNames: Record<string,string> = { opening: 'Số dư đầu kỳ', receipt: 'Nhập kho', adjustment: 'Điều chỉnh', threshold: 'Đổi ngưỡng cảnh báo' }
+const kindNames: Record<string,string> = { sale: 'Đặt hàng', opening: 'Số dư đầu kỳ', receipt: 'Nhập kho', adjustment: 'Điều chỉnh', threshold: 'Đổi ngưỡng cảnh báo' }
 export default function AdminInventoryPage() {
   const auth = useAuth()
   const [query, setQuery] = useState('')
