@@ -12,6 +12,7 @@ public sealed class CommerceDbContext(DbContextOptions<CommerceDbContext> option
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ClayNest.Domain.Inventory.StockMovement> StockMovements => Set<ClayNest.Domain.Inventory.StockMovement>();
     public DbSet<ClayNest.Domain.Orders.Order> Orders => Set<ClayNest.Domain.Orders.Order>();
+    public DbSet<ClayNest.Domain.Orders.OrderStatusChange> OrderStatusChanges => Set<ClayNest.Domain.Orders.OrderStatusChange>();
     public const string Schema = "commerce";
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

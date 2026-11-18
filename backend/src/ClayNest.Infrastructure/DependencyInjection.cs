@@ -55,6 +55,7 @@ public static class DependencyInjection
         services.AddScoped<IAdminAuthenticationService, AdminAuthenticationService>();
         services.AddScoped<AdminProvisioner>();
         services.AddSingleton(TimeProvider.System);
+        services.AddScoped<ClayNest.Application.Orders.IAdminOrderService, ClayNest.Infrastructure.Orders.AdminOrderService>();
         services.AddScoped<ClayNest.Application.Orders.IOrderService, ClayNest.Infrastructure.Orders.OrderService>();
         services.AddScoped<ClayNest.Application.Inventory.IInventoryService, ClayNest.Infrastructure.Inventory.InventoryService>();
         return services;

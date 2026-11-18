@@ -21,8 +21,9 @@ public sealed class StockMovement
     {
         if (variantId == Guid.Empty || balanceAfter < 0 || thresholdAfter is < 0 or > 1000000)
             throw new StockRuleException("Thông tin tồn kho không hợp lệ.");
-        if (kind is not ("opening" or "receipt" or "adjustment" or "threshold" or "sale")
+        if (kind is not ("opening" or "receipt" or "adjustment" or "threshold" or "sale" or "restock")
             || (kind == "sale" && (delta >= 0 || orderId is null))
+            || (kind == "restock" && (delta <= 0 || orderId is null))
             || (kind == "receipt" && delta <= 0) || (kind == "adjustment" && delta == 0)
             || (kind == "threshold" && delta != 0) || (kind == "opening" && delta < 0))
             throw new StockRuleException("Loại thay đổi kho không hợp lệ.");

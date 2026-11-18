@@ -73,6 +73,7 @@ app.MapAuthenticationEndpoints();
 app.MapCatalogEndpoints();
 app.MapInventoryEndpoints();
 app.MapOrderEndpoints();
+app.MapAdminOrderEndpoints();
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.Run();
 

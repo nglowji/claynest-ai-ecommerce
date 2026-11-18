@@ -50,6 +50,11 @@ public sealed class Order
     public string AccessTokenProtected { get; private set; } = string.Empty;
     public DateTimeOffset AccessExpiresAt { get; private set; }
     public DateTimeOffset? AccessRevokedAt { get; private set; }
+    public int Revision { get; private set; }
+    public DateTimeOffset UpdatedAt { get; private set; }
+    public DateTimeOffset? CompletedAt { get; private set; }
+    public DateTimeOffset? CancelledAt { get; private set; }
+    public DateTimeOffset? RestockedAt { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public List<OrderItem> Items { get; private set; } = [];
     private Order() { }
@@ -64,13 +69,28 @@ public sealed class Order
         IdempotencyKey = idempotencyKey; PayloadHash = payloadHash; AccessTokenHash = accessHash;
         AccessTokenProtected = accessProtected;
         // PostgreSQL timestamps have microsecond precision; first response and replay must match exactly.
-        CreatedAt = new DateTimeOffset(now.UtcTicks - now.UtcTicks % 10, TimeSpan.Zero); AccessExpiresAt = CreatedAt.AddDays(30);
+        CreatedAt = OrderFlow.Timestamp(now); UpdatedAt = CreatedAt; AccessExpiresAt = CreatedAt.AddDays(30);
     }
     public void AddItem(Guid variantId, string sku, string name, string variantName, string image, int quantity, long unitPrice)
     {
         if (Items.Count >= 30 || Items.Any(i => i.VariantId == variantId)) throw new OrderRuleException("Giỏ hàng tối đa 30 loại sản phẩm, không lặp biến thể.");
         var item = new OrderItem(Id, variantId, sku, name, variantName, image, quantity, unitPrice);
         Items.Add(item); SubtotalVnd = checked(SubtotalVnd + item.LineTotalVnd); GrandTotalVnd = checked(SubtotalVnd + ShippingFeeVnd);
+    }
+    public void TransitionTo(string target, bool confirmCodCollected, DateTimeOffset now)
+    {
+        if (!OrderFlow.IsState(target)) throw new OrderRuleException("Trạng thái đích không hợp lệ.");
+        if (!OrderFlow.Next(Status).Contains(target)) throw new OrderTransitionException("Không thể chuyển trạng thái đơn theo thao tác này.");
+        if (target == "completed" && !confirmCodCollected)
+            throw new OrderRuleException("Cần xác nhận đơn đã giao và đã thu đủ tiền COD trước khi hoàn tất.");
+        Status = target; Revision = checked(Revision + 1); UpdatedAt = OrderFlow.Timestamp(now);
+        if (target == "completed") { CompletedAt = UpdatedAt; PaymentStatus = "paid"; }
+        if (target == "cancelled") CancelledAt = UpdatedAt;
+    }
+    public void MarkRestocked()
+    {
+        if (Status != "cancelled" || RestockedAt.HasValue) throw new OrderTransitionException("Đơn không đủ điều kiện hoàn kho.");
+        RestockedAt = CancelledAt;
     }
     public void RevokeAccess(DateTimeOffset now) => AccessRevokedAt ??= now;
 }

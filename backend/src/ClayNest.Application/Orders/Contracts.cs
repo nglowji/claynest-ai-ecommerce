@@ -12,9 +12,10 @@ public sealed record QuoteSnapshot(List<AcceptedLine> Items, long ShippingFeeVnd
 public sealed record CheckoutRequest(string QuoteToken, ShippingContact Contact, bool AcceptTerms);
 public sealed record OrderReceipt(string Reference, string AccessToken, DateTimeOffset AccessExpiresAt, long GrandTotalVnd, string Status);
 public sealed record OrderLineDto(string Sku, string ProductName, string VariantName, string Image, int Quantity, long UnitPriceVnd, long LineTotalVnd);
+public sealed record OrderProgressDto(string Status, DateTimeOffset ChangedAt);
 public sealed record OrderStatusDto(string Reference, string Status, string PaymentMethod, string PaymentStatus,
     long SubtotalVnd, long ShippingFeeVnd, long GrandTotalVnd, DateTimeOffset CreatedAt,
-    ShippingContact Contact, List<OrderLineDto> Items);
+    ShippingContact Contact, List<OrderLineDto> Items, DateTimeOffset? CompletedAt, DateTimeOffset? CancelledAt, List<OrderProgressDto> Timeline);
 public sealed class CheckoutConflictException(string code, string message) : Exception(message) { public string Code { get; } = code; }
 public interface IOrderService
 {

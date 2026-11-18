@@ -108,10 +108,13 @@ public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider p
             db.StockMovements.Add(new StockMovement(variant.Id, "sale", -line.Quantity, variant.StockQty, variant.LowStockThreshold,
                 "Giữ hàng cho đơn " + reference, customerId, customerId is null ? "Khách vãng lai" : "Khách hàng", order.Id));
         }
-        db.Orders.Add(order); await db.SaveChangesAsync(ct); await transaction.CommitAsync(ct);
+        db.Orders.Add(order);
+        db.OrderStatusChanges.Add(new OrderStatusChange(order.Id, 0, "", "pending", "Khách đặt hàng COD", customerId,
+            customerId is null ? "Khách vãng lai" : "Khách hàng", order.CreatedAt));
+        await db.SaveChangesAsync(ct); await transaction.CommitAsync(ct);
         return Receipt(order);
     }
-    private OrderReceipt Receipt(Order order) => new(order.Reference, secrets.Unprotect(order.AccessTokenProtected), order.AccessExpiresAt, order.GrandTotalVnd, order.Status);
+    private OrderReceipt Receipt(Order order) => new(order.Reference, secrets.Unprotect(order.AccessTokenProtected), order.AccessExpiresAt, order.GrandTotalVnd, "pending");
 
     private async Task<Order?> Accessible(string reference, string? token, Guid? customerId, CancellationToken ct)
     {
@@ -127,12 +130,17 @@ public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider p
         var o = await Accessible(reference, accessToken, customerId, ct);
         return o is null ? null : new(o.Reference, o.Status, o.PaymentMethod, o.PaymentStatus, o.SubtotalVnd, o.ShippingFeeVnd, o.GrandTotalVnd, o.CreatedAt,
             new(o.CustomerName, o.Phone, o.Email, o.Province, o.Address, o.ShippingNote),
-            o.Items.OrderBy(i => i.Sku).Select(i => new OrderLineDto(i.Sku, i.ProductName, i.VariantName, i.Image, i.Quantity, i.UnitPriceVnd, i.LineTotalVnd)).ToList());
+            o.Items.OrderBy(i => i.Sku).Select(i => new OrderLineDto(i.Sku, i.ProductName, i.VariantName, i.Image, i.Quantity, i.UnitPriceVnd, i.LineTotalVnd)).ToList(), o.CompletedAt, o.CancelledAt,
+            await db.OrderStatusChanges.AsNoTracking().Where(e => e.OrderId == o.Id && e.Sequence <= o.Revision).OrderBy(e => e.Sequence)
+                .Select(e => new OrderProgressDto(e.ToStatus, e.CreatedAt)).ToListAsync(ct));
     }
     public async Task<bool> RevokeAccessAsync(string reference, string? accessToken, Guid? customerId, CancellationToken ct)
     {
+        if (reference.Length > 32) return false;
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
+        await db.Orders.FromSqlInterpolated($"SELECT * FROM commerce.\"Orders\" WHERE \"Reference\" = {reference} FOR UPDATE").SingleOrDefaultAsync(ct);
         var order = await Accessible(reference, accessToken, customerId, ct);
         if (order is null) return false;
-        order.RevokeAccess(clock.GetUtcNow()); await db.SaveChangesAsync(ct); return true;
+        order.RevokeAccess(clock.GetUtcNow()); await db.SaveChangesAsync(ct); await transaction.CommitAsync(ct); return true;
     }
 }
