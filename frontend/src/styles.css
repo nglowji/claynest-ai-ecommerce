@@ -919,7 +919,7 @@ h1 { white-space: normal; }
 }
 
 /* Administrator sign-in and authenticated account. */
-.auth-page { padding-block: 54px 65px; }
+.auth-page { padding-block: 38px 46px; }
 .auth-layout { max-width: 1020px; margin-inline: auto; display: grid; grid-template-columns: .94fr 1.06fr; background: #fffefa; border: 1px solid #e5e7da; border-radius: 18px; overflow: hidden; box-shadow: 0 12px 45px #53603b08; }
 .auth-photo { position: relative; min-height: 600px; isolation: isolate; }
 .auth-photo>img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 44% center; z-index: -2; }
@@ -995,9 +995,16 @@ h1 { white-space: normal; }
 }
 
 /* Member entry and administration */
-.auth-redesign { border-radius: 4px; grid-template-columns: 1fr 1fr; max-width: 1080px; }
-.auth-redesign .auth-photo { margin: 16px; border-radius: 120px 4px 4px 4px; overflow: hidden; min-height: 660px; }
-.auth-redesign .auth-form-panel { padding: 34px 48px 42px; }
+.auth-redesign { border-radius: 4px; grid-template-columns: .95fr 1.05fr; max-width: 940px; }
+.auth-redesign .auth-photo { margin: 12px; border-radius: 100px 4px 4px 4px; overflow: hidden; min-height: 540px; }
+.auth-redesign .auth-form-panel { padding: 27px 34px 30px; }
+.auth-redesign .auth-back { margin-bottom: 20px; }
+.auth-redesign .auth-tabs { margin-bottom: 22px; }
+.auth-redesign .auth-form-panel h1 { font-size: 34px; }
+.auth-redesign .auth-intro { margin: 14px 0 20px; }
+.auth-redesign .auth-field { gap: 7px; margin-bottom: 14px; }
+.auth-redesign .auth-photo>div>p { font-size: 29px; }
+.auth-redesign .auth-submit { margin-top: 20px; min-height: 44px; padding-block: 11px; }
 .auth-redesign .auth-photo small { font-size: 11px; line-height: 1.8; opacity: .8; }
 .auth-tabs { display: flex; gap: 28px; border-bottom: 1px solid #e4e7db; margin-bottom: 30px; }
 .auth-tabs a { padding: 0 0 13px; font-size: 13px; color: #969b89; }
@@ -1023,8 +1030,10 @@ h1 { white-space: normal; }
 .admin-note { margin-top: 25px; }
 @media(max-width: 700px) {
  .auth-redesign { grid-template-columns: 1fr; }
- .auth-redesign .auth-photo { min-height: 190px; margin: 10px; border-radius: 55px 3px 3px 3px; }
- .auth-redesign .auth-form-panel { padding: 22px 25px 32px; }
+ .auth-redesign .auth-photo { min-height: 150px; margin: 10px; border-radius: 55px 3px 3px 3px; }
+ .auth-redesign .auth-form-panel { padding: 21px 24px 26px; }
+ .auth-redesign .auth-form-panel h1 { font-size: 31px; }
+ .auth-redesign .auth-photo>div>p { font-size: 22px; }
  .admin-heading h1 { font-size: 33px; }
  .admin-links { grid-template-columns: 1fr; }
  .admin-welcome { padding: 20px; gap: 14px; }
