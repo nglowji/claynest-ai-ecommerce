@@ -55,6 +55,11 @@ public static class DependencyInjection
         services.AddScoped<IAdminAuthenticationService, AdminAuthenticationService>();
         services.AddScoped<AdminProvisioner>();
         services.AddSingleton(TimeProvider.System);
+        services.Configure<ClayNest.Infrastructure.Chat.ChatOptions>(configuration.GetSection("Ai"));
+        services.AddSingleton<ClayNest.Infrastructure.Chat.ServiceSignature>();
+        services.AddScoped<ClayNest.Application.Chat.IChatCatalog, ClayNest.Infrastructure.Chat.ChatCatalog>();
+        services.AddScoped<ClayNest.Application.Chat.IChatService, ClayNest.Infrastructure.Chat.ChatService>();
+        services.AddHttpClient<ClayNest.Application.Chat.IChatGateway, ClayNest.Infrastructure.Chat.ChatGateway>(client => client.Timeout = TimeSpan.FromSeconds(45));
         services.AddScoped<ClayNest.Application.Orders.IAdminOrderService, ClayNest.Infrastructure.Orders.AdminOrderService>();
         services.AddScoped<ClayNest.Application.Orders.IOrderService, ClayNest.Infrastructure.Orders.OrderService>();
         services.AddScoped<ClayNest.Application.Inventory.IInventoryService, ClayNest.Infrastructure.Inventory.InventoryService>();

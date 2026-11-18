@@ -15,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args.Where(arg => arg != "--bootstrap
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole(options => options.IncludeScopes = true);
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<ChatCapacity>();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddAdminAuthentication(builder.Configuration, builder.Environment);
 builder.Services.AddProblemDetails();
@@ -74,6 +75,7 @@ app.MapCatalogEndpoints();
 app.MapInventoryEndpoints();
 app.MapOrderEndpoints();
 app.MapAdminOrderEndpoints();
+app.MapChatEndpoints();
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.Run();
 

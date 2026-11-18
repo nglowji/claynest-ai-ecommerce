@@ -17,8 +17,8 @@ public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider p
     private readonly IDataProtector quotes = protection.CreateProtector("NangGom.Checkout.Quote.v1");
     private readonly IDataProtector secrets = protection.CreateProtector("NangGom.Order.Access.v1");
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
-    private const string ShippingPolicy = "Phí giao hàng 30.000 đ toàn quốc. Miễn phí cho giá trị sản phẩm từ 800.000 đ.";
-    private const string PackingNote = "Mỗi món gốm được bọc chống sốc, chèn cố định và đóng hộp phù hợp đồ dễ vỡ. Thời gian giao được xác nhận khi cửa hàng xử lý đơn.";
+    private const string ShippingPolicy = CommercePolicy.ShippingDescription;
+    private const string PackingNote = CommercePolicy.PackingDescription;
     private static long Shipping(long subtotal) => subtotal >= 800000 ? 0 : 30000;
     private static string Hash(string value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value)));
 

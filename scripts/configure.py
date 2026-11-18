@@ -14,6 +14,9 @@ def configure() -> None:
             key, value = line.split("=", 1)
             values[key.strip()] = value.strip().strip("\"'")
     defaults = {
+        "GEMINI_API_KEY": "", "AI_GEMINI_MODEL": "gemini-3.5-flash-lite",
+        "AI_GATEWAY_SECRET": secrets.token_hex(32), "AI_TOOL_SECRET": secrets.token_hex(32),
+        "TEST_AI_GATEWAY_SECRET": secrets.token_hex(32), "TEST_AI_TOOL_SECRET": secrets.token_hex(32),
         "POSTGRES_USER": "claynest", "POSTGRES_DB": "claynest", "POSTGRES_PORT": "5432",
         "ADMIN_EMAIL": "admin@nanggom.local", "ADMIN_PASSWORD": secrets.token_urlsafe(20) + "aA1!",
         "ADMIN_DISPLAY_NAME": "Quản trị Nàng Gốm",
