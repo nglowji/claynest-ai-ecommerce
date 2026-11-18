@@ -8,4 +8,4 @@ export type OrderStatus = { reference: string; status: string; paymentMethod: st
 export const placeOrder = (key: string, command: Checkout) => catalogRequest<Receipt>('orders', { method: 'POST', headers: { 'Idempotency-Key': key }, body: JSON.stringify(command) })
 export const lookupOrder = (reference: string, token: string) => catalogRequest<OrderStatus>(`orders/${encodeURIComponent(reference)}/status`, { headers: token ? { 'X-Order-Token': token } : {} })
 export function saveReceipt(receipt: Receipt) { try { sessionStorage.setItem('nang-gom-order-' + receipt.reference, JSON.stringify(receipt)) } catch { /* Confirmation also receives the access token through router state. */ } }
-export function savedToken(reference: string): string { try { return JSON.parse(sessionStorage.getItem('nang-gom-order-' + reference) || '{}').accessToken || '' } catch { return '' } }
+export function savedToken(reference: string): string { try { const value = JSON.parse(sessionStorage.getItem('nang-gom-order-' + reference) || '{}').accessToken; return typeof value === 'string' ? value : '' } catch { return '' } }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { AuthError } from '../auth/api'
@@ -23,6 +23,7 @@ export default function CheckoutPage({ quantities, onPlaced }: { quantities: Car
   const [contact,setContact] = useState<Contact>(() => restore()?.command.contact || { name: auth.user?.displayName || '', email: auth.user?.email || '', phone: '', province: '', address: '', note: '' })
   const [accepted,setAccepted] = useState(false)
   const [submitting,setSubmitting] = useState(false)
+  const submittingRef = useRef(false)
   const [error,setError] = useState('')
   const [now,setNow] = useState(Date.now())
   useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer) }, [])
@@ -31,10 +32,10 @@ export default function CheckoutPage({ quantities, onPlaced }: { quantities: Car
   const update = (key: keyof Contact, value: string) => setContact(current => ({ ...current, [key]: value }))
   function remember(value: Attempt | null) { setPending(value); try { value ? sessionStorage.setItem(pendingKey, JSON.stringify(value)) : sessionStorage.removeItem(pendingKey) } catch { /* The same in-memory attempt is reused while this tab remains open. */ } }
   async function submit(event: React.FormEvent) {
-    event.preventDefault(); if (submitting) return
+    event.preventDefault(); if (submittingRef.current) return
     if (!pending && (!accepted || !quote.data?.canCheckout || !quote.data.quoteToken || expired)) return
     const attempt = pending || { key: crypto.randomUUID(), command: { quoteToken: quote.data!.quoteToken!, contact, acceptTerms: true }, cart: { ...quantities } }
-    remember(attempt); setSubmitting(true); setError('')
+    submittingRef.current = true; remember(attempt); setSubmitting(true); setError('')
     try {
       const receipt = await placeOrder(attempt.key, attempt.command)
       saveReceipt(receipt); remember(null); onPlaced(attempt.cart); navigate('/orders/' + receipt.reference, { replace: true, state: receipt })
@@ -45,7 +46,7 @@ export default function CheckoutPage({ quantities, onPlaced }: { quantities: Car
         remember(null); setAccepted(false); quote.retry()
       }
       // Network errors and uncertain results keep the exact payload/key, including after refresh.
-    } finally { setSubmitting(false) }
+    } finally { submittingRef.current = false; setSubmitting(false) }
   }
   if (!Object.keys(quantities).length && !pending) return <section className="container basket-page"><h1>Giỏ hàng đang trống</h1><Link className="button primary" to="/products">Chọn một món gốm <Icon name="arrow" /></Link></section>
   return <section className="checkout-page container" aria-labelledby="checkout-title"><nav className="breadcrumbs" aria-label="Đường dẫn"><Link to="/cart">Giỏ hàng</Link><span>/</span><span>Đặt hàng</span></nav><div className="checkout-heading"><p className="eyebrow">THÊM MỘT CHÚT GỐM CHO NHÀ</p><h1 id="checkout-title">Sắp về <em>bên bạn.</em></h1><p>Kiểm tra món gốm và thông tin nhận hàng trước khi xác nhận.</p></div>

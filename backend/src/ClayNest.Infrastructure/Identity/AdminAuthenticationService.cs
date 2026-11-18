@@ -9,7 +9,7 @@ namespace ClayNest.Infrastructure.Identity;
 
 public sealed class AdminAuthenticationService(
     UserManager<AdminUser> users, SignInManager<AdminUser> signIn,
-    IPasswordHasher<AdminUser> passwords, CommerceDbContext db, RoleManager<IdentityRole<Guid>> roles) : IAdminAuthenticationService
+    IPasswordHasher<AdminUser> passwords, CommerceDbContext db, RoleManager<IdentityRole<Guid>> roles, TimeProvider clock) : IAdminAuthenticationService
 {
     private static readonly AdminUser DummyUser = new();
     private static readonly string DummyHash = new PasswordHasher<AdminUser>()
@@ -29,7 +29,7 @@ public sealed class AdminAuthenticationService(
         await signIn.SignInAsync(user, new AuthenticationProperties
         {
             IsPersistent = command.RememberMe,
-            ExpiresUtc = DateTimeOffset.UtcNow.Add(command.RememberMe ? TimeSpan.FromDays(7) : TimeSpan.FromHours(8)),
+            ExpiresUtc = clock.GetUtcNow().Add(command.RememberMe ? TimeSpan.FromDays(7) : TimeSpan.FromHours(8)),
             AllowRefresh = true
         });
         return await ProfileAsync(user);
