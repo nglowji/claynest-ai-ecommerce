@@ -40,7 +40,7 @@ test('guest checkout survives a lost success response and retries without creati
   await page.getByRole('button', { name: 'Kiểm tra lại đơn đã gửi', exact: true }).click()
   expect((await requestPromise).headers()['idempotency-key']).toBe(firstKey)
   await expect(page).toHaveURL('/orders/' + firstReference)
-  await expect(page.getByText('Đang chờ xác nhận', { exact: true })).toBeVisible()
+  await expect(page.locator('.order-status-pill')).toHaveText('Đang chờ xác nhận')
   await expect(page.locator('.order-info')).toContainText('Khách kiểm thử')
   const after = await (await page.request.get('/api/v1/products/' + product.slug)).json()
   expect(after.variants[0].stockQty).toBe(variant.stockQty - 2)
