@@ -334,7 +334,9 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderId", "VariantId", "Kind")
+                        .IsUnique()
+                        .HasFilter("\"OrderId\" IS NOT NULL AND \"Kind\" IN ('sale','restock')");
 
                     b.HasIndex("VariantId", "CreatedAt", "Id");
 
@@ -342,7 +344,7 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_Movement_Balance", "\"BalanceAfter\" >= 0 AND \"ThresholdAfter\" BETWEEN 0 AND 1000000");
 
-                            t.HasCheckConstraint("CK_Movement_Kind", "(\"Kind\" = 'receipt' AND \"QuantityDelta\" > 0) OR (\"Kind\" = 'adjustment' AND \"QuantityDelta\" <> 0) OR (\"Kind\" = 'threshold' AND \"QuantityDelta\" = 0) OR (\"Kind\" = 'opening' AND \"QuantityDelta\" >= 0) OR (\"Kind\" = 'sale' AND \"QuantityDelta\" < 0 AND \"OrderId\" IS NOT NULL)");
+                            t.HasCheckConstraint("CK_Movement_Kind", "(\"Kind\" = 'receipt' AND \"QuantityDelta\" > 0) OR (\"Kind\" = 'adjustment' AND \"QuantityDelta\" <> 0) OR (\"Kind\" = 'threshold' AND \"QuantityDelta\" = 0) OR (\"Kind\" = 'opening' AND \"QuantityDelta\" >= 0) OR (\"Kind\" = 'sale' AND \"QuantityDelta\" < 0 AND \"OrderId\" IS NOT NULL) OR (\"Kind\" = 'restock' AND \"QuantityDelta\" > 0 AND \"OrderId\" IS NOT NULL)");
                         });
                 });
 
@@ -372,6 +374,12 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -425,6 +433,13 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
 
+                    b.Property<DateTimeOffset?>("RestockedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
                     b.Property<long>("ShippingFeeVnd")
                         .HasColumnType("bigint");
 
@@ -441,6 +456,9 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                     b.Property<long>("SubtotalVnd")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdempotencyKey")
@@ -455,6 +473,12 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
 
                     b.ToTable("Orders", "commerce", t =>
                         {
+                            t.HasCheckConstraint("CK_Order_Cancellation", "(\"Status\" = 'cancelled' AND \"CancelledAt\" IS NOT NULL AND \"RestockedAt\" IS NOT NULL) OR (\"Status\" <> 'cancelled' AND \"CancelledAt\" IS NULL AND \"RestockedAt\" IS NULL)");
+
+                            t.HasCheckConstraint("CK_Order_Completion", "(\"Status\" = 'completed' AND \"CompletedAt\" IS NOT NULL AND \"PaymentStatus\" = 'paid') OR (\"Status\" <> 'completed' AND \"CompletedAt\" IS NULL AND \"PaymentStatus\" = 'unpaid')");
+
+                            t.HasCheckConstraint("CK_Order_Status", "\"Status\" IN ('pending','confirmed','packed','shipped','completed','cancelled')");
+
                             t.HasCheckConstraint("CK_Order_Totals", "\"SubtotalVnd\" > 0 AND \"ShippingFeeVnd\" >= 0 AND \"GrandTotalVnd\" = \"SubtotalVnd\" + \"ShippingFeeVnd\"");
                         });
                 });
@@ -510,6 +534,66 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                     b.ToTable("OrderItems", "commerce", t =>
                         {
                             t.HasCheckConstraint("CK_OrderItem_Amounts", "\"Quantity\" BETWEEN 1 AND 99 AND \"UnitPriceVnd\" > 0 AND \"UnitPriceVnd\" <= 1000000000 AND \"LineTotalVnd\" = \"Quantity\"::bigint * \"UnitPriceVnd\"");
+                        });
+                });
+
+            modelBuilder.Entity("ClayNest.Domain.Orders.OrderStatusChange", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ActorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ActorName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FromStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PayloadHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid?>("RequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ToStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId", "RequestId")
+                        .IsUnique();
+
+                    b.HasIndex("OrderId", "Sequence")
+                        .IsUnique();
+
+                    b.ToTable("OrderStatusChanges", "commerce", t =>
+                        {
+                            t.HasCheckConstraint("CK_OrderChange_Sequence", "\"Sequence\" >= 0");
                         });
                 });
 
@@ -773,6 +857,15 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                     b.HasOne("ClayNest.Domain.Catalog.ProductVariant", null)
                         .WithMany()
                         .HasForeignKey("VariantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ClayNest.Domain.Orders.OrderStatusChange", b =>
+                {
+                    b.HasOne("ClayNest.Domain.Orders.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
