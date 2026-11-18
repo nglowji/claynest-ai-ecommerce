@@ -52,7 +52,7 @@ public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider p
 
     private sealed record LiveVariant(ProductVariant Variant, string Name, string Slug, string Image, bool Sellable);
     private IQueryable<LiveVariant> Live(IQueryable<ProductVariant> variants) =>
-        from v in variants join p in db.Products.AsNoTracking() on v.ProductId equals p.Id
+        from v in variants join p in db.Products on v.ProductId equals p.Id
         select new LiveVariant(v, p.Name, p.Slug,
             p.Images.Where(i => i.VariantId == null || i.VariantId == v.Id).OrderByDescending(i => i.VariantId == v.Id)
                 .ThenBy(i => i.SortOrder).ThenBy(i => i.Id).Select(i => i.Url).FirstOrDefault() ?? "",

@@ -77,8 +77,8 @@ function StoreApp() {
       <Route path="/" element={<HomePage {...actions} />} />
       <Route path="/register" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/cart" element={<CartPage quantities={cart} onChange={basket.change} onRemove={basket.remove} />} />
-      <Route path="/checkout" element={<CheckoutPage quantities={cart} onPlaced={basket.clear} />} />
+      <Route path="/cart" element={<CartPage onClear={basket.clear} quantities={cart} onChange={basket.change} onRemove={basket.remove} />} />
+      <Route path="/checkout" element={<CheckoutPage quantities={cart} onPlaced={basket.consume} />} />
       <Route path="/orders" element={<OrderStatusPage />} />
       <Route path="/orders/:reference" element={<OrderStatusPage />} />
       <Route path="/account" element={<AccountPage />} />

@@ -8,16 +8,16 @@ import { placeOrder, saveReceipt, type Checkout, type Contact } from '../feature
 import { useQuote } from '../features/checkout/useQuote'
 import Icon from './Icon'
 
-type Attempt = { key: string; command: Checkout }
+type Attempt = { key: string; command: Checkout; cart: Cart }
 const pendingKey = 'nang-gom-checkout-pending'
 function restore(): Attempt | null {
   try {
     const value = JSON.parse(sessionStorage.getItem(pendingKey) || 'null')
-    return value && typeof value.key === 'string' && typeof value.command?.quoteToken === 'string' && value.command?.acceptTerms === true
+    return value && value.cart && typeof value.cart === 'object' && typeof value.key === 'string' && typeof value.command?.quoteToken === 'string' && value.command?.acceptTerms === true
       && ['name','phone','email','province','address','note'].every(k => typeof value.command?.contact?.[k] === 'string') ? value : null
   } catch { return null }
 }
-export default function CheckoutPage({ quantities, onPlaced }: { quantities: Cart; onPlaced: () => void }) {
+export default function CheckoutPage({ quantities, onPlaced }: { quantities: Cart; onPlaced: (ordered: Cart) => void }) {
   const auth = useAuth(); const navigate = useNavigate(); const quote = useQuote(quantities)
   const [pending,setPending] = useState<Attempt | null>(restore)
   const [contact,setContact] = useState<Contact>(() => restore()?.command.contact || { name: auth.user?.displayName || '', email: auth.user?.email || '', phone: '', province: '', address: '', note: '' })
@@ -33,11 +33,11 @@ export default function CheckoutPage({ quantities, onPlaced }: { quantities: Car
   async function submit(event: React.FormEvent) {
     event.preventDefault(); if (submitting) return
     if (!pending && (!accepted || !quote.data?.canCheckout || !quote.data.quoteToken || expired)) return
-    const attempt = pending || { key: crypto.randomUUID(), command: { quoteToken: quote.data!.quoteToken!, contact, acceptTerms: true } }
+    const attempt = pending || { key: crypto.randomUUID(), command: { quoteToken: quote.data!.quoteToken!, contact, acceptTerms: true }, cart: { ...quantities } }
     remember(attempt); setSubmitting(true); setError('')
     try {
       const receipt = await placeOrder(attempt.key, attempt.command)
-      saveReceipt(receipt); remember(null); onPlaced(); navigate('/orders/' + receipt.reference, { replace: true, state: receipt })
+      saveReceipt(receipt); remember(null); onPlaced(attempt.cart); navigate('/orders/' + receipt.reference, { replace: true, state: receipt })
     } catch (e) {
       const known = e instanceof AuthError
       setError(e instanceof Error ? e.message : 'Chưa xác nhận được kết quả đặt hàng. Vui lòng kiểm tra lại bằng nút bên dưới.')

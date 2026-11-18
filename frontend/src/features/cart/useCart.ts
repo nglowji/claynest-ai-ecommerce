@@ -5,7 +5,7 @@ function restore(): Cart {
   try {
     const value: unknown = JSON.parse(localStorage.getItem(key) || '{}')
     if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
-    return Object.fromEntries(Object.entries(value).filter(([id, qty]) => /^[0-9a-f-]{36}$/i.test(id) && Number.isInteger(qty) && qty >= 1 && qty <= 99).slice(0,30))
+    return Object.fromEntries(Object.entries(value).filter(([id, qty]) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) && Number.isInteger(qty) && qty >= 1 && qty <= 99).slice(0,30))
   } catch { return {} }
 }
 export function useCart() {
@@ -17,5 +17,6 @@ export function useCart() {
     change(id: string, delta: number) { set(current => { const next = { ...current }; const qty = Math.min(99, Math.max(0, (next[id] || 0) + delta)); if (qty) next[id] = qty; else delete next[id]; return next }) },
     remove(id: string) { set(current => { const next = { ...current }; delete next[id]; return next }) },
     clear() { set({}) },
+    consume(ordered: Cart) { set(current => { const next = { ...current }; for (const [id,qty] of Object.entries(ordered)) { const remaining = (next[id] || 0) - qty; if (remaining > 0) next[id] = remaining; else delete next[id] } return next }) },
   }
 }

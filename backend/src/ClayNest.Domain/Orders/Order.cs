@@ -62,7 +62,9 @@ public sealed class Order
         CustomerName = contact.Name; Phone = contact.Phone; Email = contact.Email; Province = contact.Province;
         Address = contact.Address; ShippingNote = contact.Note; ShippingFeeVnd = shippingFeeVnd;
         IdempotencyKey = idempotencyKey; PayloadHash = payloadHash; AccessTokenHash = accessHash;
-        AccessTokenProtected = accessProtected; CreatedAt = now; AccessExpiresAt = now.AddDays(30);
+        AccessTokenProtected = accessProtected;
+        // PostgreSQL timestamps have microsecond precision; first response and replay must match exactly.
+        CreatedAt = new DateTimeOffset(now.UtcTicks - now.UtcTicks % 10, TimeSpan.Zero); AccessExpiresAt = CreatedAt.AddDays(30);
     }
     public void AddItem(Guid variantId, string sku, string name, string variantName, string image, int quantity, long unitPrice)
     {
