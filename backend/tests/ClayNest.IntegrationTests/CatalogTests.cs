@@ -22,7 +22,7 @@ public sealed class CatalogTests
     public async Task Draft_publication_variant_lifecycle_and_archive_are_consistent()
     {
         await using var s = await Session.Create();
-        var input = s.Input();
+        var input = s.Input() with { Slug = Guid.NewGuid().ToString() };
         var draft = await s.Save(input);
         input = input with { Variants = [input.Variants[0] with { Id = draft.Variants.Single().Id }] };
         using var hidden = await s.Client.GetAsync("/api/v1/products/" + draft.Slug);

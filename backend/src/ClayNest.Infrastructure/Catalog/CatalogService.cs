@@ -73,7 +73,7 @@ public sealed class CatalogService(CommerceDbContext db) : ICatalogService
 
     public async Task<ProductDto?> FindAsync(string slugOrId, bool admin, CancellationToken ct)
     {
-        var parsed = Guid.TryParse(slugOrId, out var id);
+        var parsed = Guid.TryParse(slugOrId, out var id) && admin;
         var product = await Read(admin).SingleOrDefaultAsync(x => parsed ? x.Id == id : x.Slug == slugOrId, ct);
         return product is null ? null : Map(product, admin);
     }
