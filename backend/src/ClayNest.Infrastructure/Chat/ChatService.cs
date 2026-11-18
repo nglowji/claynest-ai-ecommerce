@@ -27,9 +27,20 @@ public sealed class ChatService(IChatGateway gateway,IChatCatalog catalog) : ICh
         var result = await gateway.AskAsync(safe,ct);
         if (result.Filters is null || result.Choices is null || result.Choices.Count > 3 || result.Choices.Any(c => c is null || string.IsNullOrEmpty(c.Reason) || !Reasons.ContainsKey(c.Reason))) throw new ChatUnavailableException();
         try { ChatCatalog.Validate(result.Filters); } catch (ChatValidationException) { throw new ChatUnavailableException(); }
+        var knowledgeKey = result.Topic switch
+        {
+            "knowledge" => result.KnowledgeKey,
+            "safety" => "safety",
+            "policy" => "shipping",
+            _ => null
+        };
+        if (result.Topic is "knowledge" or "safety" or "policy")
+        {
+            var article = StoreKnowledge.Find(knowledgeKey) ?? throw new ChatUnavailableException();
+            return new(article.Content, [], [new(article.Title, article.Url)],
+                [new("Nàng Gốm · Hướng dẫn cửa hàng", article.Version, article.Title, article.Url)]);
+        }
         if (result.Topic == "order") return new("Mình không tra cứu hoặc thay đổi đơn trong cuộc trò chuyện. Bạn hãy dùng trang tra cứu riêng nhé.",[],[new("Tra cứu đơn hàng","/orders")]);
-        if (result.Topic == "safety") return new("Nàng chưa có đủ thông tin kiểm chứng để khẳng định độ an toàn thực phẩm, khả năng dùng lò vi sóng, máy rửa bát hoặc chịu nhiệt. Bạn xem thông tin đã được xác minh ở trang chi tiết hoặc nhờ Nàng kiểm tra thêm nhé.",[],[new("Xem sản phẩm","/products")]);
-        if (result.Topic == "policy") return new(CommercePolicy.ShippingDescription + " " + CommercePolicy.PackingDescription,[],[]);
         if (result.Topic == "other") return new("Mình có thể giúp bạn chọn gốm theo ngân sách, sắc men, kích thước hoặc dịp tặng. Bạn đang tìm món gì cho nhà?",[],[]);
         if (result.Topic is not ("recommend" or "detail")) throw new ChatUnavailableException();
         var filters = result.Filters;
@@ -41,6 +52,13 @@ public sealed class ChatService(IChatGateway gateway,IChatCatalog catalog) : ICh
         var live = await catalog.ResolveAsync(ids,filters,ct);
         var products = result.Choices.DistinctBy(c => c.VariantId).Where(c => live.Any(v => v.VariantId == c.VariantId))
             .Select(c => new ChatProduct(live.Single(v => v.VariantId == c.VariantId),Reasons[c.Reason == "budget" && filters.MaxPrice is null && filters.MinPrice is null || c.Reason == "size" && filters.MaxHeightCm is null && filters.MinCapacityMl is null ? "match" : c.Reason])).ToList();
+        if (result.Topic == "detail" && products.Count > 0)
+        {
+            var item = products[0].Product;
+            var description = $"{item.Name}. {item.Description} Chất liệu: {item.Material}. Men: {item.Glaze}.";
+            return new(description, products, [new("Xem thông tin sản phẩm", "/products/" + item.Slug)],
+                [new(item.Name, "Hiện tại", "Thông tin catalog", "/products/" + item.Slug)]);
+        }
         return new(products.Count > 0 ? "Nàng chọn được vài món để bạn xem thử. Giá và số lượng dưới đây vừa được kiểm tra lại ở cửa hàng." : "Nàng chưa tìm được món còn phù hợp bộ lọc hiện tại. Bạn thử đổi ngân sách hoặc sắc men nhé.",products,[new("Khám phá cửa hàng","/products")]);
     }
 }

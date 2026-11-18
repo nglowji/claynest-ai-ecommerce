@@ -32,10 +32,31 @@ class ChatInput(Contract):
     history: list[Turn] | None = Field(default=None, max_length=6)
     filters: Filters | None = None
 
+KnowledgeKey = Literal["about", "catalog", "cart", "checkout", "payment", "shipping", "tracking", "order-status", "account", "location", "returns", "safety", "assistant"]
+
+class KnowledgeArticle(Contract):
+    key: KnowledgeKey
+    title: str = Field(max_length=180)
+    version: str = Field(max_length=40)
+    content: str = Field(max_length=2000)
+    url: str = Field(max_length=160, pattern=r"^/([a-zA-Z0-9#][a-zA-Z0-9/#?=&%_-]*)?$")
+
+class CatalogIndexEntry(Contract):
+    name: str = Field(max_length=180)
+    slug: str = Field(max_length=140, pattern=r"^[a-z0-9-]+$")
+    category: str = Field(max_length=100)
+    material: str = Field(max_length=160)
+
+class StoreContext(Contract):
+    knowledge: list[KnowledgeArticle] = Field(max_length=30)
+    catalog: list[CatalogIndexEntry] = Field(max_length=100)
+    catalog_truncated: bool
+
 class Intent(Contract):
-    topic: Literal["recommend", "detail", "policy", "safety", "order", "other"]
+    topic: Literal["recommend", "detail", "policy", "safety", "order", "other", "knowledge"]
     filters: Filters
     slug: str | None = Field(default=None, max_length=140, pattern=r"^[a-z0-9-]+$")
+    knowledge_key: KnowledgeKey | None = None
     style: str = Field(default="", max_length=80)
     occasion: str = Field(default="", max_length=80)
 
@@ -47,7 +68,8 @@ class Ranking(Contract):
     choices: list[Choice] = Field(max_length=3)
 
 class Decision(Contract):
-    topic: Literal["recommend", "detail", "policy", "safety", "order", "other"]
+    knowledge_key: KnowledgeKey | None = None
+    topic: Literal["recommend", "detail", "policy", "safety", "order", "other", "knowledge"]
     filters: Filters
     choices: list[Choice] = Field(default_factory=list, max_length=3)
 

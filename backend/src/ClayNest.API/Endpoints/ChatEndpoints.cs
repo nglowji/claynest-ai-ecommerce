@@ -28,7 +28,7 @@ public static class ChatEndpoints
         }).WithTags("Product advice").RequireRateLimiting("public-chat").Produces<ChatResponse>().ProducesProblem(400).ProducesProblem(503).ProducesProblem(429);
 
         var tools = endpoints.MapGroup("/internal/ai/tools").WithTags("Internal read-only catalog tools");
-        foreach (var operation in new[] { "search","detail","policy" })
+        foreach (var operation in new[] { "search","detail","policy","context" })
         {
             var name = operation;
             tools.MapPost("/" + name,async (HttpContext http,IOptions<ChatOptions> config,ServiceSignature signatures,IChatCatalog catalog,CancellationToken ct) =>
@@ -47,6 +47,7 @@ public static class ChatEndpoints
                     if (name == "search") return Results.Ok(await catalog.SearchAsync(JsonSerializer.Deserialize<ChatFilters>(body,json) ?? throw new JsonException(),ct));
                     if (name == "detail") return Results.Ok(await catalog.DetailAsync((JsonSerializer.Deserialize<DetailRequest>(body,json) ?? throw new JsonException()).Slug,ct));
                     if (JsonSerializer.Deserialize<Dictionary<string,JsonElement>>(body,json)?.Count != 0) throw new JsonException();
+                    if (name == "context") return Results.Ok(await catalog.ContextAsync(ct));
                     return Results.Ok(new { shipping = CommercePolicy.ShippingDescription, packing = CommercePolicy.PackingDescription });
                 }
                 catch (Exception ex) when (ex is JsonException or ChatValidationException or ArgumentException)

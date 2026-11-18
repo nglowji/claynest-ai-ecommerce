@@ -28,7 +28,10 @@ class GeminiProvider:
                           "responseMimeType":"application/json","responseJsonSchema":schema.model_json_schema(by_alias=True)}},
                 timeout=16,
             )
-            if response.status_code != 200 or len(response.content) > 65536:
+            if response.status_code != 200:
+                application_logger().warning("gemini_http_error", extra={"status_code": response.status_code, "model": self.config.gemini_model})
+                raise ProviderUnavailable()
+            if len(response.content) > 65536:
                 raise ProviderUnavailable()
             data = response.json()
             usage = data.get("usageMetadata",{})

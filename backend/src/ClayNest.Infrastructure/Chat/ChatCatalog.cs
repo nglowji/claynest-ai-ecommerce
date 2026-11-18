@@ -6,6 +6,15 @@ namespace ClayNest.Infrastructure.Chat;
 
 public sealed class ChatCatalog(CommerceDbContext db) : IChatCatalog
 {
+    public async Task<ChatContext> ContextAsync(CancellationToken ct)
+    {
+        var entries = await db.Products.AsNoTracking()
+            .Where(p => p.Published && !p.Archived && p.Category.Active && p.Variants.Any(v => v.Active))
+            .OrderBy(p => p.Slug).Select(p => new CatalogIndexEntry(p.Name, p.Slug, p.Category.Slug, p.Material))
+            .Take(101).ToListAsync(ct);
+        return new(StoreKnowledge.Articles.ToList(), entries.Take(100).ToList(), entries.Count > 100);
+    }
+
     public static void Validate(ChatFilters f)
     {
         if (f.Q?.Length > 180 || f.Category?.Length > 100 || f.Glaze?.Length > 120 || f.Use?.Length > 160
@@ -28,9 +37,11 @@ public sealed class ChatCatalog(CommerceDbContext db) : IChatCatalog
         if (!string.IsNullOrWhiteSpace(f.Category)) products = products.Where(p => p.Category.Slug == f.Category || p.Category.Name == f.Category);
         if (!string.IsNullOrWhiteSpace(f.Q)) { var term = Product.NormalizeSearch(f.Q.Trim()); products = products.Where(p => p.SearchText.Contains(term)); }
         return from v in variants join p in products on v.ProductId equals p.Id
-            select new ChatFact(v.Id,p.Id,p.Name,p.Slug,v.Sku,v.Name,p.Description.Substring(0,Math.Min(350,p.Description.Length)),p.Material,
-                v.Glaze,v.IntendedUse,v.PriceVnd,v.StockQty,v.HeightCm,v.CapacityMl,
-                p.Images.Where(i => i.VariantId == null || i.VariantId == v.Id).OrderByDescending(i => i.VariantId == v.Id).ThenBy(i => i.SortOrder).Select(i => i.Url).FirstOrDefault() ?? "");
+            select new ChatFact(default,default,"","","","","","","","",0,0,null,null,"") {
+                VariantId=v.Id, ProductId=p.Id, Name=p.Name, Slug=p.Slug, Sku=v.Sku, VariantName=v.Name,
+                Description=p.Description.Substring(0,Math.Min(350,p.Description.Length)), Material=p.Material,
+                Glaze=v.Glaze, Use=v.IntendedUse, PriceVnd=v.PriceVnd, StockQty=v.StockQty, HeightCm=v.HeightCm, CapacityMl=v.CapacityMl,
+                Image=p.Images.Where(i => i.VariantId == null || i.VariantId == v.Id).OrderByDescending(i => i.VariantId == v.Id).ThenBy(i => i.SortOrder).Select(i => i.Url).FirstOrDefault() ?? "" };
     }
     public async Task<List<ChatFact>> SearchAsync(ChatFilters filters,CancellationToken ct) => await Facts(filters).OrderBy(v => v.PriceVnd).ThenBy(v => v.Sku).Take(8).ToListAsync(ct);
     public async Task<List<ChatFact>> DetailAsync(string slug,CancellationToken ct)

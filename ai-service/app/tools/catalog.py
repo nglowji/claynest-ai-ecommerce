@@ -1,7 +1,7 @@
 import json
 import httpx
 from pydantic import TypeAdapter, ValidationError
-from app.api.chat_models import Fact
+from app.api.chat_models import Fact, StoreContext
 from app.core.config import Settings
 from app.core.logging import correlation_context
 from app.core.service_auth import headers
@@ -12,7 +12,7 @@ class CatalogTools:
         self.config, self.client = config, client
 
     async def read(self, name: str, payload: dict):
-        if name not in {"search","detail","policy"}:
+        if name not in {"search","detail","policy","context"}:
             raise ProviderUnavailable()
         path = "/internal/ai/tools/" + name
         body = json.dumps(payload,separators=(",",":"),ensure_ascii=False).encode()
@@ -28,6 +28,8 @@ class CatalogTools:
                 if response.status_code != 200 or len(response.content) > 65536:
                     raise ProviderUnavailable()
                 data = response.json()
+                if name == "context":
+                    return StoreContext.model_validate(data)
                 if name == "policy":
                     if not isinstance(data,dict) or not isinstance(data.get("shipping"),str):
                         raise ProviderUnavailable()
