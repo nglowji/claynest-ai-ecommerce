@@ -59,10 +59,12 @@ test('public catalog filters on server and retries a network error', async ({ pa
   const affordable = all.items.filter((p: { variants: { priceVnd: number }[] }) => p.variants.some(v => v.priceVnd <= 1000000)).length
   await page.goto('/products')
   await expect(page.locator('.product-card')).toHaveCount(Math.min(12, all.totalCount))
+  await page.locator('.catalog-refine summary').click()
   await page.getByLabel('Giá đến', { exact: true }).fill('1000000')
   await expect(page.locator('.product-card')).toHaveCount(Math.min(12, affordable))
   await page.getByLabel('Còn hàng', { exact: true }).check()
-  await expect(page.getByRole('heading', { name: 'Chưa tìm thấy món gốm phù hợp' })).toBeVisible()
+  const stocked = all.items.filter((p: { variants: { priceVnd: number; stockQty: number }[] }) => p.variants.some(v => v.priceVnd <= 1000000 && v.stockQty > 0)).length
+  await expect(page.locator('.product-card')).toHaveCount(Math.min(12, stocked))
   await page.route('**/api/v1/products?**', route => route.abort())
   await page.getByLabel('Còn hàng', { exact: true }).uncheck()
   await expect(page.getByRole('alert')).toContainText('Chưa tải được sản phẩm')

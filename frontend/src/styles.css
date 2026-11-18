@@ -1262,3 +1262,18 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .inventory-history { margin-top: 32px; border-top: 1px solid var(--line); padding-top: 24px; }.inventory-history h3 { font: 26px var(--serif); margin-bottom: 15px; }.inventory-history ol { list-style: none; padding: 0; }.inventory-history li { padding: 17px 0; border-bottom: 1px solid var(--line); font-size: 11px; }.inventory-history li>div { display: flex; justify-content: space-between; gap: 12px; }.inventory-history li p { margin: 10px 0; overflow-wrap: anywhere; }.inventory-history small { display: block; color: var(--muted); line-height: 1.8; }.inventory-history .catalog-pagination { gap: 10px; }.inventory-history>p { font-size: 12px; }
 @media(max-width: 900px) { .inventory-layout { grid-template-columns: 1fr; }.inventory-filters { flex-wrap: wrap; gap: 18px; }.inventory-editor { max-width: none; } }
 @media(max-width: 600px) { .inventory-page { padding-top: 25px; }.inventory-filters { padding: 18px; }.inventory-filters>label:first-child { flex-basis: 100%; }.inventory-check { padding-bottom: 0; }.inventory-filters>span { padding-bottom: 0; }.inventory-editor { padding: 22px; } }
+
+.inventory-page .text-link,.inventory-page td button { background: transparent; border: 0; cursor: pointer; font: inherit; color: inherit; }
+.inventory-editor { scroll-margin-top: 20px; }
+@media(max-width: 900px) { .inventory-editor.has-selection { grid-row: 1; } }
+@media(max-width: 600px) {
+ .inventory-page .admin-heading { align-items: start; flex-direction: column; gap: 20px; }
+ .inventory-page .admin-heading h1 { font-size: 36px; }
+ .inventory-table-scroll { overflow: visible; }.inventory-list .catalog-table { display: block; }
+ .inventory-list thead { display: none; }.inventory-list tbody { display: grid; gap: 12px; }
+ .inventory-list tr { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 5px; padding: 10px; }
+ .inventory-list td { display: flex; border: 0; padding: 10px; align-items: center; gap: 10px; }
+ .inventory-list td:first-child { grid-column: 1/-1; }.inventory-list td:last-child { grid-column: 1/-1; justify-content: end; padding-top: 0; }
+ .inventory-list td[data-label]::before { content: attr(data-label); font-size: 10px; color: var(--muted); }
+ .inventory-product { min-width: 0; }.inventory-product small { overflow-wrap: anywhere; }
+}
