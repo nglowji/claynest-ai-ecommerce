@@ -128,8 +128,8 @@ public sealed class CheckoutTests
         using var stillOwned = await s.Client.GetAsync($"/api/v1/orders/{second.Reference}/status"); Assert.Equal(HttpStatusCode.OK, stillOwned.StatusCode);
     }
 
-    private sealed class TestClock : TimeProvider { private DateTimeOffset now = DateTimeOffset.UtcNow; public override DateTimeOffset GetUtcNow() => now; public void Advance(TimeSpan by) => now += by; }
-    private sealed class Fixture : IAsyncDisposable
+    internal sealed class TestClock : TimeProvider { private DateTimeOffset now = DateTimeOffset.UtcNow; public override DateTimeOffset GetUtcNow() => now; public void Advance(TimeSpan by) => now += by; }
+    internal sealed class Fixture : IAsyncDisposable
     {
         public WebApplicationFactory<Program> Factory { get; }
         public TestClock Clock { get; } = new();

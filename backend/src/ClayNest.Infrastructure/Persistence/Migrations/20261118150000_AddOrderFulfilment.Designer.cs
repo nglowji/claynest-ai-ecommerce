@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClayNest.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(CommerceDbContext))]
-    [Migration("20261118074155_AddOrderFulfilment")]
+    [Migration("20261118150000_AddOrderFulfilment")]
     partial class AddOrderFulfilment
     {
         /// <inheritdoc />

@@ -133,11 +133,35 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                 table: "OrderStatusChanges",
                 columns: new[] { "OrderId", "Sequence" },
                 unique: true);
+
+            migrationBuilder.Sql("""
+                UPDATE commerce."Orders" SET "UpdatedAt" = "CreatedAt";
+                INSERT INTO commerce."OrderStatusChanges"
+                    ("Id","OrderId","Sequence","FromStatus","ToStatus","Reason","ActorId","ActorName","CreatedAt","RequestId","PayloadHash")
+                SELECT gen_random_uuid(), "Id", 0, '', "Status", 'Khởi tạo lịch sử cho đơn hiện có', NULL, 'Hệ thống', "CreatedAt", NULL, ''
+                FROM commerce."Orders";
+                CREATE FUNCTION commerce.prevent_order_change_edit() RETURNS trigger LANGUAGE plpgsql AS $$
+                BEGIN
+                    RAISE EXCEPTION 'Order history is append-only' USING ERRCODE = '23514';
+                END;
+                $$;
+                CREATE TRIGGER order_changes_append_only BEFORE UPDATE OR DELETE ON commerce."OrderStatusChanges"
+                    FOR EACH ROW EXECUTE FUNCTION commerce.prevent_order_change_edit();
+                """);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("""
+                DO $$ BEGIN
+                    IF EXISTS (SELECT 1 FROM commerce."OrderStatusChanges" WHERE "Sequence" > 0) THEN
+                        RAISE EXCEPTION 'Cannot remove fulfilment audit history; use a forward migration';
+                    END IF;
+                END $$;
+                DROP TRIGGER order_changes_append_only ON commerce."OrderStatusChanges";
+                DROP FUNCTION commerce.prevent_order_change_edit();
+                """);
             migrationBuilder.DropTable(
                 name: "OrderStatusChanges",
                 schema: "commerce");
