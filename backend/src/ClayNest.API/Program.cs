@@ -42,6 +42,15 @@ if (bootstrapAuth)
 }
 app.UseMiddleware<CorrelationMiddleware>();
 app.UseExceptionHandler(new ExceptionHandlerOptions { SuppressDiagnosticsCallback = _ => true });
+app.UseStatusCodePages(async status =>
+{
+    var code = status.HttpContext.Response.StatusCode;
+    await ApiErrors.WriteAsync(status.HttpContext, code, code switch
+    {
+        400 => "invalid_input", 401 => "unauthenticated", 403 => "forbidden",
+        404 => "not_found", 405 => "method_not_allowed", _ => "request_failed"
+    }, "Yêu cầu không thể thực hiện. Vui lòng kiểm tra và thử lại.");
+});
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -8,11 +8,11 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ClayNest.IntegrationTests;
 
-public sealed class ApiFactory(bool ready = true, bool fail = false) : WebApplicationFactory<Program>
+public sealed class ApiFactory(bool ready = true, bool fail = false, string environment = "Testing") : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment(environment);
         builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
             new Dictionary<string, string?> { ["ConnectionStrings:Commerce"] = "Host=localhost;Database=unused;Username=unused" }));
         builder.ConfigureTestServices(services =>
