@@ -120,7 +120,12 @@ public sealed class ProductVariant
     public string CareSource { get; private set; } = string.Empty;
     public bool CareVerified { get; private set; }
     private ProductVariant() { }
-    public ProductVariant(Guid productId) => ProductId = productId;
+    public ProductVariant(Guid productId, int initialStockQty = 0)
+    {
+        if (initialStockQty < 0) throw new CatalogRuleException("Số lượng tồn kho không được âm.");
+        ProductId = productId;
+        StockQty = initialStockQty;
+    }
     public void Update(string sku, string name, string glaze, string intendedUse, int? capacityMl,
         decimal? widthCm, decimal? heightCm, int? weightG, long priceVnd, long? originalPriceVnd,
         bool active, string careNote, string careSource, bool careVerified)

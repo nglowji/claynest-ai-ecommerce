@@ -166,7 +166,7 @@ public sealed class CatalogService(CommerceDbContext db) : ICatalogService
                 entry.Material, entry.HandmadeNote, entry.Label, entry.Images.Count > 0);
             if (!string.IsNullOrEmpty(entry.SourceUrl))
                 product.RecordSource(entry.SourceUrl, entry.SourceName, entry.SourceDimensions, entry.SourceAvailability, entry.PriceUnit);
-            var variant = new ProductVariant(product.Id);
+            var variant = new ProductVariant(product.Id, initialStockQty: entry.IsAuthored ? 30 : 0);
             variant.Update(entry.Sku, entry.VariantName, entry.Glaze, entry.IntendedUse,
                 entry.CapacityMl, entry.WidthCm, entry.HeightCm, entry.WeightG, entry.PriceVnd, entry.OriginalPriceVnd, true, "", "", false);
             product.Variants.Add(variant);
