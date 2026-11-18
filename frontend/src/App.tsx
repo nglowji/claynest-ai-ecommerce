@@ -4,6 +4,7 @@ import Icon from './components/Icon'
 import Brand from './components/Brand'
 import SiteLocation from './components/SiteLocation'
 import LoginPage from './components/LoginPage'
+import AdminLayout from './components/AdminLayout'
 import AdminPage from './components/AdminPage'
 import AccountPage from './components/AccountPage'
 import { AuthProvider, useAuth } from './auth/AuthContext'
@@ -48,7 +49,10 @@ function ProductsPage(actions: ProductActions) {
   </section>
 }
 
-export default function App() { return <AuthProvider><StoreApp /></AuthProvider> }
+export default function App() { return <AuthProvider><Routes>
+  <Route path="/admin" element={<AdminLayout />}><Route index element={<AdminPage />} /><Route path="*" element={<section className="container account-page"><h1>Không tìm thấy trang quản trị</h1><Link to="/admin">Về tổng quan</Link></section>} /></Route>
+  <Route path="*" element={<StoreApp />} />
+</Routes></AuthProvider> }
 
 function StoreApp() {
   const auth = useAuth()
@@ -100,14 +104,13 @@ function StoreApp() {
         <NavLink to="/stories" className={({ isActive }) => isActive ? 'nav-active' : ''}>Chuyện của gốm</NavLink>
       </nav>
       <div className="header-actions"><Link className="icon-button" aria-label="Tìm kiếm sản phẩm" to="/products?search=1"><Icon name="search" /></Link>
-        <Link className="icon-button account-link" aria-label={auth.user ? 'Tài khoản quản trị' : 'Đăng nhập'} to={auth.user ? (auth.user.role === 'Admin' ? '/admin' : '/account') : '/login'}><Icon name="user" /></Link>
+        <Link className="icon-button account-link" aria-label={auth.user ? 'Tài khoản' : 'Đăng nhập'} to={auth.user ? (auth.user.role === 'Admin' ? '/admin' : '/account') : '/login'}><Icon name="user" /></Link>
         <button className="icon-button bag-button" aria-label={`Giỏ hàng, ${count} sản phẩm`} onClick={() => setOverlay('cart')}><Icon name="bag" /><span className="bag-count">{count}</span></button>
         <button className="icon-button menu-button" aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'} aria-expanded={menuOpen} aria-controls="mobile-nav" onClick={() => setMenuOpen(!menuOpen)}><Icon name={menuOpen ? 'close' : 'menu'} /></button>
       </div>
     </div></header>
     <main id="main"><Routes>
       <Route path="/" element={<HomePage {...actions} />} />
-      <Route path="/admin" element={<AdminPage />} />
       <Route path="/register" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/account" element={<AccountPage />} />

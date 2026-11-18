@@ -9,8 +9,8 @@ public sealed class DatabaseOwnershipTests
     [DatabaseFact]
     public async Task Commerce_and_ai_roles_are_isolated_and_not_superusers()
     {
-        await using var commerce = NpgsqlDataSource.Create(Environment.GetEnvironmentVariable("TEST_COMMERCE_CONNECTION")!);
-        await using var ai = NpgsqlDataSource.Create(Environment.GetEnvironmentVariable("TEST_AI_CONNECTION")!);
+        await using var commerce = NpgsqlDataSource.Create(TestDatabase.Connection("TEST_COMMERCE_CONNECTION"));
+        await using var ai = NpgsqlDataSource.Create(TestDatabase.Connection("TEST_AI_CONNECTION"));
         Assert.True(await new PostgresReadinessProbe(commerce).IsReadyAsync(CancellationToken.None));
         foreach (var (source, own, other) in new[] { (commerce, "commerce", "ai"), (ai, "ai", "commerce") })
         {
@@ -28,7 +28,7 @@ public sealed class DatabaseOwnershipTests
     [DatabaseFact]
     public async Task Ai_role_cannot_create_commerce_table()
     {
-        await using var ai = NpgsqlDataSource.Create(Environment.GetEnvironmentVariable("TEST_AI_CONNECTION")!);
+        await using var ai = NpgsqlDataSource.Create(TestDatabase.Connection("TEST_AI_CONNECTION"));
         await using var connection = await ai.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
         await using var command = new NpgsqlCommand("CREATE TABLE commerce.__forbidden_probe (id integer)", connection, transaction);
@@ -39,7 +39,7 @@ public sealed class DatabaseOwnershipTests
     [DatabaseFact]
     public async Task Commerce_role_cannot_create_ai_table()
     {
-        await using var commerce = NpgsqlDataSource.Create(Environment.GetEnvironmentVariable("TEST_COMMERCE_CONNECTION")!);
+        await using var commerce = NpgsqlDataSource.Create(TestDatabase.Connection("TEST_COMMERCE_CONNECTION"));
         await using var connection = await commerce.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
         await using var command = new NpgsqlCommand("CREATE TABLE ai.__forbidden_probe (id integer)", connection, transaction);

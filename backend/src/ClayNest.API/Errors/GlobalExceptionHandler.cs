@@ -17,7 +17,7 @@ public sealed partial class GlobalExceptionHandler(
             {
                 Status = StatusCodes.Status500InternalServerError,
                 Title = "Không thể xử lý yêu cầu lúc này.",
-                Extensions = { ["correlation_id"] = context.TraceIdentifier }
+                Extensions = { ["correlationId"] = context.TraceIdentifier, ["code"] = "internal_error" }
             }
         });
         return true;

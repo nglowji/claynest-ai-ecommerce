@@ -43,7 +43,7 @@ public sealed class OperationalTests
         var content = await response.Content.ReadAsStringAsync(CancellationToken.None);
         Assert.DoesNotContain("private-password-sentinel", content);
         using var document = JsonDocument.Parse(content);
-        Assert.Equal(response.Headers.GetValues("X-Correlation-ID").Single(), document.RootElement.GetProperty("correlation_id").GetString());
+        Assert.Equal(response.Headers.GetValues("X-Correlation-ID").Single(), document.RootElement.GetProperty("correlationId").GetString());
     }
 
     [Theory]

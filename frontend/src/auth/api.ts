@@ -5,7 +5,7 @@ export class AuthError extends Error {
 
 async function request(path: string, options: RequestInit = {}) {
   try {
-    return await fetch(`/api/v1/auth${path}`, { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(10000), ...options })
+    return await fetch(path.startsWith('/api/') ? path : `/api/v1/auth${path}`, { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(10000), ...options })
   } catch {
     throw new AuthError(0, 'Chưa kết nối được dịch vụ đăng nhập. Vui lòng thử lại.')
   }
@@ -27,6 +27,11 @@ async function csrf() {
   const data: unknown = await response.json()
   if (!data || typeof data !== 'object' || !('requestToken' in data) || typeof data.requestToken !== 'string') throw new AuthError(500, 'Chưa khởi tạo được phiên bảo mật.')
   return data.requestToken
+}
+export async function adminSession() {
+  const response = await request('/api/v1/admin/session')
+  await ensureSuccess(response)
+  return profile(await response.json())
 }
 export async function currentUser() {
   const response = await request('/me')

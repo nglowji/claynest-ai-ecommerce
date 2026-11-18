@@ -1,6 +1,5 @@
-# Keep local Markdown documents out of version control, except README files.
+# Keep all Markdown documents local; do not commit them.
 *.[mM][dD]
-![rR][eE][aA][dD][mM][eE].[mM][dD]
 
 # Local credentials and configuration
 .env
@@ -31,8 +30,6 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# Track the phase learning guide; keep local specifications ignored.
-!docs/LEARNING_P0.md
 *.egg-info/
 
 # .NET build output and local tooling
@@ -42,5 +39,7 @@ Thumbs.db
 .vs/
 *.user
 *.suo
-!docs/learning/PHASE_0.md
-!docs/ADRs/0001-hybrid-clean-architecture.md
+
+# Browser test artifacts may contain session data.
+**/test-results/
+**/playwright-report/

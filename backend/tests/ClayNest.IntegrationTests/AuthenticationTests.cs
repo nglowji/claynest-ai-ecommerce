@@ -77,7 +77,12 @@ public sealed class AuthenticationTests
         using var unknown = await session.LoginAsync(email: "missing-" + session.Email);
         Assert.Equal(HttpStatusCode.Unauthorized, wrong.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, unknown.StatusCode);
-        Assert.Equal(await wrong.Content.ReadAsStringAsync(), await unknown.Content.ReadAsStringAsync());
+        var wrongError = await wrong.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+        var unknownError = await unknown.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+        Assert.Equal(wrongError.GetProperty("code").GetString(), unknownError.GetProperty("code").GetString());
+        Assert.Equal(wrongError.GetProperty("title").GetString(), unknownError.GetProperty("title").GetString());
+        Assert.Equal("application/problem+json", wrong.Content.Headers.ContentType?.MediaType);
+        Assert.Equal(wrong.Headers.GetValues("X-Correlation-ID").Single(), wrongError.GetProperty("correlationId").GetString());
     }
 
     [DatabaseFact]
@@ -176,7 +181,7 @@ public sealed class AuthenticationTests
             builder.UseEnvironment("Testing");
             builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:Commerce"] = Environment.GetEnvironmentVariable("TEST_COMMERCE_CONNECTION"),
+                ["ConnectionStrings:Commerce"] = TestDatabase.Connection("TEST_COMMERCE_CONNECTION"),
                 ["Logging:LogLevel:Default"] = "None"
             }));
             builder.ConfigureTestServices(services => services.AddDataProtection().UseEphemeralDataProtectionProvider());

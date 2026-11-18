@@ -18,6 +18,9 @@ def configure() -> None:
         "ADMIN_EMAIL": "admin@nanggom.local", "ADMIN_PASSWORD": secrets.token_urlsafe(20) + "aA1!",
         "ADMIN_DISPLAY_NAME": "Quản trị Nàng Gốm",
         "COMMERCE_API_PORT": "8000", "VITE_API_BASE_URL": "http://localhost:8000",
+        "TEST_POSTGRES_PASSWORD": secrets.token_hex(24),
+        "TEST_COMMERCE_DB_PASSWORD": secrets.token_hex(24), "TEST_AI_DB_PASSWORD": secrets.token_hex(24),
+        "E2E_ADMIN_EMAIL": "admin@example.test", "E2E_ADMIN_PASSWORD": secrets.token_urlsafe(20) + "aA1!",
         "POSTGRES_PASSWORD": secrets.token_hex(24),
         "COMMERCE_DB_PASSWORD": secrets.token_hex(24), "AI_DB_PASSWORD": secrets.token_hex(24),
     }

@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using ClayNest.API.Errors;
 using ClayNest.Domain.Identity;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -26,8 +27,8 @@ public static class AdminAuthentication
                 options.ExpireTimeSpan = TimeSpan.FromHours(8);
                 options.SlidingExpiration = true;
                 options.Events.OnValidatePrincipal = SecurityStampValidator.ValidatePrincipalAsync;
-                options.Events.OnRedirectToLogin = context => { context.Response.StatusCode = 401; return Task.CompletedTask; };
-                options.Events.OnRedirectToAccessDenied = context => { context.Response.StatusCode = 403; return Task.CompletedTask; };
+                options.Events.OnRedirectToLogin = context => ApiErrors.WriteAsync(context.HttpContext, 401, "unauthenticated", "Vui lòng đăng nhập lại.");
+                options.Events.OnRedirectToAccessDenied = context => ApiErrors.WriteAsync(context.HttpContext, 403, "forbidden", "Bạn không có quyền truy cập.");
             });
         services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
         services.AddAuthorizationBuilder().AddPolicy(Policy, policy => policy.RequireAuthenticatedUser().RequireRole(CommerceRoles.Admin));
@@ -43,6 +44,11 @@ public static class AdminAuthentication
         services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.OnRejected = async (context, _) =>
+            {
+                context.HttpContext.Response.Headers.RetryAfter = "60";
+                await ApiErrors.WriteAsync(context.HttpContext, 429, "rate_limited", "Vui lòng chờ một phút rồi thử lại.");
+            };
             options.AddPolicy("admin-login", context => RateLimitPartition.GetFixedWindowLimiter(
                 context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions
                 { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0, AutoReplenishment = true }));
