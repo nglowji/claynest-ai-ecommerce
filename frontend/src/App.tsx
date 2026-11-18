@@ -63,7 +63,7 @@ function StoreApp() {
   function change(id: string, delta: number) {
     setCart(current => { const next = { ...current }; next[id] = Math.min(cartProducts[id]?.stockQty || 0, Math.max(0, (next[id] || 0) + delta)); if (!next[id]) delete next[id]; return next })
   }
-  function showProduct(product: Product) { navigate('/products/' + product.slug) }
+  function showProduct(product: Product) { navigate('/products/' + product.slug + '?variant=' + product.variantId) }
   const actions = { onAdd: add, onShow: showProduct }
   return <>
     <a className="skip-link" href="#main">Đến nội dung chính</a>

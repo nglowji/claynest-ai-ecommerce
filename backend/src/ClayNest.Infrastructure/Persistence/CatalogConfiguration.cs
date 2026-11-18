@@ -35,6 +35,9 @@ public sealed class VariantConfiguration : IEntityTypeConfiguration<ProductVaria
         {
             t.HasCheckConstraint("CK_Variant_Price", "\"PriceVnd\" > 0 AND \"PriceVnd\" <= 1000000000");
             t.HasCheckConstraint("CK_Variant_ReferencePrice", "\"OriginalPriceVnd\" IS NULL OR (\"OriginalPriceVnd\" > \"PriceVnd\" AND \"OriginalPriceVnd\" <= 1000000000)");
+            t.HasCheckConstraint("CK_Variant_Attributes", "(\"CapacityMl\" IS NULL OR \"CapacityMl\" BETWEEN 1 AND 100000) AND (\"WidthCm\" IS NULL OR \"WidthCm\" BETWEEN 0.01 AND 1000) AND (\"HeightCm\" IS NULL OR \"HeightCm\" BETWEEN 0.01 AND 1000) AND (\"WeightG\" IS NULL OR \"WeightG\" BETWEEN 1 AND 1000000)");
+            t.HasCheckConstraint("CK_Variant_VerifiedCare", "NOT \"CareVerified\" OR (length(trim(\"CareNote\")) > 0 AND length(trim(\"CareSource\")) > 0)");
+            t.HasCheckConstraint("CK_Variant_Sku", "\"Sku\" ~ '^[A-Z0-9][A-Z0-9_-]*$'");
             t.HasCheckConstraint("CK_Variant_Stock", "\"StockQty\" >= 0");
         });
         b.HasKey(x => x.Id); b.HasIndex(x => x.Sku).IsUnique(); b.Property(x => x.Sku).HasMaxLength(64);

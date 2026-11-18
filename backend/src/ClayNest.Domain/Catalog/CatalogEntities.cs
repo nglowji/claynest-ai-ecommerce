@@ -80,7 +80,7 @@ public sealed class Product
             string.Join(" ", Variants.Select(v => $"{v.Sku} {v.Glaze} {v.IntendedUse}"))));
         if (Variants.Count == 0 || Variants.Count > 30 || Images.Count > 12)
             throw new CatalogRuleException("Cần 1–30 biến thể và tối đa 12 ảnh.");
-        if (Published && (!Variants.Any(v => v.Active) || Images.Count == 0 || Archived))
+        if (Published && (!Variants.Any(v => v.Active) || !Images.Any(i => i.VariantId is null || Variants.Any(v => v.Active && v.Id == i.VariantId)) || Archived))
             throw new CatalogRuleException("Chỉ xuất bản sản phẩm có biến thể hoạt động và ảnh.");
     }
 }
@@ -116,8 +116,10 @@ public sealed class ProductVariant
         IntendedUse = CatalogRules.Text(intendedUse, 160, "Công dụng");
         if (priceVnd <= 0 || priceVnd > 1_000_000_000 || originalPriceVnd is not null && (originalPriceVnd <= priceVnd || originalPriceVnd > 1_000_000_000))
             throw new CatalogRuleException("Giá bán phải dương; giá tham chiếu phải cao hơn giá bán, tối đa 1 tỷ VND.");
-        if (capacityMl is <= 0 or > 100000 || widthCm is <= 0 or > 1000 || heightCm is <= 0 or > 1000 || weightG is <= 0 or > 1000000)
+        if (capacityMl is <= 0 or > 100000 || widthCm is < 0.01m or > 1000 || heightCm is < 0.01m or > 1000 || weightG is <= 0 or > 1000000)
             throw new CatalogRuleException("Thông số phải dương và trong giới hạn cho phép.");
+        if (widthCm.HasValue && decimal.Round(widthCm.Value, 2) != widthCm.Value || heightCm.HasValue && decimal.Round(heightCm.Value, 2) != heightCm.Value)
+            throw new CatalogRuleException("Kích thước hỗ trợ tối đa 2 chữ số thập phân.");
         CapacityMl = capacityMl; WidthCm = widthCm; HeightCm = heightCm; WeightG = weightG;
         PriceVnd = priceVnd; OriginalPriceVnd = originalPriceVnd; Active = active;
         CareNote = CatalogRules.Text(careNote, 2000, "Hướng dẫn chăm sóc"); CareSource = CatalogRules.Text(careSource, 1000, "Nguồn xác minh");

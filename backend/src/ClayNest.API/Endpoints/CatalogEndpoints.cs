@@ -63,6 +63,7 @@ public static class CatalogEndpoints
         catch (CatalogRuleException ex) { return ApiErrors.Create(context.HttpContext, 400, "invalid_catalog", ex.Message); }
         catch (CatalogConflictException ex) { return ApiErrors.Create(context.HttpContext, 409, "catalog_conflict", ex.Message); }
         catch (KeyNotFoundException) { return ApiErrors.Create(context.HttpContext, 404, "not_found", "Không tìm thấy dữ liệu."); }
+        catch (BadHttpRequestException ex) when (ex.StatusCode == 413) { return ApiErrors.Create(context.HttpContext, 413, "image_too_large", "Ảnh vượt giới hạn tải lên."); }
         catch (InvalidDataException) { return ApiErrors.Create(context.HttpContext, 400, "invalid_image", "Ảnh không hợp lệ hoặc quá lớn."); }
     }
     public sealed class CatalogParameters
@@ -73,11 +74,11 @@ public static class CatalogEndpoints
         public long? MaxPrice { get; set; }
         public string? Glaze { get; set; }
         public string? Use { get; set; }
-        public bool InStock { get; set; }
-        public bool Sale { get; set; }
-        public string Sort { get; set; } = "default";
-        public int Page { get; set; } = 1;
-        public int PageSize { get; set; } = 12;
-        public CatalogQuery ToQuery() => new(Q, Category, MinPrice, MaxPrice, Glaze, Use, InStock, Sale, Sort, Page, PageSize);
+        public bool? InStock { get; set; }
+        public bool? Sale { get; set; }
+        public string? Sort { get; set; }
+        public int? Page { get; set; }
+        public int? PageSize { get; set; }
+        public CatalogQuery ToQuery() => new(Q, Category, MinPrice, MaxPrice, Glaze, Use, InStock ?? false, Sale ?? false, Sort ?? "default", Page ?? 1, PageSize ?? 12);
     }
 }

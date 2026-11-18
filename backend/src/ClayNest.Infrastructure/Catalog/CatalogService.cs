@@ -174,6 +174,16 @@ public sealed class CatalogService(CommerceDbContext db) : ICatalogService
             product.Variants.Add(variant); product.Images.Add(new ProductImage(product.Id, $"/images/slow-living/{image}.jpg", name, 0));
             product.ValidatePublication(); db.Products.Add(product);
         }
+        // A deliberately hidden, inactive example exercises publication boundaries.
+        if (!await db.Products.AnyAsync(p => p.Slug == "ban-nhap-demo", ct))
+        {
+            var category = await db.Categories.SingleAsync(c => c.Slug == "coc-tach", ct);
+            var hidden = new Product(isDemo: true);
+            hidden.Update(category.Id, "Bản nháp DEMO", "ban-nhap-demo", "Mẫu chưa xuất bản.", "", "Gốm minh họa", "", "", false);
+            var inactive = new ProductVariant(hidden.Id);
+            inactive.Update("NG-DRAFT-DEMO", "Chưa hoạt động", "", "", null, null, null, null, 100000, null, false, "", "", false);
+            hidden.Variants.Add(inactive); hidden.ValidatePublication(); db.Products.Add(hidden);
+        }
         await SaveAsync(ct);
     }
 }
