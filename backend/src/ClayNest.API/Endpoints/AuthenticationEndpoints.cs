@@ -12,6 +12,7 @@ public static class AuthenticationEndpoints
     public static IEndpointRouteBuilder MapAuthenticationEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/api/v1/auth").WithTags("Authentication")
+            .WithDescription("Same-origin Identity cookie authentication. Mutations require X-CSRF-TOKEN from /api/v1/auth/csrf. Public registration never grants Admin.")
             .AddEndpointFilter(async (context, next) =>
             {
                 context.HttpContext.Response.Headers.CacheControl = "no-cache, no-store";

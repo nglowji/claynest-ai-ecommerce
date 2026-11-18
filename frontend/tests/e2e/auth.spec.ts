@@ -35,7 +35,7 @@ test('registration validates confirmation, creates a customer and denies admin A
   await page.getByLabel('Nhập lại mật khẩu').fill(password)
   await page.getByRole('button', { name: 'Tạo tài khoản', exact: true }).click()
   await expect(page).toHaveURL('/login')
-  await expect(page.getByRole('status')).toContainText('Tài khoản đã sẵn sàng')
+  await expect(page.getByRole('status').filter({ hasText: 'Tài khoản đã sẵn sàng' })).toBeVisible()
   await page.getByLabel('Mật khẩu', { exact: true }).fill(password)
   await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click()
   await expect(page).toHaveURL('/account')

@@ -144,6 +144,7 @@ services:
       target: runtime
     environment: &e2e-api-env
       ASPNETCORE_ENVIRONMENT: Development
+      DataProtection__KeysPath: /app/keys
       ConnectionStrings__Commerce: Host=db-test;Port=5432;Database=claynest_test;Username=commerce_app;Password=${TEST_COMMERCE_DB_PASSWORD}
       Bootstrap__Email: ${E2E_ADMIN_EMAIL}
       Bootstrap__Password: ${E2E_ADMIN_PASSWORD}
@@ -159,6 +160,8 @@ services:
       context: ./backend
       target: runtime
     environment: *e2e-api-env
+    ports:
+      - "127.0.0.1:18000:8080"
     depends_on:
       e2e-bootstrap:
         condition: service_completed_successfully

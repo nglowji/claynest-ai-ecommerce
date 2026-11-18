@@ -11,6 +11,7 @@ export default function AdminLayout() {
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
   const [denied, setDenied] = useState(false)
+  useEffect(() => { document.title = 'Quản trị | Nàng Gốm' }, [])
   useEffect(() => {
     let active = true
     if (auth.user?.role !== 'Admin') return
