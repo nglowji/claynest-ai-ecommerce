@@ -58,6 +58,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.Configure<ClayNest.Infrastructure.Chat.ChatOptions>(configuration.GetSection("Ai"));
         services.AddSingleton<ClayNest.Infrastructure.Chat.ServiceSignature>();
+        services.AddHttpClient<ClayNest.Application.Chat.IKnowledgeGateway, ClayNest.Infrastructure.Chat.KnowledgeGateway>(client => client.Timeout = TimeSpan.FromSeconds(15));
         services.AddScoped<ClayNest.Application.Chat.IChatCatalog, ClayNest.Infrastructure.Chat.ChatCatalog>();
         services.AddScoped<ClayNest.Application.Chat.IChatService, ClayNest.Infrastructure.Chat.ChatService>();
         services.AddHttpClient<ClayNest.Application.Chat.IChatGateway, ClayNest.Infrastructure.Chat.ChatGateway>(client => client.Timeout = TimeSpan.FromSeconds(45));

@@ -49,7 +49,7 @@ public static class AdminAuthentication
                 context.HttpContext.Response.Headers.RetryAfter = "60";
                 await ApiErrors.WriteAsync(context.HttpContext, 429, "rate_limited", "Vui lòng chờ một phút rồi thử lại.");
             };
-            foreach (var (name, limit) in new[] { ("public-chat", 8), ("cart-quote", 120), ("checkout", 20), ("order-lookup", 60) })
+            foreach (var (name, limit) in new[] { ("knowledge-admin", 30), ("knowledge-read", 120), ("knowledge-feedback", 20), ("public-chat", 8), ("cart-quote", 120), ("checkout", 20), ("order-lookup", 60) })
                 options.AddPolicy(name, context => RateLimitPartition.GetFixedWindowLimiter(
                     context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions
                     { PermitLimit = limit, Window = TimeSpan.FromMinutes(1), QueueLimit = 0, AutoReplenishment = true }));

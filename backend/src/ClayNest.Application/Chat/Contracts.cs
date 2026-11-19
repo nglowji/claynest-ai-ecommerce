@@ -5,7 +5,7 @@ public sealed record ChatFilters(string? Q = null, string? Category = null, long
     string? Glaze = null, string? Use = null, bool InStock = true, decimal? MaxHeightCm = null, int? MinCapacityMl = null);
 public sealed record ChatRequest(string Message, List<ChatTurn>? History = null, ChatFilters? Filters = null);
 public sealed record ChatChoice(Guid VariantId, string Reason);
-public sealed record AiDecision(string Topic, ChatFilters Filters, List<ChatChoice> Choices, string? KnowledgeKey = null);
+public sealed record AiDecision(string Topic, ChatFilters Filters, List<ChatChoice> Choices, string? KnowledgeKey = null, List<Guid>? ChunkIds = null, string? ProductSlug = null, bool SafetyOnly = false);
 public sealed record ChatFact(Guid VariantId, Guid ProductId, string Name, string Slug, string Sku, string VariantName,
     string Description, string Material, string Glaze, string Use, long PriceVnd, int StockQty, decimal? HeightCm, int? CapacityMl, string Image);
 public sealed record ChatProduct(ChatFact Product, string Reason);

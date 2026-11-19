@@ -49,6 +49,7 @@ services:
       Catalog__ImagePath: /app/media/catalog
       Ai__BaseUrl: http://ai-service:8001
       Ai__GatewaySecret: ${AI_GATEWAY_SECRET}
+      Ai__KnowledgeAdminSecret: ${AI_KNOWLEDGE_ADMIN_SECRET}
       Ai__ToolSecret: ${AI_TOOL_SECRET}
       ConnectionStrings__Commerce: Host=db;Port=5432;Database=${POSTGRES_DB:-claynest};Username=commerce_app;Password=${COMMERCE_DB_PASSWORD}
     volumes:
@@ -93,6 +94,7 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       AI_GEMINI_MODEL: ${AI_GEMINI_MODEL:-gemini-3.5-flash-lite}
       AI_GATEWAY_SECRET: ${AI_GATEWAY_SECRET}
+      AI_KNOWLEDGE_ADMIN_SECRET: ${AI_KNOWLEDGE_ADMIN_SECRET}
       AI_TOOL_SECRET: ${AI_TOOL_SECRET}
       AI_COMMERCE_BASE_URL: http://api:8080
       AI_DAILY_TURN_LIMIT: ${AI_DAILY_TURN_LIMIT:-100}

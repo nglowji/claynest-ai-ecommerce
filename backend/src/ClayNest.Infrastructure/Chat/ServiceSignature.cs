@@ -8,6 +8,7 @@ public sealed class ChatOptions
 {
     public string BaseUrl { get; set; } = "http://ai-service:8001";
     public string GatewaySecret { get; set; } = "";
+    public string KnowledgeAdminSecret { get; set; } = "";
     public string ToolSecret { get; set; } = "";
 }
 public sealed class ServiceSignature(TimeProvider clock)

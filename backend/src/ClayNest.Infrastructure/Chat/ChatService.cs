@@ -3,7 +3,7 @@ using ClayNest.Application.Chat;
 using ClayNest.Domain.Orders;
 namespace ClayNest.Infrastructure.Chat;
 
-public sealed class ChatService(IChatGateway gateway,IChatCatalog catalog) : IChatService
+public sealed class ChatService(IChatGateway gateway,IChatCatalog catalog, IKnowledgeGateway knowledge) : IChatService
 {
     private static readonly Dictionary<string,string> Reasons = new()
     {
@@ -11,6 +11,7 @@ public sealed class ChatService(IChatGateway gateway,IChatCatalog catalog) : ICh
         ["glaze"] = "Sắc men để bạn cân nhắc cho góc nhà.", ["size"] = "Kích thước phù hợp bộ lọc bạn chọn.",
         ["gift"] = "Một gợi ý để bạn cân nhắc làm quà.", ["everyday"] = "Gợi ý cho những khoảnh khắc thường ngày.", ["decor"] = "Một điểm nhấn gốm cho góc nhà."
     };
+    public static string SourceUrl(KnowledgeExcerpt p) => "/knowledge/"+p.ChunkId+(p.ProductSlug is null ? "" : "?product="+Uri.EscapeDataString(p.ProductSlug));
     public static string Redact(string text)
     {
         text = Regex.Replace(text,@"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}","[email đã ẩn]");
@@ -27,6 +28,16 @@ public sealed class ChatService(IChatGateway gateway,IChatCatalog catalog) : ICh
         var result = await gateway.AskAsync(safe,ct);
         if (result.Filters is null || result.Choices is null || result.Choices.Count > 3 || result.Choices.Any(c => c is null || string.IsNullOrEmpty(c.Reason) || !Reasons.ContainsKey(c.Reason))) throw new ChatUnavailableException();
         try { ChatCatalog.Validate(result.Filters); } catch (ChatValidationException) { throw new ChatUnavailableException(); }
+        if (result.Topic == "rag")
+        {
+            var ids=result.ChunkIds ?? [];
+            if (ids.Count>2 || ids.Distinct().Count()!=ids.Count) throw new ChatUnavailableException();
+            if (result.ProductSlug is { } slug && (await catalog.DetailAsync(slug,ct)).Count==0) ids=[];
+            var passages=ids.Count==0 ? [] : await knowledge.ResolveAsync(ids,result.ProductSlug,result.SafetyOnly,ct);
+            if (passages.Count==0) return new("Nàng chưa có nguồn đã duyệt đủ phù hợp để trả lời câu hỏi này. Bạn có thể xem thông tin sản phẩm hoặc nhờ cửa hàng kiểm tra thêm.",[],[new("Xem sản phẩm","/products")]);
+            return new("Theo tài liệu đã được cửa hàng duyệt:\n\n"+string.Join("\n\n",passages.Select(p=>p.Content)),[],[],
+                passages.Select(p=>new ChatSource(p.Title,"v"+p.Version,p.Section,SourceUrl(p))).ToList());
+        }
         var knowledgeKey = result.Topic switch
         {
             "knowledge" => result.KnowledgeKey,

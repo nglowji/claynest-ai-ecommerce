@@ -6,6 +6,8 @@ import SiteLocation from './components/SiteLocation'
 import LoginPage from './components/LoginPage'
 import AdminLayout from './components/AdminLayout'
 import AdminPage from './components/AdminPage'
+import AdminKnowledgePage from './components/AdminKnowledgePage'
+import KnowledgeSourcePage from './components/KnowledgeSourcePage'
 import AdminInventoryPage from './components/AdminInventoryPage'
 import AdminOrdersPage, { AdminOrderDetailPage } from './components/AdminOrdersPage'
 import AccountPage from './components/AccountPage'
@@ -24,7 +26,7 @@ import { stories } from './data/stories'
 import { type Product } from './data/products'
 
 export default function App() { return <AuthProvider><Routes>
-  <Route path="/admin" element={<AdminLayout />}><Route index element={<AdminPage />} /><Route path="products" element={<AdminCatalogPage />} /><Route path="inventory" element={<AdminInventoryPage />} /><Route path="orders" element={<AdminOrdersPage />} /><Route path="orders/:id" element={<AdminOrderDetailPage />} /><Route path="*" element={<section className="container account-page"><h1>Không tìm thấy trang quản trị</h1><Link to="/admin">Về tổng quan</Link></section>} /></Route>
+  <Route path="/admin" element={<AdminLayout />}><Route index element={<AdminPage />} /><Route path="knowledge" element={<AdminKnowledgePage />} /><Route path="products" element={<AdminCatalogPage />} /><Route path="inventory" element={<AdminInventoryPage />} /><Route path="orders" element={<AdminOrdersPage />} /><Route path="orders/:id" element={<AdminOrderDetailPage />} /><Route path="*" element={<section className="container account-page"><h1>Không tìm thấy trang quản trị</h1><Link to="/admin">Về tổng quan</Link></section>} /></Route>
   <Route path="*" element={<StoreApp />} />
 </Routes></AuthProvider> }
 
@@ -86,6 +88,7 @@ function StoreApp() {
       <Route path="/account" element={<AccountPage />} />
       <Route path="/products" element={<ProductsPage {...actions} />} />
       <Route path="/products/:slug" element={<ProductPage {...actions} />} />
+      <Route path="/knowledge/:id" element={<KnowledgeSourcePage />} />
       <Route path="/stories" element={<StoriesPage />} />
       <Route path="/stories/:slug" element={<StoryPage />} />
       <Route path="*" element={<section className="container empty-state not-found"><h1>Không tìm thấy trang</h1><Link className="button primary" to="/">Về trang chủ <Icon name="arrow" /></Link></section>} />

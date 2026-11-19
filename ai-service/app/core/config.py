@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     gemini_api_key: SecretStr = Field(default=SecretStr(""), validation_alias="GEMINI_API_KEY")
     gemini_model: str = "gemini-3.5-flash-lite"
     gateway_secret: SecretStr = SecretStr("")
+    knowledge_admin_secret: SecretStr = SecretStr("")
+    knowledge_worker_enabled: bool = True
     tool_secret: SecretStr = SecretStr("")
     commerce_base_url: str = "http://api:8080"
     daily_turn_limit: int = Field(default=100, ge=1, le=10000)

@@ -22,7 +22,7 @@ public static class ChatEndpoints
             try { return Results.Ok(await chat.AskAsync(input,ct)); }
             catch (ChatValidationException ex) { return ApiErrors.Create(http,400,"invalid_chat",ex.Message); }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { return Results.StatusCode(499); }
-            catch (Exception ex) when (ex is ChatUnavailableException or HttpRequestException or JsonException or OperationCanceledException)
+            catch (Exception ex) when (ex is ChatUnavailableException or KnowledgeException or HttpRequestException or JsonException or OperationCanceledException)
             { return ApiErrors.Create(http,503,"chat_unavailable","Nàng chưa kết nối được trợ lý tư vấn. Bạn vẫn có thể xem sản phẩm và đặt hàng bình thường."); }
             finally { capacity.Slots.Release(); }
         }).WithTags("Product advice").RequireRateLimiting("public-chat").Produces<ChatResponse>().ProducesProblem(400).ProducesProblem(503).ProducesProblem(429);

@@ -2,6 +2,9 @@ import asyncio
 import httpx
 from contextlib import asynccontextmanager
 from app.api.chat_models import ChatInput
+from app.rag.embedding import GeminiEmbedding
+from app.rag.store import KnowledgeStore
+from app.rag.api import mount_knowledge
 from app.core.service_auth import ReplayGuard
 from app.llm.advisor import Advisor
 from app.llm.gemini import GeminiProvider, ProviderUnavailable
@@ -29,18 +32,34 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     config = settings or Settings()
     engine = build_engine(config.database_url)
     network = httpx.AsyncClient(limits=httpx.Limits(max_connections=8,max_keepalive_connections=4),follow_redirects=False)
-    advisor = Advisor(GeminiProvider(config,network),CatalogTools(config,network),config.daily_turn_limit)
+    knowledge = KnowledgeStore(engine, GeminiEmbedding(config,network))
+    advisor = Advisor(GeminiProvider(config,network),CatalogTools(config,network),config.daily_turn_limit,knowledge)
+    async def worker():
+        while True:
+            try:
+                if not await knowledge.process_one(): await asyncio.sleep(2)
+            except asyncio.CancelledError: raise
+            except Exception as error:
+                logger.error("knowledge_worker_failed",extra={"exception_type":type(error).__name__})
+                await asyncio.sleep(5)
     guard = ReplayGuard()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        yield
+        task=asyncio.create_task(worker()) if config.knowledge_worker_enabled else None
+        try: yield
+        finally:
+            if task:
+                task.cancel()
+                await asyncio.gather(task,return_exceptions=True)
         await network.aclose()
         engine.dispose()
 
     app = FastAPI(title=config.app_name, version="0.2.0", lifespan=lifespan)
     app.state.engine = engine
     app.state.advisor = advisor
+    app.state.knowledge = knowledge
+    mount_knowledge(app,config,guard)
 
     @app.middleware("http")
     async def correlation(request: Request, call_next):

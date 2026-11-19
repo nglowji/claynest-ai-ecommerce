@@ -21,15 +21,15 @@ class ReplayGuard:
         self.nonces: dict[str, float] = {}
         self.lock = Lock()
 
-    def verify(self, secret: str, path: str, supplied, body: bytes) -> bool:
+    def verify(self, secret: str, path: str, supplied, body: bytes, scope: str = "chat:public") -> bool:
         now = time.time()
         stamp, nonce = supplied.get("x-service-time", ""), supplied.get("x-service-nonce", "")
         try:
-            if len(secret) < 32 or abs(now - int(stamp)) > 60 or UUID(nonce).hex != nonce or supplied.get("x-service-scope") != "chat:public":
+            if len(secret) < 32 or abs(now - int(stamp)) > 60 or UUID(nonce).hex != nonce or supplied.get("x-service-scope") != scope:
                 return False
         except (ValueError, TypeError):
             return False
-        expected = signature(secret,path,"chat:public",stamp,nonce,body)
+        expected = signature(secret,path,scope,stamp,nonce,body)
         provided = supplied.get("x-service-signature", "")
         if not isinstance(provided,str) or len(provided) != 64 or any(c not in "0123456789abcdef" for c in provided) or not hmac.compare_digest(expected,provided):
             return False

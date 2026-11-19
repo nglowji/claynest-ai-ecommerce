@@ -15,6 +15,8 @@ def configure() -> None:
             values[key.strip()] = value.strip().strip("\"'")
     defaults = {
         "GEMINI_API_KEY": "", "AI_GEMINI_MODEL": "gemini-3.5-flash-lite",
+        "AI_KNOWLEDGE_ADMIN_SECRET": secrets.token_hex(32),
+        "TEST_AI_KNOWLEDGE_ADMIN_SECRET": secrets.token_hex(32),
         "AI_GATEWAY_SECRET": secrets.token_hex(32), "AI_TOOL_SECRET": secrets.token_hex(32),
         "TEST_AI_GATEWAY_SECRET": secrets.token_hex(32), "TEST_AI_TOOL_SECRET": secrets.token_hex(32),
         "POSTGRES_USER": "claynest", "POSTGRES_DB": "claynest", "POSTGRES_PORT": "5432",

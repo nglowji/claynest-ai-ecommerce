@@ -53,7 +53,7 @@ class StoreContext(Contract):
     catalog_truncated: bool
 
 class Intent(Contract):
-    topic: Literal["recommend", "detail", "policy", "safety", "order", "other", "knowledge"]
+    topic: Literal["recommend", "detail", "policy", "safety", "order", "other", "knowledge", "rag"]
     filters: Filters
     slug: str | None = Field(default=None, max_length=140, pattern=r"^[a-z0-9-]+$")
     knowledge_key: KnowledgeKey | None = None
@@ -68,8 +68,11 @@ class Ranking(Contract):
     choices: list[Choice] = Field(max_length=3)
 
 class Decision(Contract):
+    chunk_ids: list[UUID] = Field(default_factory=list,max_length=2)
+    product_slug: str | None = Field(default=None,max_length=140,pattern=r"^[a-z0-9-]+$")
+    safety_only: bool = False
     knowledge_key: KnowledgeKey | None = None
-    topic: Literal["recommend", "detail", "policy", "safety", "order", "other", "knowledge"]
+    topic: Literal["recommend", "detail", "policy", "safety", "order", "other", "knowledge", "rag"]
     filters: Filters
     choices: list[Choice] = Field(default_factory=list, max_length=3)
 
