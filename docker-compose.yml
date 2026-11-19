@@ -159,6 +159,7 @@ services:
       context: ./backend
       target: runtime
     environment: &e2e-api-env
+      AllowedHosts: localhost;127.0.0.1;e2e-api
       ASPNETCORE_ENVIRONMENT: Development
       DataProtection__KeysPath: /app/keys
       Catalog__ImagePath: /app/media/catalog
@@ -166,10 +167,34 @@ services:
       Bootstrap__Email: ${E2E_ADMIN_EMAIL}
       Bootstrap__Password: ${E2E_ADMIN_PASSWORD}
       Bootstrap__DisplayName: E2E administrator
+      Ai__BaseUrl: http://e2e-ai:8001
+      Ai__GatewaySecret: ${TEST_AI_GATEWAY_SECRET}
+      Ai__ToolSecret: ${TEST_AI_TOOL_SECRET}
+      Ai__KnowledgeAdminSecret: ${TEST_AI_KNOWLEDGE_ADMIN_SECRET}
     command: ["--bootstrap-auth", "--seed-catalog", "--refresh-catalog"]
     depends_on:
       db-test:
         condition: service_healthy
+
+  e2e-ai:
+    profiles: ["e2e"]
+    build: ./ai-service
+    environment:
+      AI_DATABASE_URL: postgresql+psycopg://ai_app:${TEST_AI_DB_PASSWORD}@db-test:5432/claynest_test
+      AI_INTEGRATION_TESTS: "1"
+      AI_GATEWAY_SECRET: ${TEST_AI_GATEWAY_SECRET}
+      AI_TOOL_SECRET: ${TEST_AI_TOOL_SECRET}
+      AI_KNOWLEDGE_ADMIN_SECRET: ${TEST_AI_KNOWLEDGE_ADMIN_SECRET}
+      AI_COMMERCE_BASE_URL: http://e2e-api:8080
+    command: ["sh", "-c", "python -m app.db.migrate && exec uvicorn tests.e2e_server:app --host 0.0.0.0 --port 8001 --no-access-log"]
+    depends_on:
+      db-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/ready', timeout=3)"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
 
   e2e-api:
     profiles: ["e2e"]
@@ -182,6 +207,8 @@ services:
     depends_on:
       e2e-bootstrap:
         condition: service_completed_successfully
+      e2e-ai:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/ready"]
       interval: 2s

@@ -23,7 +23,7 @@ public sealed class KnowledgeGateway(HttpClient http, IOptions<ChatOptions> conf
         using var response=await http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,ct);
         await using var stream=await response.Content.ReadAsStreamAsync(ct);
         using var memory=new MemoryStream(); var buffer=new byte[8192];
-        while (true) { var count=await stream.ReadAsync(buffer,ct); if (count==0) break; if (memory.Length+count>2097152) throw new KnowledgeException(503,"knowledge_unavailable","Phản hồi kho kiến thức quá lớn."); memory.Write(buffer,0,count); }
+        while (true) { var count=await stream.ReadAsync(buffer,ct); if (count==0) break; if (memory.Length+count>8388608) throw new KnowledgeException(503,"knowledge_unavailable","Phản hồi kho kiến thức quá lớn."); memory.Write(buffer,0,count); }
         if (!response.IsSuccessStatusCode)
         {
             var status=(int)response.StatusCode;
@@ -41,7 +41,7 @@ public sealed class KnowledgeGateway(HttpClient http, IOptions<ChatOptions> conf
         if (ids.Count>3) throw new ChatUnavailableException();
         var result=await SendAsync("/internal/knowledge/resolve","knowledge:read",config.Value.GatewaySecret,new { chunkIds=ids,productSlug=slug,safetyOnly=safety },ct);
         var excerpts=result.Deserialize<List<KnowledgeExcerpt>>(Json) ?? throw new ChatUnavailableException();
-        if (excerpts.Count>3 || excerpts.Any(e=>!ids.Contains(e.ChunkId) || e.Content.Length>1200 || string.IsNullOrWhiteSpace(e.Content) || e.Version<1 || e.Title.Length>180 || e.Section.Length>180 || (e.ProductSlug!=null && e.ProductSlug!=slug) || (safety && (slug==null || e.ProductSlug!=slug || e.EvidenceType!="safety_evidence")))) throw new ChatUnavailableException();
+        if (excerpts.Count>3 || excerpts.Any(e=>e is null || !ids.Contains(e.ChunkId) || string.IsNullOrWhiteSpace(e.Content) || e.Content.Length>1200 || e.Version<1 || string.IsNullOrWhiteSpace(e.Title) || e.Title.Length>180 || string.IsNullOrWhiteSpace(e.Section) || e.Section.Length>180 || (e.ProductSlug!=null && e.ProductSlug!=slug) || (safety && (slug==null || e.ProductSlug!=slug || e.EvidenceType!="safety_evidence")))) throw new ChatUnavailableException();
         return excerpts;
     }
     public async Task FeedbackAsync(KnowledgeFeedback input,CancellationToken ct) =>

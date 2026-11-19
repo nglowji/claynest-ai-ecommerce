@@ -20,6 +20,8 @@ class DocumentInput(Contract):
     @model_validator(mode="after")
     def validate_source(self):
         import re
+        self.title=self.title.strip(); self.source_label=self.source_label.strip()
+        if len(self.title)<3 or len(self.source_label)<3: raise ValueError("Title and source are required")
         if any(ord(c)<32 and c not in "\r\n\t" for c in self.content) or not self.content.strip():
             raise ValueError("Only plain UTF-8 text is supported")
         if self.file_name and (not self.file_name.lower().endswith((".txt",".md")) or any(c in self.file_name for c in "/\\")):
@@ -28,7 +30,7 @@ class DocumentInput(Contract):
             raise ValueError("Safety evidence must be scoped to one product")
         if self.document_id and self.revision is None:
             raise ValueError("Revision required")
-        if re.search(r"AIza[A-Za-z0-9_-]{20,}|(?:GEMINI_API_KEY|ADMIN_PASSWORD|DATABASE_URL)\s*[:=]", self.content):
+        if re.search(r"AIza[A-Za-z0-9_-]{20,}|(?:GEMINI_API_KEY|ADMIN_PASSWORD|DATABASE_URL)\s*[:=]", "\n".join([self.title,self.source_label,self.content,self.file_name or ""])):
             raise ValueError("Credentials must not be uploaded")
         return self
 
@@ -48,6 +50,11 @@ class ResolveInput(Contract):
     chunk_ids: list[UUID] = Field(max_length=3)
     product_slug: str | None = Field(default=None,max_length=140,pattern=r"^[a-z0-9-]+$")
     safety_only: bool = False
+
+    @model_validator(mode="after")
+    def distinct_ids(self):
+        if len(set(self.chunk_ids))!=len(self.chunk_ids): raise ValueError("Duplicate source")
+        return self
 
 class FeedbackInput(Contract):
     request_id: UUID

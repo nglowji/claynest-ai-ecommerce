@@ -59,7 +59,7 @@ public static class KnowledgeEndpoints
         endpoints.MapPost("/api/v1/knowledge/feedback",async (KnowledgeFeedback input,HttpContext http,IAntiforgery csrf,IKnowledgeGateway gateway,CancellationToken ct)=>
         {
             http.Response.Headers.CacheControl="no-store";
-            try { await csrf.ValidateRequestAsync(http); await gateway.FeedbackAsync(input,ct); return Results.NoContent(); }
+            try { await csrf.ValidateRequestAsync(http); if (input.RequestId==Guid.Empty || input.ChunkId==Guid.Empty) return ApiErrors.Create(http,400,"invalid_feedback","Phản hồi không hợp lệ."); await gateway.FeedbackAsync(input,ct); return Results.NoContent(); }
             catch (AntiforgeryValidationException) { return ApiErrors.Create(http,400,"invalid_csrf","Phiên bảo mật không hợp lệ."); }
             catch (KnowledgeException ex) { return ApiErrors.Create(http,ex.Status,ex.Code,ex.Message); }
             catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException) { return ApiErrors.Create(http,503,"feedback_unavailable","Chưa lưu được phản hồi."); }
