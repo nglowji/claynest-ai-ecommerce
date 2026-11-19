@@ -99,4 +99,18 @@ public sealed class KnowledgeTests
         using var hidden=await client.GetAsync("/api/v1/knowledge/sources/"+chunk); Assert.Equal(HttpStatusCode.NotFound,hidden.StatusCode);
         using var noCsrf=await Post(client,"/api/v1/knowledge/feedback",new KnowledgeFeedback(Guid.NewGuid(),chunk,true),false); Assert.Equal(HttpStatusCode.BadRequest,noCsrf.StatusCode);
     }
+    [Theory]
+    [InlineData("Is this microwave safe?")]
+    [InlineData("Is this lead-free and food safe?")]
+    [InlineData("Can every cup go in the dishwasher?")]
+    public async Task Safety_questions_cannot_use_a_general_unscoped_passage_even_if_model_misclassifies(string question)
+    {
+        var chunk=Guid.NewGuid();
+        var gateway=new Knowledge { Excerpts=[new(chunk,Guid.NewGuid(),Guid.NewGuid(),"Unverified",1,"Section","Unsafe unsupported claim","Not evidence",null,"general","care")] };
+        await using var factory=Factory(gateway,new Chat(chunk)); using var client=factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress=new Uri("https://localhost") });
+        using var result=await Post(client,"/api/v1/chat",new ChatRequest(question));
+        Assert.Equal(HttpStatusCode.OK,result.StatusCode);
+        Assert.DoesNotContain("Unsafe unsupported claim",await result.Content.ReadAsStringAsync());
+    }
+
 }

@@ -58,6 +58,7 @@ def chunks(store,doc,slug=None,safety=False):
 
 def test_version_approval_revoke_and_final_resolution(store):
     data=payload(); doc=store.command("save",data,"admin-test")
+    assert doc["updatedAt"].endswith("Z") and "T" in doc["versions"][0]["createdAt"]
     assert store.command("save",data,"admin-test")==doc
     with pytest.raises(KnowledgeError): store.command("save",{**data,"title":"Different"},"admin-test")
     job=store.claim(); assert str(job["id"])==doc["versions"][0]["id"]
@@ -86,7 +87,8 @@ def test_new_version_does_not_rewrite_published_title_or_content(store):
     store.command("revoke",command(active),"admin-test")
 
 def test_scoped_safety_evidence_never_leaks_to_other_products(store):
-    ordinary=approved(store,topic="safety",productSlug="coc-test")
+    ordinary=ready(store,topic="safety",productSlug="coc-test")
+    with pytest.raises(KnowledgeError): store.command("approve",command(ordinary),"admin-test")
     assert not [e for e in chunks(store,ordinary,"coc-test",True) if str(e.document_id)==ordinary["id"]]
     evidence=approved(store,topic="safety",productSlug="coc-test",evidenceType="safety_evidence")
     matches=[e for e in chunks(store,evidence,"coc-test",True) if str(e.document_id)==evidence["id"]]
@@ -94,7 +96,7 @@ def test_scoped_safety_evidence_never_leaks_to_other_products(store):
     ids=[matches[0].chunk_id]
     assert store.resolve(ids)==[] and store.resolve(ids,"other",True)==[]
     assert store.resolve(ids,"coc-test",True)
-    for d in [ordinary,evidence]: store.command("revoke",command(d),"admin-test")
+    for d in [evidence]: store.command("revoke",command(d),"admin-test")
 
 def test_failed_job_explicit_retry_and_stable_chunk_ids(store):
     class Failing:

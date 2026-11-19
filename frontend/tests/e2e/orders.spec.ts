@@ -1,3 +1,4 @@
+import { loginAdminWithBackoff } from './support/adminLogin'
 import { test, expect } from '@playwright/test'
 import { randomUUID } from 'node:crypto'
 
@@ -13,11 +14,8 @@ test('admin fulfils COD, resolves stale state and cancels once despite double-su
   }
   const completed = await order('nang-dia-canh-hoa',2)
   const cancelled = await order('nang-khay-trang-suc-la',1)
-  await page.goto('/login')
-  await page.getByLabel('Email', { exact: true }).fill(process.env.E2E_ADMIN_EMAIL!)
-  await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.E2E_ADMIN_PASSWORD!)
-  await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click()
-  await expect(page).toHaveURL('/admin')
+  test.setTimeout(120000)
+  await loginAdminWithBackoff(page)
   await page.getByRole('link', { name: 'Đơn hàng', exact: true }).click()
   await expect(page).toHaveURL('/admin/orders')
   await page.getByLabel('Tìm mã đơn', { exact: true }).fill(completed.receipt.reference)

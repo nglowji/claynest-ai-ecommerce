@@ -21,6 +21,7 @@ class DocumentInput(Contract):
     def validate_source(self):
         import re
         self.title=self.title.strip(); self.source_label=self.source_label.strip()
+        if any(ord(c)<32 for c in self.title+self.source_label): raise ValueError("Invalid source metadata")
         if len(self.title)<3 or len(self.source_label)<3: raise ValueError("Title and source are required")
         if any(ord(c)<32 and c not in "\r\n\t" for c in self.content) or not self.content.strip():
             raise ValueError("Only plain UTF-8 text is supported")

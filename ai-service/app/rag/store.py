@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import json
 from uuid import UUID, uuid4, uuid5
+from datetime import datetime, timezone
 from sqlalchemy import text
 from app.rag.contracts import DocumentInput, CommandInput, Excerpt, KnowledgeError
 from app.rag.chunking import chunk_text
@@ -14,7 +15,9 @@ def execute(connection, sql, **params):
 
 
 def serializable(value):
-    return json.loads(json.dumps(value,default=str))
+    def encode(item):
+        return item.astimezone(timezone.utc).isoformat().replace("+00:00","Z") if isinstance(item,datetime) else str(item)
+    return json.loads(json.dumps(value,default=encode))
 
 
 def conflict():
@@ -60,12 +63,12 @@ class KnowledgeStore:
             previous=execute(c,"SELECT payload_hash,response FROM ai.knowledge_commands WHERE request_id=:id",id=data.request_id).mappings().first()
             if previous:
                 if previous["payload_hash"]!=digest: conflict()
-                return previous["response"]
+                return self._detail(c,previous["response"].get("documentId",previous["response"].get("id")))
             if action=="save": document_id,version_id=self._save(c,data,actor_id)
             else: document_id,version_id=self._transition(c,action,data)
             execute(c,"INSERT INTO ai.knowledge_audit(id,document_id,version_id,action,actor_id) VALUES(:id,:doc,:ver,:action,:actor)",id=uuid4(),doc=document_id,ver=version_id,action=action,actor=actor_id)
             result=self._detail(c,document_id)
-            execute(c,"INSERT INTO ai.knowledge_commands(request_id,payload_hash,response) VALUES(:id,:hash,CAST(:response AS jsonb))",id=data.request_id,hash=digest,response=json.dumps(result))
+            execute(c,"INSERT INTO ai.knowledge_commands(request_id,payload_hash,response) VALUES(:id,:hash,CAST(:response AS jsonb))",id=data.request_id,hash=digest,response=json.dumps({"documentId":str(document_id)}))
             return result
 
     def _save(self,c,data,actor):
@@ -94,6 +97,8 @@ class KnowledgeStore:
         version=execute(c,"SELECT * FROM ai.knowledge_versions WHERE id=:id AND document_id=:doc",id=data.version_id,doc=data.document_id).mappings().first()
         if not version: raise KnowledgeError(404,"knowledge_not_found","Không tìm thấy phiên bản.")
         if action=="approve":
+            if version["topic"]=="safety" and (version["evidence_type"]!="safety_evidence" or not version["product_slug"]):
+                raise KnowledgeError(409,"unverified_safety","Chứng cứ an toàn cần được xác minh và gắn một sản phẩm cụ thể.")
             latest=execute(c,"SELECT max(number) FROM ai.knowledge_versions WHERE document_id=:id",id=data.document_id).scalar_one()
             if not data.confirm_public or version["index_status"]!="ready" or version["number"]!=latest or doc["active_version"]==data.version_id: conflict()
             if not execute(c,"SELECT EXISTS(SELECT 1 FROM ai.knowledge_chunks WHERE version_id=:id)",id=data.version_id).scalar_one(): conflict()

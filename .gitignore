@@ -43,3 +43,6 @@ Thumbs.db
 # Browser test artifacts may contain session data.
 **/test-results/
 **/playwright-report/
+
+# Local implementation diagnostics
+.r7-*.log
