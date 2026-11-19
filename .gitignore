@@ -46,3 +46,5 @@ Thumbs.db
 
 # Local implementation diagnostics
 .r7-*.log
+
+.r8-*.log

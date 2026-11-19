@@ -28,13 +28,14 @@ export default function AdminLayout() {
   if (auth.status === 'loading') return <main className="account-page container" role="status">Đang kiểm tra phiên…</main>
   if (!auth.user) return <Navigate to="/login" replace />
   if (auth.user.role !== 'Admin' || denied) return <Navigate to="/account" replace />
-  const section = location.pathname.startsWith('/admin/knowledge') ? 'Kho kiến thức AI' : location.pathname.startsWith('/admin/products') ? 'Sản phẩm & danh mục' : location.pathname.startsWith('/admin/inventory') ? 'Quản lý kho' : location.pathname.startsWith('/admin/orders') ? 'Đơn hàng' : 'Tổng quan'
+  const section = location.pathname.startsWith('/admin/reports') ? 'Báo cáo bán hàng' : location.pathname.startsWith('/admin/knowledge') ? 'Kho kiến thức AI' : location.pathname.startsWith('/admin/products') ? 'Sản phẩm & danh mục' : location.pathname.startsWith('/admin/inventory') ? 'Quản lý kho' : location.pathname.startsWith('/admin/orders') ? 'Đơn hàng' : 'Tổng quan'
   return <div className="admin-shell admin-workspace"><a className="skip-link" href="#admin-main">Đến nội dung quản trị</a>
     <aside className="admin-sidebar"><div className="admin-sidebar-brand"><Brand /><span>QUẢN LÝ CỬA HÀNG</span></div><nav aria-label="Điều hướng quản trị">
       <NavLink to="/admin" end><AdminIcon name="overview" />Tổng quan</NavLink>
       <NavLink to="/admin/products"><AdminIcon name="products" />Sản phẩm & danh mục</NavLink>
       <NavLink to="/admin/inventory"><AdminIcon name="inventory" />Quản lý kho</NavLink>
       <NavLink to="/admin/orders"><AdminIcon name="orders" />Đơn hàng</NavLink>
+      <NavLink to="/admin/reports"><AdminIcon name="reports" />Báo cáo bán hàng</NavLink>
       <NavLink to="/admin/knowledge"><AdminIcon name="knowledge" />Kho kiến thức AI</NavLink>
     </nav><div className="admin-sidebar-bottom"><span className="admin-workspace-label">NÀNG GỐM WORKSPACE</span><Link to="/"><AdminIcon name="external" />Ghé cửa hàng</Link></div></aside>
     <div className="admin-workspace-body"><header className="admin-workspace-top"><div className="admin-breadcrumb"><span>Không gian quản trị</span><span aria-hidden="true">/</span><strong>{section}</strong></div><div className="admin-profile-chip"><span>NG</span><div><strong>{auth.user.displayName}</strong><small>Quản trị viên</small></div></div></header>

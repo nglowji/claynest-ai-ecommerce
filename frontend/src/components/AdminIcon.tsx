@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
-export type AdminIconName = 'knowledge' | 'overview' | 'products' | 'inventory' | 'orders' | 'truck' | 'refresh' | 'external' | 'arrow' | 'logout' | 'check' | 'clock'
+export type AdminIconName = 'reports' | 'download' | 'knowledge' | 'overview' | 'products' | 'inventory' | 'orders' | 'truck' | 'refresh' | 'external' | 'arrow' | 'logout' | 'check' | 'clock'
 const paths: Record<AdminIconName, ReactNode> = {
+  reports: <><path d="M3 3v18h18M7 16v-4M12 16V8M17 16V5"/></>,
+  download: <><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></>,
   knowledge: <><path d="M12 5C8 2 4 3 2 4v16c3-2 7-2 10 0 3-2 7-2 10 0V4c-3-1-7-2-10 1ZM12 5v15M5 8h3M5 12h3M16 8h3M16 12h3"/></>,
   overview: <><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></>,
   products: <><path d="m12 3 9 5-9 5-9-5 9-5ZM3 8v9l9 5 9-5V8M12 13v9M7.5 5.5l9 5"/></>,

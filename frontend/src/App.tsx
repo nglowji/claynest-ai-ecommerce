@@ -6,6 +6,7 @@ import SiteLocation from './components/SiteLocation'
 import LoginPage from './components/LoginPage'
 import AdminLayout from './components/AdminLayout'
 import AdminPage from './components/AdminPage'
+import AdminReportsPage from './components/AdminReportsPage'
 import AdminKnowledgePage from './components/AdminKnowledgePage'
 import KnowledgeSourcePage from './components/KnowledgeSourcePage'
 import AdminInventoryPage from './components/AdminInventoryPage'
@@ -26,7 +27,7 @@ import { stories } from './data/stories'
 import { type Product } from './data/products'
 
 export default function App() { return <AuthProvider><Routes>
-  <Route path="/admin" element={<AdminLayout />}><Route index element={<AdminPage />} /><Route path="knowledge" element={<AdminKnowledgePage />} /><Route path="products" element={<AdminCatalogPage />} /><Route path="inventory" element={<AdminInventoryPage />} /><Route path="orders" element={<AdminOrdersPage />} /><Route path="orders/:id" element={<AdminOrderDetailPage />} /><Route path="*" element={<section className="container account-page"><h1>Không tìm thấy trang quản trị</h1><Link to="/admin">Về tổng quan</Link></section>} /></Route>
+  <Route path="/admin" element={<AdminLayout />}><Route index element={<AdminPage />} /><Route path="reports" element={<AdminReportsPage />} /><Route path="knowledge" element={<AdminKnowledgePage />} /><Route path="products" element={<AdminCatalogPage />} /><Route path="inventory" element={<AdminInventoryPage />} /><Route path="orders" element={<AdminOrdersPage />} /><Route path="orders/:id" element={<AdminOrderDetailPage />} /><Route path="*" element={<section className="container account-page"><h1>Không tìm thấy trang quản trị</h1><Link to="/admin">Về tổng quan</Link></section>} /></Route>
   <Route path="*" element={<StoreApp />} />
 </Routes></AuthProvider> }
 

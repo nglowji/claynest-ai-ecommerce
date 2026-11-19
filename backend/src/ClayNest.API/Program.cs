@@ -77,6 +77,7 @@ app.MapOrderEndpoints();
 app.MapAdminOrderEndpoints();
 app.MapChatEndpoints();
 app.MapKnowledgeEndpoints();
+app.MapReportEndpoints();
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.Run();
 

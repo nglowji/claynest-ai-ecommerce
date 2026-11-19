@@ -17,7 +17,7 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         });
         b.Property(x => x.Revision).IsConcurrencyToken();
         b.HasKey(x => x.Id); b.HasIndex(x => x.Reference).IsUnique(); b.HasIndex(x => x.IdempotencyKey).IsUnique();
-        b.HasIndex(x => new { x.CustomerId, x.CreatedAt }); b.HasIndex(x => new { x.Status, x.CreatedAt });
+        b.HasIndex(x => x.CompletedAt).HasFilter("\"Status\" = 'completed'"); b.HasIndex(x => new { x.CustomerId, x.CreatedAt }); b.HasIndex(x => new { x.Status, x.CreatedAt });
         b.Property(x => x.Reference).HasMaxLength(32); b.Property(x => x.CustomerName).HasMaxLength(100);
         b.Property(x => x.Phone).HasMaxLength(16); b.Property(x => x.Email).HasMaxLength(254);
         b.Property(x => x.Province).HasMaxLength(100); b.Property(x => x.Address).HasMaxLength(500);

@@ -461,6 +461,9 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompletedAt")
+                        .HasFilter("\"Status\" = 'completed'");
+
                     b.HasIndex("IdempotencyKey")
                         .IsUnique();
 

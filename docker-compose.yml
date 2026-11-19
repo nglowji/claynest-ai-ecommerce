@@ -159,6 +159,7 @@ services:
       context: ./backend
       target: runtime
     environment: &e2e-api-env
+      Reports__IsDemo: "true"
       AllowedHosts: localhost;127.0.0.1;e2e-api
       ASPNETCORE_ENVIRONMENT: Development
       DataProtection__KeysPath: /app/keys
