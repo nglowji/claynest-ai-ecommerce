@@ -176,17 +176,18 @@ class KnowledgeStore:
     async def retrieve(self,query,slug=None,safety=False,topic=None):
         def exists():
             with self.engine.connect() as c:
-                return execute(c,"SELECT EXISTS(SELECT 1 "+self._eligible()+" AND (:topic IS NULL OR v.topic=:topic))",slug=slug,safety=safety,topic=topic).scalar_one()
+                return execute(c,"SELECT EXISTS(SELECT 1 "+self._eligible()+" AND (CAST(:topic AS text) IS NULL OR v.topic=:topic))",slug=slug,safety=safety,topic=topic).scalar_one()
         if not await asyncio.to_thread(exists): return []
         embedding=(await self.embedding.embed([query],query=True))[0]
         def search():
             with self.engine.connect() as c:
-                rows=execute(c,"SELECT "+self._fields()+",ch.embedding <=> CAST(:embedding AS ai.vector) AS distance "+self._eligible()+" AND (:topic IS NULL OR v.topic=:topic) ORDER BY distance,ch.id LIMIT 4",slug=slug,safety=safety,topic=topic,embedding=vector_literal(embedding)).mappings().all()
+                rows=execute(c,"SELECT "+self._fields()+",ch.embedding <=> CAST(:embedding AS ai.vector) AS distance "+self._eligible()+" AND (CAST(:topic AS text) IS NULL OR v.topic=:topic) ORDER BY distance,ch.id LIMIT 4",slug=slug,safety=safety,topic=topic,embedding=vector_literal(embedding)).mappings().all()
                 return [Excerpt.model_validate({k:v for k,v in dict(r).items() if k!='distance'}) for r in rows if r["distance"]<=0.50]
         return await asyncio.to_thread(search)
 
     def feedback(self,data):
         with self.engine.begin() as c:
+            execute(c,"SELECT pg_advisory_xact_lock(:key)",key=int.from_bytes(data.request_id.bytes[:8],signed=True))
             existing=execute(c,"SELECT chunk_id,useful FROM ai.knowledge_feedback WHERE request_id=:id",id=data.request_id).mappings().first()
             if existing:
                 if existing["chunk_id"]!=data.chunk_id or existing["useful"]!=data.useful: conflict()

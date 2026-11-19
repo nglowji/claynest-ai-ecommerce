@@ -30,10 +30,10 @@ public sealed class ChatService(IChatGateway gateway,IChatCatalog catalog, IKnow
         try { ChatCatalog.Validate(result.Filters); } catch (ChatValidationException) { throw new ChatUnavailableException(); }
         if (result.Topic == "rag")
         {
-            var ids=result.ChunkIds ?? [];
-            if (ids.Count>2 || ids.Distinct().Count()!=ids.Count) throw new ChatUnavailableException();
-            if (result.ProductSlug is { } slug && (await catalog.DetailAsync(slug,ct)).Count==0) ids=[];
-            var passages=ids.Count==0 ? [] : await knowledge.ResolveAsync(ids,result.ProductSlug,result.SafetyOnly,ct);
+            var passageIds=result.ChunkIds ?? [];
+            if (passageIds.Count>2 || passageIds.Distinct().Count()!=passageIds.Count) throw new ChatUnavailableException();
+            if (result.ProductSlug is { } slug && (await catalog.DetailAsync(slug,ct)).Count==0) passageIds=[];
+            var passages=passageIds.Count==0 ? [] : await knowledge.ResolveAsync(passageIds,result.ProductSlug,result.SafetyOnly,ct);
             if (passages.Count==0) return new("Nàng chưa có nguồn đã duyệt đủ phù hợp để trả lời câu hỏi này. Bạn có thể xem thông tin sản phẩm hoặc nhờ cửa hàng kiểm tra thêm.",[],[new("Xem sản phẩm","/products")]);
             return new("Theo tài liệu đã được cửa hàng duyệt:\n\n"+string.Join("\n\n",passages.Select(p=>p.Content)),[],[],
                 passages.Select(p=>new ChatSource(p.Title,"v"+p.Version,p.Section,SourceUrl(p))).ToList());
