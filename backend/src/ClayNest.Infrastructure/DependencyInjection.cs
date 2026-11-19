@@ -64,6 +64,7 @@ public static class DependencyInjection
         services.AddHttpClient<ClayNest.Application.Chat.IChatGateway, ClayNest.Infrastructure.Chat.ChatGateway>(client => client.Timeout = TimeSpan.FromSeconds(45));
         services.AddScoped<ClayNest.Application.Orders.IAdminOrderService, ClayNest.Infrastructure.Orders.AdminOrderService>();
         services.AddScoped<ClayNest.Application.Orders.IOrderService, ClayNest.Infrastructure.Orders.OrderService>();
+        services.AddScoped<ClayNest.Infrastructure.Reports.ReportDemoSeeder>();
         services.Configure<ClayNest.Infrastructure.Reports.ReportOptions>(configuration.GetSection("Reports"));
         services.AddScoped<ClayNest.Application.Reports.IReportService, ClayNest.Infrastructure.Reports.ReportService>();
         services.AddScoped<ClayNest.Application.Inventory.IInventoryService, ClayNest.Infrastructure.Inventory.InventoryService>();

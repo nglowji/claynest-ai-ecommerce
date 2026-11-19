@@ -76,11 +76,11 @@ public sealed class OperationalTests
     }
 
     [Fact]
-    public async Task Unimplemented_report_mutations_are_not_exposed()
+    public async Task Unimplemented_campaign_mutations_are_not_exposed()
     {
         await using var factory = new ApiFactory();
         using var client = factory.CreateClient();
-        using var response = await client.PostAsJsonAsync("/api/v1/admin/reports", new { }, CancellationToken.None);
+        using var response = await client.PostAsJsonAsync("/api/v1/admin/campaigns", new { }, CancellationToken.None);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

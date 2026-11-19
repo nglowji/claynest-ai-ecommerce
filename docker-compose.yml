@@ -172,7 +172,7 @@ services:
       Ai__GatewaySecret: ${TEST_AI_GATEWAY_SECRET}
       Ai__ToolSecret: ${TEST_AI_TOOL_SECRET}
       Ai__KnowledgeAdminSecret: ${TEST_AI_KNOWLEDGE_ADMIN_SECRET}
-    command: ["--bootstrap-auth", "--seed-catalog", "--refresh-catalog"]
+    command: ["--bootstrap-auth", "--seed-catalog", "--refresh-catalog", "--seed-report-demo"]
     depends_on:
       db-test:
         condition: service_healthy
