@@ -3,6 +3,7 @@ import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { adminSession, AuthError } from '../auth/api'
 import Brand from './Brand'
+import AdminIcon from './AdminIcon'
 
 export default function AdminLayout() {
   const auth = useAuth()
@@ -29,12 +30,12 @@ export default function AdminLayout() {
   if (auth.user.role !== 'Admin' || denied) return <Navigate to="/account" replace />
   const section = location.pathname.startsWith('/admin/products') ? 'Sản phẩm & danh mục' : location.pathname.startsWith('/admin/inventory') ? 'Quản lý kho' : location.pathname.startsWith('/admin/orders') ? 'Đơn hàng' : 'Tổng quan'
   return <div className="admin-shell admin-workspace"><a className="skip-link" href="#admin-main">Đến nội dung quản trị</a>
-    <aside className="admin-sidebar"><div className="admin-sidebar-brand"><Brand /><span>KHÔNG GIAN QUẢN TRỊ</span></div><nav aria-label="Điều hướng quản trị">
-      <NavLink to="/admin" end><span aria-hidden="true">▦</span>Tổng quan</NavLink>
-      <NavLink to="/admin/products"><span aria-hidden="true">◇</span>Sản phẩm & danh mục</NavLink>
-      <NavLink to="/admin/inventory"><span aria-hidden="true">▤</span>Quản lý kho</NavLink>
-      <NavLink to="/admin/orders"><span aria-hidden="true">▧</span>Đơn hàng</NavLink>
-    </nav><div className="admin-sidebar-bottom"><p>Một chút chỉn chu,<br />cho từng món gốm.</p><Link to="/">Ghé cửa hàng ↗</Link></div></aside>
-    <div className="admin-workspace-body"><header className="admin-workspace-top"><div><span>Quản trị /</span> {section}</div><div className="admin-profile-chip"><span>NG</span><div><strong>{auth.user.displayName}</strong><small>Quản trị viên</small></div></div></header>
+    <aside className="admin-sidebar"><div className="admin-sidebar-brand"><Brand /><span>QUẢN LÝ CỬA HÀNG</span></div><nav aria-label="Điều hướng quản trị">
+      <NavLink to="/admin" end><AdminIcon name="overview" />Tổng quan</NavLink>
+      <NavLink to="/admin/products"><AdminIcon name="products" />Sản phẩm & danh mục</NavLink>
+      <NavLink to="/admin/inventory"><AdminIcon name="inventory" />Quản lý kho</NavLink>
+      <NavLink to="/admin/orders"><AdminIcon name="orders" />Đơn hàng</NavLink>
+    </nav><div className="admin-sidebar-bottom"><span className="admin-workspace-label">NÀNG GỐM WORKSPACE</span><Link to="/"><AdminIcon name="external" />Ghé cửa hàng</Link></div></aside>
+    <div className="admin-workspace-body"><header className="admin-workspace-top"><div className="admin-breadcrumb"><span>Không gian quản trị</span><span aria-hidden="true">/</span><strong>{section}</strong></div><div className="admin-profile-chip"><span>NG</span><div><strong>{auth.user.displayName}</strong><small>Quản trị viên</small></div></div></header>
     <main id="admin-main">{error ? <section className="account-page container"><p role="alert">{error}</p><button className="button primary" onClick={() => setAttempt(value => value + 1)}>Thử lại</button></section> : verifiedPath === location.pathname ? <Outlet /> : <p className="account-page container" role="status">Đang xác thực quyền quản trị…</p>}</main></div></div>
 }

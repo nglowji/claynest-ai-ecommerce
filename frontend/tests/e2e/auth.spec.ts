@@ -11,7 +11,7 @@ async function loginAdmin(page: Page, remember = false) {
   if (remember) await page.getByLabel('Giữ đăng nhập', { exact: true }).check()
   await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click()
   await expect(page).toHaveURL('/admin')
-  await expect(page.getByText('Phiên quản trị đã được xác thực bởi máy chủ.')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Tổng quan cửa hàng', exact: true })).toBeVisible()
 }
 
 test('guest cannot open administration', async ({ page }) => {
@@ -61,7 +61,7 @@ test('admin redirects into dedicated layout, restores session and logs out', asy
   await expect(page.getByRole('navigation', { name: 'Điều hướng quản trị' })).toBeVisible()
   await expect(page.locator('.site-footer')).toHaveCount(0)
   await page.reload()
-  await expect(page.getByText('Phiên quản trị đã được xác thực bởi máy chủ.')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Tổng quan cửa hàng', exact: true })).toBeVisible()
   const response = await page.request.get('/api/v1/admin/session')
   expect(response.status()).toBe(200)
   expect(response.headers()['cache-control']).toContain('no-store')
@@ -72,6 +72,7 @@ test('admin redirects into dedicated layout, restores session and logs out', asy
 
 test('remember me persists cookie and a revoked session leaves admin immediately', async ({ page, context }) => {
   await loginAdmin(page, true)
+  await expect(page.locator('.dashboard-metrics')).toHaveAttribute('aria-busy', 'false')
   const cookie = (await context.cookies('http://127.0.0.1:4173/api/v1/auth/me')).find(value => value.name === 'nang_gom.admin')
   expect(cookie?.httpOnly).toBe(true)
   expect(cookie!.expires).toBeGreaterThan(Date.now() / 1000)
@@ -91,7 +92,7 @@ test('network interruption offers retry without disclosing admin content', async
   await expect(page.locator('.admin-welcome')).toHaveCount(0)
   await page.unroute('**/api/v1/admin/session')
   await page.getByRole('button', { name: 'Thử lại', exact: true }).click()
-  await expect(page.getByText('Phiên quản trị đã được xác thực bởi máy chủ.')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Tổng quan cửa hàng', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Đăng xuất', exact: true }).click()
 })
 
