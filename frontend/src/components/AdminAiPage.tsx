@@ -31,13 +31,16 @@ export default function AdminAiPage() {
   const input = useRef<HTMLTextAreaElement>(null)
   const end = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (assistant.entries.length) end.current?.scrollIntoView({ block: 'nearest' })
+    if (assistant.entries.length) {
+      const panel = end.current?.parentElement
+      panel?.scrollTo({ top: panel.scrollHeight })
+    }
   }, [assistant.entries])
   async function submit(event: React.FormEvent) {
     event.preventDefault()
     if (await assistant.ask({ message: text.trim(), days: Number(period) })) {
       setText('')
-      input.current?.focus()
+      input.current?.focus({ preventScroll: true })
     }
   }
   return (
@@ -175,7 +178,13 @@ export default function AdminAiPage() {
             <div>
               <small>{text.length}/1200 · Ctrl + Enter để gửi</small>
               {assistant.busy ? (
-                <button type="button" onClick={assistant.stop}>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    assistant.stop()
+                  }}
+                >
                   Dừng yêu cầu
                 </button>
               ) : (
