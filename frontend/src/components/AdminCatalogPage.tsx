@@ -273,7 +273,7 @@ export default function AdminCatalogPage() {
           Tạo sản phẩm
         </button>
       </div>
-      {error && (
+      {error && !draft && (
         <p className="auth-error" role="alert">
           {error}{' '}
           <button type="button" onClick={() => setAttempt((n) => n + 1)}>
@@ -281,13 +281,13 @@ export default function AdminCatalogPage() {
           </button>
         </p>
       )}
-      {notice && (
+      {notice && !draft && (
         <p className="auth-success" role="status">
           {notice}
         </p>
       )}
       {draft && (
-        <AdminEditorDialog busy={busy} error={error} onClose={() => setDraft(null)}>
+        <AdminEditorDialog busy={busy} error={error} notice={notice} onClose={() => setDraft(null)}>
           <form className="catalog-editor" onSubmit={save}>
             <fieldset disabled={busy}>
               <div className="editor-heading">

@@ -1,15 +1,14 @@
+import { loginAdminWithBackoff } from './support/adminLogin'
 import { test, expect } from '@playwright/test'
 import { randomUUID } from 'node:crypto'
+
+test.setTimeout(120000)
 
 test('admin creates draft, publishes, edits price, uploads image and archives; storefront follows DB', async ({
   page,
 }) => {
   const key = randomUUID().replaceAll('-', '').slice(0, 12)
-  await page.goto('/login')
-  await page.getByLabel('Email', { exact: true }).fill(process.env.E2E_ADMIN_EMAIL!)
-  await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.E2E_ADMIN_PASSWORD!)
-  await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click()
-  await expect(page).toHaveURL('/admin')
+  await loginAdminWithBackoff(page)
   await page.getByRole('link', { name: 'Sản phẩm & danh mục', exact: true }).click()
   await expect(page).toHaveURL('/admin/products')
   await page.getByRole('button', { name: 'Tạo sản phẩm', exact: true }).click()

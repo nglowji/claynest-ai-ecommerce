@@ -718,3 +718,42 @@
     overflow-wrap: anywhere;
   }
 }
+
+.admin-editor-dialog > :is(.auth-success, .auth-error) {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin: 0;
+  padding: 14px 24px;
+  border-radius: 0;
+  font-size: 13px;
+}
+.admin-editor-dialog > .auth-success {
+  background: #eaf4ed;
+  color: #35734a;
+}
+.admin-editor-dialog > .auth-error {
+  background: #fff0ed;
+  color: #a94c42;
+}
+.admin-workspace .fulfilment-actions :is(input:not([type='checkbox']), select, textarea) {
+  border: 1px solid #d5dfe7;
+  border-radius: 7px;
+  min-height: 42px;
+  padding: 10px 12px;
+  background: #fff;
+  font-size: 14px;
+  color: #263d4b;
+}
+.admin-workspace .fulfilment-contact,
+.admin-workspace .fulfilment-items,
+.admin-workspace .fulfilment-actions label {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.admin-workspace .admin-table-viewport {
+  background: #fff;
+  border: 1px solid #e1e7ed;
+  border-radius: 10px;
+}

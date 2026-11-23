@@ -4,11 +4,13 @@ export default function AdminEditorDialog({
   children,
   busy,
   error,
+  notice,
   onClose,
 }: {
   children: ReactNode
   busy: boolean
   error: string
+  notice: string
   onClose: () => void
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
@@ -33,6 +35,11 @@ export default function AdminEditorDialog({
       {error && (
         <p role="alert" className="auth-error">
           {error}
+        </p>
+      )}
+      {notice && (
+        <p role="status" className="auth-success">
+          {notice}
         </p>
       )}
       {children}

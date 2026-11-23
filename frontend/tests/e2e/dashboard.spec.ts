@@ -42,6 +42,7 @@ test('dedicated admin dashboard shows server totals, recent orders and mobile na
   await page.screenshot({ path: 'test-results/admin-dashboard-mobile.png', fullPage: true })
   await metrics.getByRole('link').filter({ hasText: 'Chờ xác nhận' }).click()
   await expect(page).toHaveURL(/admin\/orders\?status=pending/)
+  await page.locator('.admin-menu-toggle').click()
   await expect(
     page
       .getByRole('navigation', { name: 'Điều hướng quản trị' })
