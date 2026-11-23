@@ -1,3 +1,5 @@
+from app.llm.admin_advisor import AdminAdvisor
+from app.api.admin_assistant import mount_admin_assistant
 import asyncio
 import httpx
 from contextlib import asynccontextmanager
@@ -60,6 +62,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.advisor = advisor
     app.state.knowledge = knowledge
     mount_knowledge(app,config,guard)
+    app.state.admin_advisor = AdminAdvisor(GeminiProvider(config,network), knowledge, config.daily_turn_limit)
+    mount_admin_assistant(app,config,guard)
 
     @app.middleware("http")
     async def correlation(request: Request, call_next):
