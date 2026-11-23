@@ -183,3 +183,193 @@
   font: inherit;
   font-size: 12px;
 }
+
+.dashboard-revenue-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0 24px 22px;
+  gap: 16px;
+}
+.dashboard-revenue-metrics > div {
+  min-width: 0;
+}
+.dashboard-revenue-metrics span {
+  display: block;
+  color: #64776f;
+  font-size: 12px;
+}
+.dashboard-revenue-metrics strong {
+  display: block;
+  color: #203a34;
+  font-size: clamp(17px, 1.4vw, 23px);
+  letter-spacing: -0.6px;
+  margin-block: 7px;
+  overflow-wrap: anywhere;
+}
+.dashboard-revenue-metrics small {
+  display: block;
+  color: #64776f;
+  font-size: 11px;
+}
+.dashboard-sales .report-chart-summary,
+.dashboard-sales .report-chart,
+.dashboard-sales .report-chart-empty,
+.dashboard-sales .report-data-details {
+  margin-inline: 24px;
+}
+.dashboard-sales .report-chart-summary {
+  border-top: 1px solid #e7ece5;
+  padding-top: 18px;
+  font-size: 12px;
+}
+.dashboard-sales .report-chart {
+  margin-top: 14px;
+}
+.dashboard-sales .report-chart-empty {
+  min-height: 210px;
+  background: #f8faf5;
+  border: 1px dashed #d8e2d0;
+  border-radius: 10px;
+}
+.dashboard-sales .report-chart-empty h3 {
+  font-size: 15px;
+}
+.dashboard-sales .report-chart-empty p {
+  font-size: 12px;
+}
+.dashboard-sales .report-data-details {
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+.dashboard-chart-loading {
+  min-height: 250px;
+  display: grid;
+  place-content: center;
+  color: #64776f;
+}
+.dashboard-sales-footer,
+.dashboard-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-top: 1px solid #e4ebe2;
+  color: #64776f;
+  font-size: 12px;
+}
+.dashboard-sales-footer a,
+.dashboard-table-footer a {
+  color: #35694e;
+  font-weight: 500;
+}
+.dashboard-queue-list {
+  padding: 0 18px 12px;
+}
+.dashboard-queue-list > a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 8px;
+  border-top: 1px solid #edf0e9;
+}
+.dashboard-queue-list > a:hover {
+  background: #f6f8f2;
+}
+.dashboard-queue-list i {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  color: #86613c;
+  background: #f8f0e4;
+  flex-shrink: 0;
+}
+.dashboard-queue-list > a:nth-child(2) i {
+  color: #426749;
+  background: #edf3e7;
+}
+.dashboard-queue-list > a:nth-child(3) i {
+  color: #446c86;
+  background: #eaf1f5;
+}
+.dashboard-queue-list strong,
+.dashboard-queue-list small {
+  display: block;
+}
+.dashboard-queue-list strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+.dashboard-queue-list small {
+  color: #64776f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.dashboard-queue-list b {
+  margin-left: auto;
+  font-size: 22px;
+  font-weight: 500;
+}
+.dashboard-queue-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 24px 24px;
+  padding: 14px;
+  background: #f5f7f0;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #58704e;
+}
+.dashboard-order-filters {
+  display: flex;
+  gap: 6px;
+  padding: 0 24px 20px;
+  flex-wrap: wrap;
+}
+.dashboard-order-filters button {
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 8px 12px;
+  background: #f5f7f3;
+  color: #64776f;
+  font-size: 13px;
+}
+.dashboard-order-filters button[aria-pressed='true'] {
+  border-color: #c7d8be;
+  background: #edf3e7;
+  color: #305b3c;
+}
+.dashboard-v2 .dashboard-order-table table {
+  font-size: 13px;
+}
+.dashboard-v2 .dashboard-order-table th {
+  font-size: 12px;
+  background: #fafbf8;
+}
+.dashboard-v2 .dashboard-order-table td,
+.dashboard-v2 .dashboard-order-table th {
+  padding: 16px 24px;
+}
+.dashboard-order-table td small {
+  display: block;
+  margin-top: 3px;
+  color: #64776f;
+  font-size: 12px;
+}
+.dashboard-v2 .dashboard-status {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.dashboard-v2 .dashboard-empty {
+  font-size: 14px;
+}
+.dashboard-v2 .dashboard-empty p,
+.dashboard-v2 .dashboard-error {
+  font-size: 13px;
+}
+.dashboard-v2 .dashboard-footer {
+  font-size: 12px;
+}
