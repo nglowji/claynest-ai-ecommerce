@@ -459,3 +459,179 @@
   margin-top: 14px;
   text-decoration: underline;
 }
+
+.dashboard-v2 :is(a, button, select):focus-visible,
+.admin-sidebar a:focus-visible {
+  outline: 3px solid #d7ab5e;
+  outline-offset: 3px;
+}
+.dashboard-v2 .dashboard-empty button {
+  margin-top: 14px;
+  color: #35694e;
+  padding: 8px 12px;
+  border: 1px solid #c7d8be;
+  border-radius: 6px;
+}
+.dashboard-v2 .dashboard-order-table td:first-child a {
+  font-size: 13px;
+  font-weight: 600;
+}
+.dashboard-v2 .dashboard-order-table {
+  overflow-x: auto;
+}
+.dashboard-v2 .dashboard-order-table table {
+  min-width: 690px;
+}
+.dashboard-v2 .report-chart-axis {
+  font-size: 12px;
+}
+@media (max-width: 1300px) {
+  .admin-workspace {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+  .admin-workspace .admin-sidebar {
+    padding-inline: 12px;
+  }
+  .admin-workspace .admin-sidebar nav > a {
+    padding-inline: 10px;
+    gap: 9px;
+    font-size: 13px;
+  }
+  .dashboard-v2 {
+    padding: 28px;
+  }
+  .dashboard-overview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dashboard-queue-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .dashboard-queue-list > a {
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .dashboard-queue-list i {
+    width: 30px;
+    height: 34px;
+  }
+  .dashboard-insights-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 1000px) {
+  .dashboard-v2 .dashboard-heading {
+    flex-direction: column;
+    gap: 18px;
+  }
+  .dashboard-v2 .dashboard-heading-actions {
+    flex-direction: row;
+  }
+  .dashboard-v2 .dashboard-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dashboard-queue-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dashboard-queue-list > a {
+    align-items: center;
+  }
+  .dashboard-revenue-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+}
+@media (max-width: 760px) {
+  .admin-workspace {
+    display: block;
+  }
+  .admin-workspace .admin-sidebar {
+    padding: 18px 16px 12px;
+    height: auto;
+  }
+  .admin-workspace .admin-sidebar-brand {
+    padding-bottom: 18px;
+  }
+  .admin-workspace .admin-sidebar nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .admin-workspace .admin-sidebar nav > a {
+    font-size: 12px;
+    min-height: 60px;
+    gap: 5px;
+    padding: 8px 3px;
+  }
+  .admin-workspace .admin-workspace-top {
+    height: 68px;
+    padding-inline: 18px;
+  }
+  .admin-workspace .admin-profile-chip strong {
+    max-width: 125px;
+  }
+  .dashboard-v2 {
+    padding: 24px 16px;
+  }
+  .dashboard-v2 .dashboard-context {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .dashboard-v2 .dashboard-metric {
+    padding: 16px;
+  }
+  .dashboard-v2 .dashboard-metric > div {
+    font-size: 13px;
+  }
+  .dashboard-v2 .dashboard-metric > strong {
+    font-size: 29px;
+  }
+  .dashboard-v2 .dashboard-metric i {
+    width: 30px;
+    height: 30px;
+  }
+  .dashboard-v2 .dashboard-panel-heading {
+    padding: 20px 18px;
+    align-items: flex-start;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .dashboard-revenue-metrics {
+    padding-inline: 18px;
+  }
+  .dashboard-sales .report-chart-summary,
+  .dashboard-sales .report-chart,
+  .dashboard-sales .report-chart-empty,
+  .dashboard-sales .report-data-details {
+    margin-inline: 18px;
+  }
+  .dashboard-sales-footer,
+  .dashboard-table-footer {
+    padding-inline: 18px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .dashboard-order-filters {
+    padding-inline: 18px;
+  }
+  .dashboard-ranking,
+  .dashboard-stock-list {
+    padding-inline: 18px;
+  }
+  .dashboard-ranking li {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .dashboard-ranking li > div:first-of-type {
+    flex-basis: calc(100% - 50px);
+  }
+  .dashboard-ranking li > div:last-child {
+    padding-left: 44px;
+    text-align: left;
+  }
+  .dashboard-v2 .dashboard-description {
+    max-width: none;
+    font-size: 14px;
+  }
+}
