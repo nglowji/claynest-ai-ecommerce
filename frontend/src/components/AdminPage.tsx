@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { dashboardPeriod, useDashboard } from '../features/dashboard/useDashboard'
 import { OperationMetrics, RevenueMetrics } from './DashboardMetrics'
@@ -11,23 +10,9 @@ import AdminIcon from './AdminIcon'
 
 export default function AdminPage() {
   const auth = useAuth()
-  const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
   const period = dashboardPeriod(params.get('days'))
   const { summary, report, query, refresh } = useDashboard(period, auth.expire)
-  const [loggingOut, setLoggingOut] = useState(false)
-  const [logoutError, setLogoutError] = useState('')
-  async function logout() {
-    setLoggingOut(true)
-    setLogoutError('')
-    try {
-      await auth.logout()
-      navigate('/login', { replace: true })
-    } catch {
-      setLogoutError('Chưa thể đăng xuất. Vui lòng thử lại.')
-      setLoggingOut(false)
-    }
-  }
   const reportUrl = '/admin/reports?' + query
   return (
     <section className="admin-dashboard dashboard-v2">
@@ -45,10 +30,6 @@ export default function AdminPage() {
           <button onClick={refresh} disabled={summary.loading || report.loading}>
             <AdminIcon name="refresh" />
             Làm mới
-          </button>
-          <button className="logout-button" onClick={logout} disabled={loggingOut}>
-            <AdminIcon name="logout" />
-            {loggingOut ? 'Đang đăng xuất…' : 'Đăng xuất'}
           </button>
         </div>
       </div>
@@ -76,11 +57,6 @@ export default function AdminPage() {
               : 'Chưa cập nhật được hoạt động'}
         </span>
       </div>
-      {logoutError && (
-        <p className="dashboard-error" role="alert">
-          {logoutError}
-        </p>
-      )}
       {summary.error && (
         <div className="dashboard-error" role="alert">
           {summary.error}

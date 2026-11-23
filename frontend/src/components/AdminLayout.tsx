@@ -1,9 +1,10 @@
 import SessionUnavailable from './SessionUnavailable'
 import { useEffect, useState } from 'react'
-import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
+import { Link, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { adminSession, AuthError } from '../auth/api'
-import Brand from './Brand'
+import AdminNavigation from './AdminNavigation'
+import AdminToolbar from './AdminToolbar'
 import AdminIcon from './AdminIcon'
 
 export default function AdminLayout() {
@@ -65,40 +66,7 @@ export default function AdminLayout() {
         Đến nội dung quản trị
       </a>
       <aside className="admin-sidebar">
-        <div className="admin-sidebar-brand">
-          <Brand />
-          <span>QUẢN LÝ CỬA HÀNG</span>
-        </div>
-        <nav aria-label="Điều hướng quản trị">
-          <NavLink to="/admin" end>
-            <AdminIcon name="overview" />
-            Tổng quan
-          </NavLink>
-          <NavLink to="/admin/products">
-            <AdminIcon name="products" />
-            Sản phẩm & danh mục
-          </NavLink>
-          <NavLink to="/admin/inventory">
-            <AdminIcon name="inventory" />
-            Quản lý kho
-          </NavLink>
-          <NavLink to="/admin/orders">
-            <AdminIcon name="orders" />
-            Đơn hàng
-          </NavLink>
-          <NavLink to="/admin/reports">
-            <AdminIcon name="reports" />
-            Báo cáo bán hàng
-          </NavLink>
-          <NavLink to="/admin/assistant">
-            <AdminIcon name="assistant" />
-            Trợ lý quản trị
-          </NavLink>
-          <NavLink to="/admin/knowledge">
-            <AdminIcon name="knowledge" />
-            Kho kiến thức AI
-          </NavLink>
-        </nav>
+        <AdminNavigation />
         <div className="admin-sidebar-bottom">
           <span className="admin-workspace-label">NÀNG GỐM WORKSPACE</span>
           <Link to="/">
@@ -108,20 +76,7 @@ export default function AdminLayout() {
         </div>
       </aside>
       <div className="admin-workspace-body">
-        <header className="admin-workspace-top">
-          <div className="admin-breadcrumb">
-            <span>Không gian quản trị</span>
-            <span aria-hidden="true">/</span>
-            <strong>{section}</strong>
-          </div>
-          <div className="admin-profile-chip">
-            <span>NG</span>
-            <div>
-              <strong>{auth.user.displayName}</strong>
-              <small>Quản trị viên</small>
-            </div>
-          </div>
-        </header>
+        <AdminToolbar section={section} />
         <main id="admin-main">
           {error ? (
             <section className="account-page container">

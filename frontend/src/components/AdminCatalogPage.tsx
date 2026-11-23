@@ -1,6 +1,6 @@
 import SiteImage from './SiteImage'
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { catalogRequest, getCategories, getProducts, type PageResult } from '../catalog/api'
 import { useAuth } from '../auth/AuthContext'
 import { AuthError } from '../auth/api'
@@ -72,7 +72,13 @@ export default function AdminCatalogPage() {
   const auth = useAuth()
   const [categories, setCategories] = useState<Category[]>([])
   const [list, setList] = useState<PageResult<CatalogProduct> | null>(null)
-  const [q, setQ] = useState('')
+  const [params] = useSearchParams()
+  const queryParam = params.get('q') || ''
+  const [q, setQ] = useState(queryParam)
+  useEffect(() => {
+    setQ(queryParam)
+    setPage(1)
+  }, [queryParam])
   const [page, setPage] = useState(1)
   const [attempt, setAttempt] = useState(0)
   const [loading, setLoading] = useState(false)
