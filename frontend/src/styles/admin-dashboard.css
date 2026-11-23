@@ -1,0 +1,185 @@
+/* Administration workspace: scoped so the storefront retains its own visual language. */
+.admin-workspace {
+  --admin-ink: #203a34;
+  --admin-muted: #64776f;
+  --admin-border: #dfe7e1;
+  grid-template-columns: 248px minmax(0, 1fr);
+  background: #f3f5f2;
+  font-size: 14px;
+}
+.admin-workspace .admin-sidebar {
+  background: #183d35;
+  border: 0;
+  padding: 32px 18px 24px;
+}
+.admin-workspace .admin-sidebar-brand .brand {
+  color: #f7f5ec;
+}
+.admin-workspace .admin-sidebar-brand .brand-emblem,
+.admin-workspace .admin-sidebar-brand .brand-tagline {
+  color: #c0d2bb;
+}
+.admin-workspace .admin-sidebar-brand > span {
+  color: #a7bdb3;
+  font-size: 11px;
+}
+.admin-workspace .admin-sidebar nav > a {
+  color: #c6d7ce;
+  font-size: 14px;
+  min-height: 50px;
+  border-radius: 10px;
+}
+.admin-workspace .admin-sidebar nav > a svg {
+  color: inherit;
+}
+.admin-workspace .admin-sidebar nav > a:hover {
+  color: #fff;
+  background: #254d42;
+}
+.admin-workspace .admin-sidebar nav > a.active {
+  color: #183d35;
+  background: #e2ebd8;
+}
+.admin-workspace .admin-sidebar nav > a.active svg {
+  color: inherit;
+}
+.admin-workspace .admin-sidebar nav > a.active::after {
+  display: none;
+}
+.admin-workspace .admin-sidebar-bottom {
+  border-color: #426054;
+}
+.admin-workspace .admin-sidebar-bottom a,
+.admin-workspace .admin-workspace-label {
+  color: #c6d7ce;
+  font-size: 12px;
+}
+.admin-workspace .admin-workspace-top {
+  height: 84px;
+  background: #fff;
+  padding-inline: 36px;
+}
+.admin-workspace .admin-breadcrumb,
+.admin-workspace .admin-profile-chip strong {
+  font-size: 14px;
+}
+.admin-workspace .admin-profile-chip small {
+  font-size: 12px;
+  color: #64776f;
+}
+.dashboard-v2 {
+  max-width: 1800px;
+  padding: 32px 36px;
+  margin-inline: auto;
+}
+.dashboard-v2 .dashboard-heading h1 {
+  font-size: clamp(26px, 2.2vw, 34px);
+  font-weight: 650;
+  letter-spacing: -1.2px;
+}
+.dashboard-v2 .dashboard-eyebrow {
+  color: #648173;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+}
+.dashboard-v2 .dashboard-description {
+  font-size: 14px;
+  color: #64776f;
+  margin-top: 8px;
+}
+.dashboard-v2 .dashboard-heading-actions button {
+  min-height: 42px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+.dashboard-v2 .dashboard-context {
+  font-size: 12px;
+  margin-block: 24px 18px;
+  color: #64776f;
+}
+.dashboard-v2 .dashboard-metrics {
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.dashboard-v2 .dashboard-metric {
+  background: #fff;
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 3px 10px #183d3503;
+}
+.dashboard-v2 .dashboard-metric:hover {
+  border-color: #739b83;
+  box-shadow: 0 6px 18px #183d350b;
+}
+.dashboard-v2 .dashboard-metric > div {
+  font-size: 14px;
+  font-weight: 500;
+}
+.dashboard-v2 .dashboard-metric > strong {
+  font-size: 34px;
+  color: #203a34;
+  margin-top: 10px;
+  letter-spacing: -1px;
+}
+.dashboard-v2 .dashboard-metric p {
+  font-size: 12px;
+  color: #64776f;
+}
+.dashboard-v2 .dashboard-metric i {
+  border-radius: 10px;
+  background: #edf3e7;
+  color: #4c6d46;
+}
+.dashboard-v2 .dashboard-metric:nth-child(2) i {
+  background: #fff0dd;
+  color: #966128;
+}
+.dashboard-overview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.4fr) minmax(270px, 1fr);
+  gap: 22px;
+  margin-bottom: 24px;
+  align-items: start;
+}
+.dashboard-v2 .dashboard-panel {
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
+  box-shadow: none;
+  min-width: 0;
+  overflow: hidden;
+}
+.dashboard-v2 .dashboard-panel-heading {
+  padding: 22px 24px;
+}
+.dashboard-v2 .dashboard-panel-heading h2 {
+  font-size: 17px;
+  font-weight: 600;
+}
+.dashboard-v2 .dashboard-panel-heading p {
+  color: #64776f;
+  font-size: 12px;
+}
+.dashboard-v2 .dashboard-panel-heading > a {
+  font-size: 13px;
+  color: #35694e;
+}
+.dashboard-v2 .dashboard-section-label {
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  margin-bottom: 6px;
+}
+.dashboard-period span {
+  display: block;
+  font-size: 11px;
+  color: #64776f;
+  margin-bottom: 5px;
+}
+.dashboard-period select {
+  border: 1px solid #d5dfd6;
+  background: #fafbf8;
+  color: #203a34;
+  padding: 9px 28px 9px 10px;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+}

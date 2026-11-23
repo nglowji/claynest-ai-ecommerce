@@ -1,3 +1,4 @@
+import '../styles/admin-dashboard.css'
 import SessionUnavailable from './SessionUnavailable'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
