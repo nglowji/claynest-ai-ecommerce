@@ -23,6 +23,8 @@ public sealed class AdminAiSnapshotTests
         var context = await snapshot.GetAsync(new("buyer@example.test 0901234567 " + new string('K', 43), 7), default);
         Assert.Equal(6, context.To.DayNumber - context.From.DayNumber);
         Assert.Contains(context.Facts, fact => fact.Id == "pending");
+        foreach (var id in new[] { "sales-change", "cancellation-rate", "stalled-orders", "out-of-stock", "unsold-stock", "draft-products" })
+            Assert.Contains(context.Facts, fact => fact.Id == id);
         Assert.Contains(context.Guides, guide => guide.Key == "inventory");
         var json = JsonSerializer.Serialize(context);
         foreach (var secret in new[] { CheckoutTests.Fixture.Contact.Name, CheckoutTests.Fixture.Contact.Email,

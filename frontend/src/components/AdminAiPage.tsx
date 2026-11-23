@@ -72,8 +72,8 @@ export default function AdminAiPage() {
             </i>
             <h2>Một góc nhìn rõ hơn.</h2>
             <p>
-              Phân tích doanh thu, tỷ lệ hủy, đơn tồn đọng, SKU hết hàng và sản phẩm chưa bán. Mỗi
-              câu hỏi được đối chiếu với dữ liệu mới và nguồn đã duyệt.
+              Phân tích doanh thu, tỷ lệ hủy, đơn tồn đọng, SKU hết hàng và sản phẩm chưa bán. Trợ
+              lý đối chiếu dữ liệu database, so sánh kỳ trước và đề xuất các bước có căn cứ.
             </p>
           </div>
           <h2 className="admin-ai-sidebar-label">BẮT ĐẦU TỪ MỘT CÂU HỎI</h2>
@@ -140,7 +140,7 @@ export default function AdminAiPage() {
             ))}
             {assistant.busy && (
               <p className="admin-ai-working" role="status">
-                Đang đối chiếu số liệu và tìm nguồn phù hợp…
+                Đang phân tích dữ liệu và xây dựng phương án xử lý…
               </p>
             )}
             {assistant.notice && (

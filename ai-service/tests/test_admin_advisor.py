@@ -116,3 +116,13 @@ def test_internal_route_requires_admin_scope_and_rejects_replay():
         invalid = b'{}'
         assert client.post(PATH, content=invalid, headers=headers(SECRET, PATH, "chat:admin", invalid)).status_code == 400
         assert client.post(PATH, content=b'x' * 32769).status_code == 413
+
+
+def test_plans_must_reference_real_database_evidence():
+    from app.llm.admin_advisor import AdminPlan
+    valid = AdminPlan(title="Review", reason="Inspect evidence", steps=["Open report"], fact_ids=["sales"])
+    result = asyncio.run(AdminAdvisor(Provider(AdminSelection(plans=[valid])), Knowledge(), 10).ask(context()))
+    assert result.plans[0].fact_ids == ["sales"]
+    invalid = valid.model_copy(update={"fact_ids": ["fiction"]})
+    with pytest.raises(ProviderUnavailable):
+        asyncio.run(AdminAdvisor(Provider(AdminSelection(plans=[invalid])), Knowledge(), 10).ask(context()))

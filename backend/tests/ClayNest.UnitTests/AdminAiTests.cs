@@ -46,6 +46,17 @@ public sealed class AdminAiTests
         Assert.Equal(1, knowledge.Calls); Assert.Empty(answer.Sources); Assert.Empty(answer.Insights);
         Assert.Contains("Chưa có dữ liệu", answer.Message);
     }
+    [Fact]
+    public async Task Plans_require_real_evidence_and_include_it_in_the_response()
+    {
+        var plan = new AdminAiPlan("Kiểm tra doanh thu", "Đối chiếu dữ liệu trước khi quyết định.", ["Mở báo cáo và kiểm tra từng kỳ."], ["sales"]);
+        var answer = await AdminAiService.ComposeAsync(Context(), new([], [], [], [plan]), new Knowledge(), default);
+        Assert.Single(answer.Plans!); Assert.Equal("sales", Assert.Single(answer.Insights).Id);
+        await Assert.ThrowsAsync<ChatUnavailableException>(() => AdminAiService.ComposeAsync(Context(),
+            new([], [], [], [plan with { FactIds = ["invented"] }]), new Knowledge(), default));
+        await Assert.ThrowsAsync<ChatUnavailableException>(() => AdminAiService.ComposeAsync(Context(),
+            new([], [], [], [plan with { Steps = [] }]), new Knowledge(), default));
+    }
     private sealed class Snapshot : IAdminAiSnapshot
     {
         public int Calls;
