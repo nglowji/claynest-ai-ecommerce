@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom'
 import SiteImage from './SiteImage'
 import { useEffect, useState } from 'react'
 import { catalogRequest, type PageResult } from '../catalog/api'
@@ -37,9 +38,17 @@ const kindNames: Record<string, string> = {
 }
 export default function AdminInventoryPage() {
   const auth = useAuth()
-  const [query, setQuery] = useState('')
-  const [lowOnly, setLowOnly] = useState(false)
+  const [params] = useSearchParams()
+  const queryParam = params.get('q') || ''
+  const lowParam = params.get('lowOnly') === 'true'
+  const [query, setQuery] = useState(queryParam)
+  const [lowOnly, setLowOnly] = useState(lowParam)
   const [page, setPage] = useState(1)
+  useEffect(() => {
+    setQuery(queryParam)
+    setLowOnly(lowParam)
+    setPage(1)
+  }, [queryParam, lowParam])
   const [attempt, setAttempt] = useState(0)
   const [data, setData] = useState<PageResult<StockItem> | null>(null)
   const [loading, setLoading] = useState(true)

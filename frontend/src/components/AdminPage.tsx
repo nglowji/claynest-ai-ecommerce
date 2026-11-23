@@ -5,6 +5,7 @@ import { dashboardPeriod, useDashboard } from '../features/dashboard/useDashboar
 import { OperationMetrics, RevenueMetrics } from './DashboardMetrics'
 import DashboardOrders from './DashboardOrders'
 import DashboardQueue from './DashboardQueue'
+import DashboardInsights from './DashboardInsights'
 import { SalesChart } from './AdminReportsPage'
 import AdminIcon from './AdminIcon'
 
@@ -138,6 +139,9 @@ export default function AdminPage() {
         error={summary.error}
         revision={summary.updatedAt?.toISOString() || ''}
       />
+      {report.data && !report.loading && (
+        <DashboardInsights report={report.data} reportUrl={reportUrl} />
+      )}
       <footer className="dashboard-footer">
         <span>Nàng Gốm · Chăm chút cửa hàng mỗi ngày</span>
         <Link to="/">
