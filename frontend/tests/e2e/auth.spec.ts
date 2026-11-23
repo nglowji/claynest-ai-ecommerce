@@ -3,7 +3,8 @@ import { randomUUID } from 'node:crypto'
 
 const adminEmail = process.env.E2E_ADMIN_EMAIL
 const adminPassword = process.env.E2E_ADMIN_PASSWORD
-if (!adminEmail || !adminPassword) throw new Error('Use the isolated Compose e2e profile with generated E2E credentials.')
+if (!adminEmail || !adminPassword)
+  throw new Error('Use the isolated Compose e2e profile with generated E2E credentials.')
 async function loginAdmin(page: Page, remember = false) {
   await page.goto('/login')
   await page.getByLabel('Email', { exact: true }).fill(adminEmail!)
@@ -22,7 +23,9 @@ test('guest cannot open administration', async ({ page }) => {
   expect((await response.json()).code).toBe('unauthenticated')
 })
 
-test('registration validates confirmation, creates a customer and denies admin API', async ({ page }) => {
+test('registration validates confirmation, creates a customer and denies admin API', async ({
+  page,
+}) => {
   await page.goto('/register')
   const email = `browser-${randomUUID()}@example.test`
   const password = `Browser-${randomUUID()}-Aa1!`
@@ -70,10 +73,15 @@ test('admin redirects into dedicated layout, restores session and logs out', asy
   expect((await page.request.get('/api/v1/admin/session')).status()).toBe(401)
 })
 
-test('remember me persists cookie and a revoked session leaves admin immediately', async ({ page, context }) => {
+test('remember me persists cookie and a revoked session leaves admin immediately', async ({
+  page,
+  context,
+}) => {
   await loginAdmin(page, true)
   await expect(page.locator('.dashboard-metrics')).toHaveAttribute('aria-busy', 'false')
-  const cookie = (await context.cookies('http://127.0.0.1:4173/api/v1/auth/me')).find(value => value.name === 'nang_gom.admin')
+  const cookie = (await context.cookies('http://127.0.0.1:4173/api/v1/auth/me')).find(
+    (value) => value.name === 'nang_gom.admin',
+  )
   expect(cookie?.httpOnly).toBe(true)
   expect(cookie!.expires).toBeGreaterThan(Date.now() / 1000)
   await context.clearCookies()
@@ -83,7 +91,7 @@ test('remember me persists cookie and a revoked session leaves admin immediately
 })
 
 test('network interruption offers retry without disclosing admin content', async ({ page }) => {
-  await page.route('**/api/v1/admin/session', route => route.abort())
+  await page.route('**/api/v1/admin/session', (route) => route.abort())
   await page.goto('/login')
   await page.getByLabel('Email', { exact: true }).fill(adminEmail!)
   await page.getByLabel('Mật khẩu', { exact: true }).fill(adminPassword!)
@@ -101,6 +109,8 @@ test('mobile entry remains usable without horizontal overflow', async ({ page })
   await page.goto('/register')
   await expect(page.getByLabel('Tên của bạn')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Tạo tài khoản', exact: true })).toBeVisible()
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  )
   await page.screenshot({ path: 'test-results/register-mobile.png', fullPage: true })
 })

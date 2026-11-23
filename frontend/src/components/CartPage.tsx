@@ -5,13 +5,148 @@ import { money } from '../data/products'
 import type { Cart } from '../features/cart/useCart'
 import { useQuote } from '../features/checkout/useQuote'
 
-type Props = { onClear: () => void; quantities: Cart; onChange: (id: string, delta: number) => void; onRemove: (id: string) => void }
+type Props = {
+  onClear: () => void
+  quantities: Cart
+  onChange: (id: string, delta: number) => void
+  onRemove: (id: string) => void
+}
 export default function CartPage({ quantities, onChange, onRemove, onClear }: Props) {
   const quote = useQuote(quantities)
-  const count = Object.values(quantities).reduce((n,q) => n + q, 0)
-  return <section className="basket-page compact-basket container" aria-labelledby="basket-title"><nav className="breadcrumbs" aria-label="Đường dẫn"><Link to="/">Trang chủ</Link><span>/</span><span>Giỏ hàng</span></nav><div className="basket-heading"><h1 id="basket-title">Giỏ hàng <span className="basket-count">({count})</span></h1><Link className="text-link" to="/products">Tiếp tục mua sắm <Icon name="arrow" /></Link></div>
-    {!count ? <div className="basket-empty"><Icon name="bag" /><h2>Giỏ hàng đang trống</h2><p>Chọn một món gốm bạn yêu để bắt đầu.</p><Link className="button primary" to="/products">Khám phá sản phẩm <Icon name="arrow" /></Link></div> : <>
-    {quote.loading && <p role="status" className="checkout-message">Đang kiểm tra giá và tồn kho…</p>}{quote.error && <div className="checkout-message auth-error" role="alert">{quote.error} <button onClick={quote.retry}>Thử lại báo giá</button> · <button onClick={onClear}>Xóa giỏ hàng</button></div>}
-    {quote.data && <div className="basket-layout"><div><div className="basket-list-heading"><span>Sản phẩm đã chọn</span><span>{count} món gốm</span></div><ul className="basket-items">{quote.data.items.map(p => <li key={p.variantId}>{p.image && <Link to={'/products/' + p.slug}><SiteImage src={p.image} alt={p.name} /></Link>}<div className="basket-item-info">{p.slug ? <Link to={'/products/' + p.slug}><h2>{p.name}</h2></Link> : <h2>{p.name}</h2>}<span className="basket-unit-price">{p.unitPriceVnd ? money(p.unitPriceVnd) : 'Không khả dụng'}</span><div className="quantity"><button aria-label={`Giảm số lượng ${p.name}`} onClick={() => onChange(p.variantId,-1)}><Icon name="minus" /></button><span>{p.quantity}</span><button disabled={p.quantity >= Math.min(99,p.availableQty)} aria-label={`Tăng số lượng ${p.name}`} onClick={() => onChange(p.variantId,1)}><Icon name="plus" /></button></div>{p.issue && <p className="checkout-line-issue" role="alert">{p.issue}</p>}</div><div className="basket-line-end"><button className="icon-button" aria-label={`Xóa ${p.name}`} onClick={() => onRemove(p.variantId)}><Icon name="close" /></button><strong>{money(p.lineTotalVnd)}</strong></div></li>)}</ul><p className="basket-note"><Icon name="leaf" /> Sản phẩm trong giỏ chưa được giữ hàng.</p></div><aside className="basket-summary"><h2>Tóm tắt giỏ hàng</h2><div><span>Tiền sản phẩm</span><strong>{money(quote.data.subtotalVnd)}</strong></div><div><span>Phí giao hàng</span><span>{quote.data.shippingFeeVnd ? money(quote.data.shippingFeeVnd) : 'Miễn phí'}</span></div><div className="basket-grand"><span>Tổng cộng</span><strong>{money(quote.data.grandTotalVnd)}</strong></div><p>{quote.data.shippingPolicy}</p>{quote.data.canCheckout ? <Link className="button primary" to="/checkout">Tiến hành đặt hàng <Icon name="arrow" /></Link> : <p role="status">Vui lòng cập nhật các sản phẩm không khả dụng trước khi đặt hàng.</p>}</aside></div>}</>}
-  </section>
+  const count = Object.values(quantities).reduce((n, q) => n + q, 0)
+  return (
+    <section className="basket-page compact-basket container" aria-labelledby="basket-title">
+      <nav className="breadcrumbs" aria-label="Đường dẫn">
+        <Link to="/">Trang chủ</Link>
+        <span>/</span>
+        <span>Giỏ hàng</span>
+      </nav>
+      <div className="basket-heading">
+        <h1 id="basket-title">
+          Giỏ hàng <span className="basket-count">({count})</span>
+        </h1>
+        <Link className="text-link" to="/products">
+          Tiếp tục mua sắm <Icon name="arrow" />
+        </Link>
+      </div>
+      {!count ? (
+        <div className="basket-empty">
+          <Icon name="bag" />
+          <h2>Giỏ hàng đang trống</h2>
+          <p>Chọn một món gốm bạn yêu để bắt đầu.</p>
+          <Link className="button primary" to="/products">
+            Khám phá sản phẩm <Icon name="arrow" />
+          </Link>
+        </div>
+      ) : (
+        <>
+          {quote.loading && (
+            <p role="status" className="checkout-message">
+              Đang kiểm tra giá và tồn kho…
+            </p>
+          )}
+          {quote.error && (
+            <div className="checkout-message auth-error" role="alert">
+              {quote.error} <button onClick={quote.retry}>Thử lại báo giá</button> ·{' '}
+              <button onClick={onClear}>Xóa giỏ hàng</button>
+            </div>
+          )}
+          {quote.data && (
+            <div className="basket-layout">
+              <div>
+                <div className="basket-list-heading">
+                  <span>Sản phẩm đã chọn</span>
+                  <span>{count} món gốm</span>
+                </div>
+                <ul className="basket-items">
+                  {quote.data.items.map((p) => (
+                    <li key={p.variantId}>
+                      {p.image && (
+                        <Link to={'/products/' + p.slug}>
+                          <SiteImage src={p.image} alt={p.name} />
+                        </Link>
+                      )}
+                      <div className="basket-item-info">
+                        {p.slug ? (
+                          <Link to={'/products/' + p.slug}>
+                            <h2>{p.name}</h2>
+                          </Link>
+                        ) : (
+                          <h2>{p.name}</h2>
+                        )}
+                        <span className="basket-unit-price">
+                          {p.unitPriceVnd ? money(p.unitPriceVnd) : 'Không khả dụng'}
+                        </span>
+                        <div className="quantity">
+                          <button
+                            aria-label={`Giảm số lượng ${p.name}`}
+                            onClick={() => onChange(p.variantId, -1)}
+                          >
+                            <Icon name="minus" />
+                          </button>
+                          <span>{p.quantity}</span>
+                          <button
+                            disabled={p.quantity >= Math.min(99, p.availableQty)}
+                            aria-label={`Tăng số lượng ${p.name}`}
+                            onClick={() => onChange(p.variantId, 1)}
+                          >
+                            <Icon name="plus" />
+                          </button>
+                        </div>
+                        {p.issue && (
+                          <p className="checkout-line-issue" role="alert">
+                            {p.issue}
+                          </p>
+                        )}
+                      </div>
+                      <div className="basket-line-end">
+                        <button
+                          className="icon-button"
+                          aria-label={`Xóa ${p.name}`}
+                          onClick={() => onRemove(p.variantId)}
+                        >
+                          <Icon name="close" />
+                        </button>
+                        <strong>{money(p.lineTotalVnd)}</strong>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <p className="basket-note">
+                  <Icon name="leaf" /> Sản phẩm trong giỏ chưa được giữ hàng.
+                </p>
+              </div>
+              <aside className="basket-summary">
+                <h2>Tóm tắt giỏ hàng</h2>
+                <div>
+                  <span>Tiền sản phẩm</span>
+                  <strong>{money(quote.data.subtotalVnd)}</strong>
+                </div>
+                <div>
+                  <span>Phí giao hàng</span>
+                  <span>
+                    {quote.data.shippingFeeVnd ? money(quote.data.shippingFeeVnd) : 'Miễn phí'}
+                  </span>
+                </div>
+                <div className="basket-grand">
+                  <span>Tổng cộng</span>
+                  <strong>{money(quote.data.grandTotalVnd)}</strong>
+                </div>
+                <p>{quote.data.shippingPolicy}</p>
+                {quote.data.canCheckout ? (
+                  <Link className="button primary" to="/checkout">
+                    Tiến hành đặt hàng <Icon name="arrow" />
+                  </Link>
+                ) : (
+                  <p role="status">
+                    Vui lòng cập nhật các sản phẩm không khả dụng trước khi đặt hàng.
+                  </p>
+                )}
+              </aside>
+            </div>
+          )}
+        </>
+      )}
+    </section>
+  )
 }

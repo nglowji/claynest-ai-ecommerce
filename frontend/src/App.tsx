@@ -26,10 +26,33 @@ import { StoriesPage, StoryPage } from './components/Stories'
 import { stories } from './data/stories'
 import { type Product } from './data/products'
 
-export default function App() { return <AuthProvider><Routes>
-  <Route path="/admin" element={<AdminLayout />}><Route index element={<AdminPage />} /><Route path="reports" element={<AdminReportsPage />} /><Route path="knowledge" element={<AdminKnowledgePage />} /><Route path="products" element={<AdminCatalogPage />} /><Route path="inventory" element={<AdminInventoryPage />} /><Route path="orders" element={<AdminOrdersPage />} /><Route path="orders/:id" element={<AdminOrderDetailPage />} /><Route path="*" element={<section className="container account-page"><h1>Không tìm thấy trang quản trị</h1><Link to="/admin">Về tổng quan</Link></section>} /></Route>
-  <Route path="*" element={<StoreApp />} />
-</Routes></AuthProvider> }
+export default function App() {
+  return (
+    <AuthProvider>
+      <Routes>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminPage />} />
+          <Route path="reports" element={<AdminReportsPage />} />
+          <Route path="knowledge" element={<AdminKnowledgePage />} />
+          <Route path="products" element={<AdminCatalogPage />} />
+          <Route path="inventory" element={<AdminInventoryPage />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="orders/:id" element={<AdminOrderDetailPage />} />
+          <Route
+            path="*"
+            element={
+              <section className="container account-page">
+                <h1>Không tìm thấy trang quản trị</h1>
+                <Link to="/admin">Về tổng quan</Link>
+              </section>
+            }
+          />
+        </Route>
+        <Route path="*" element={<StoreApp />} />
+      </Routes>
+    </AuthProvider>
+  )
+}
 
 function StoreApp() {
   const auth = useAuth()
@@ -43,60 +66,203 @@ function StoreApp() {
   useEffect(() => {
     setMenuOpen(false)
     if (location.hash) {
-      const id = requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView())
+      const id = requestAnimationFrame(() =>
+        document.getElementById(location.hash.slice(1))?.scrollIntoView(),
+      )
       return () => cancelAnimationFrame(id)
     }
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [location.pathname, location.hash])
   useEffect(() => {
-    const story = stories.find(item => location.pathname === `/stories/${item.slug}`)
-    document.title = location.pathname === '/checkout' ? 'Đặt hàng | Nàng Gốm' : location.pathname.startsWith('/orders') ? 'Đơn hàng | Nàng Gốm' : location.pathname === '/cart' ? 'Giỏ hàng | Nàng Gốm' : location.pathname === '/admin' ? 'Quản trị | Nàng Gốm' : location.pathname === '/register' ? 'Đăng ký | Nàng Gốm' : location.pathname === '/login' ? 'Đăng nhập | Nàng Gốm' : location.pathname === '/account' ? 'Tài khoản | Nàng Gốm' : story ? `${story.title} | Nàng Gốm` : location.pathname === '/products' ? 'Tất cả sản phẩm | Nàng Gốm' : location.pathname.startsWith('/stories') ? 'Chuyện của gốm | Nàng Gốm' : 'Nàng Gốm | Gốm mộc & chuyện nhà'
+    const story = stories.find((item) => location.pathname === `/stories/${item.slug}`)
+    document.title =
+      location.pathname === '/checkout'
+        ? 'Đặt hàng | Nàng Gốm'
+        : location.pathname.startsWith('/orders')
+          ? 'Đơn hàng | Nàng Gốm'
+          : location.pathname === '/cart'
+            ? 'Giỏ hàng | Nàng Gốm'
+            : location.pathname === '/admin'
+              ? 'Quản trị | Nàng Gốm'
+              : location.pathname === '/register'
+                ? 'Đăng ký | Nàng Gốm'
+                : location.pathname === '/login'
+                  ? 'Đăng nhập | Nàng Gốm'
+                  : location.pathname === '/account'
+                    ? 'Tài khoản | Nàng Gốm'
+                    : story
+                      ? `${story.title} | Nàng Gốm`
+                      : location.pathname === '/products'
+                        ? 'Tất cả sản phẩm | Nàng Gốm'
+                        : location.pathname.startsWith('/stories')
+                          ? 'Chuyện của gốm | Nàng Gốm'
+                          : 'Nàng Gốm | Gốm mộc & chuyện nhà'
   }, [location.pathname])
-  useEffect(() => { if (!notice) return; const id = window.setTimeout(() => setNotice(''), 3000); return () => window.clearTimeout(id) }, [notice])
+  useEffect(() => {
+    if (!notice) return
+    const id = window.setTimeout(() => setNotice(''), 3000)
+    return () => window.clearTimeout(id)
+  }, [notice])
   function add(product: Product) {
     if (product.stockQty <= 0) return
-    if (!cart[product.variantId] && Object.keys(cart).length >= 30) { setNotice('Giỏ hàng tối đa 30 loại sản phẩm.'); return }
+    if (!cart[product.variantId] && Object.keys(cart).length >= 30) {
+      setNotice('Giỏ hàng tối đa 30 loại sản phẩm.')
+      return
+    }
     basket.add(product.variantId, product.stockQty)
     setNotice(`Đã thêm ${product.name} vào giỏ hàng`)
   }
-  function showProduct(product: Product) { navigate('/products/' + product.slug + '?variant=' + product.variantId) }
+  function showProduct(product: Product) {
+    navigate('/products/' + product.slug + '?variant=' + product.variantId)
+  }
   const actions = { onAdd: add, onShow: showProduct }
-  return <>
-    <a className="skip-link" href="#main">Đến nội dung chính</a>
-    <header className="site-header"><div className="header-inner container">
-      <Brand />
-      <nav id="mobile-nav" className={menuOpen ? 'main-nav is-open' : 'main-nav'} aria-label="Điều hướng chính">
-        <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-active' : ''}>Trang chủ</NavLink>
-        <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-active' : ''}>Sản phẩm</NavLink>
-        <Link to="/#collections" onClick={() => setMenuOpen(false)}>Bộ sưu tập</Link>
-        <Link to="/#story" onClick={() => setMenuOpen(false)}>Về Nàng</Link>
-        <NavLink to="/stories" className={({ isActive }) => isActive ? 'nav-active' : ''}>Chuyện của gốm</NavLink>
-      </nav>
-      <div className="header-actions"><Link className="icon-button" aria-label="Tìm kiếm sản phẩm" to="/products?search=1"><Icon name="search" /></Link>
-        <Link className="icon-button account-link" aria-label={auth.user ? 'Tài khoản' : 'Đăng nhập'} to={auth.user ? (auth.user.role === 'Admin' ? '/admin' : '/account') : '/login'}><Icon name="user" /></Link>
-        <Link className="icon-button bag-button" aria-label={`Giỏ hàng, ${count} sản phẩm`} to="/cart"><Icon name="bag" /><span className="bag-count">{count}</span></Link>
-        <button className="icon-button menu-button" aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'} aria-expanded={menuOpen} aria-controls="mobile-nav" onClick={() => setMenuOpen(!menuOpen)}><Icon name={menuOpen ? 'close' : 'menu'} /></button>
+  return (
+    <>
+      <a className="skip-link" href="#main">
+        Đến nội dung chính
+      </a>
+      <header className="site-header">
+        <div className="header-inner container">
+          <Brand />
+          <nav
+            id="mobile-nav"
+            className={menuOpen ? 'main-nav is-open' : 'main-nav'}
+            aria-label="Điều hướng chính"
+          >
+            <NavLink to="/" end className={({ isActive }) => (isActive ? 'nav-active' : '')}>
+              Trang chủ
+            </NavLink>
+            <NavLink to="/products" className={({ isActive }) => (isActive ? 'nav-active' : '')}>
+              Sản phẩm
+            </NavLink>
+            <Link to="/#collections" onClick={() => setMenuOpen(false)}>
+              Bộ sưu tập
+            </Link>
+            <Link to="/#story" onClick={() => setMenuOpen(false)}>
+              Về Nàng
+            </Link>
+            <NavLink to="/stories" className={({ isActive }) => (isActive ? 'nav-active' : '')}>
+              Chuyện của gốm
+            </NavLink>
+          </nav>
+          <div className="header-actions">
+            <Link className="icon-button" aria-label="Tìm kiếm sản phẩm" to="/products?search=1">
+              <Icon name="search" />
+            </Link>
+            <Link
+              className="icon-button account-link"
+              aria-label={auth.user ? 'Tài khoản' : 'Đăng nhập'}
+              to={auth.user ? (auth.user.role === 'Admin' ? '/admin' : '/account') : '/login'}
+            >
+              <Icon name="user" />
+            </Link>
+            <Link
+              className="icon-button bag-button"
+              aria-label={`Giỏ hàng, ${count} sản phẩm`}
+              to="/cart"
+            >
+              <Icon name="bag" />
+              <span className="bag-count">{count}</span>
+            </Link>
+            <button
+              className="icon-button menu-button"
+              aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              <Icon name={menuOpen ? 'close' : 'menu'} />
+            </button>
+          </div>
+        </div>
+      </header>
+      <main id="main">
+        <Routes>
+          <Route path="/" element={<HomePage {...actions} />} />
+          <Route path="/register" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/cart"
+            element={
+              <CartPage
+                onClear={basket.clear}
+                quantities={cart}
+                onChange={basket.change}
+                onRemove={basket.remove}
+              />
+            }
+          />
+          <Route
+            path="/checkout"
+            element={<CheckoutPage quantities={cart} onPlaced={basket.consume} />}
+          />
+          <Route path="/orders" element={<OrderStatusPage />} />
+          <Route path="/orders/:reference" element={<OrderStatusPage />} />
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/products" element={<ProductsPage {...actions} />} />
+          <Route path="/products/:slug" element={<ProductPage {...actions} />} />
+          <Route path="/knowledge/:id" element={<KnowledgeSourcePage />} />
+          <Route path="/stories" element={<StoriesPage />} />
+          <Route path="/stories/:slug" element={<StoryPage />} />
+          <Route
+            path="*"
+            element={
+              <section className="container empty-state not-found">
+                <h1>Không tìm thấy trang</h1>
+                <Link className="button primary" to="/">
+                  Về trang chủ <Icon name="arrow" />
+                </Link>
+              </section>
+            }
+          />
+        </Routes>
+      </main>
+      <footer className="site-footer">
+        {location.pathname === '/' && <SiteLocation />}
+        <div className="container footer-main">
+          <div className="footer-brand">
+            <Brand />
+            <p>
+              Một chút mộc cho nhà.
+              <br />
+              Một chút thương cho những ngày bình thường.
+            </p>
+          </div>
+          <div className="footer-column">
+            <h2>Ghé nhà Nàng</h2>
+            <Link to="/orders">Tra cứu đơn hàng</Link>
+            <Link to="/products">Tất cả sản phẩm</Link>
+            <Link to="/#collections">Những bộ sưu tập</Link>
+            <Link to="/#story">Câu chuyện Nàng Gốm</Link>
+            <Link to="/#location">Địa chỉ & bản đồ</Link>
+          </div>
+          <div className="footer-column">
+            <h2>Ở lại một chút</h2>
+            <Link to="/stories">Chuyện của gốm</Link>
+            <Link to="/#craft">Từ đất đến gốm</Link>
+            <Link to="/products?category=B%E1%BB%99%20s%C6%B0u%20t%E1%BA%ADp">Một món quà nhỏ</Link>
+          </div>
+          <div className="footer-message">
+            <p className="eyebrow">THƯƠNG NHÀ, THƯƠNG MÌNH</p>
+            <p>
+              Nhà không cần thật lớn.
+              <br />
+              Chỉ cần có những điều mình yêu.
+            </p>
+            <span>Nàng Gốm</span>
+          </div>
+        </div>
+        <div className="container footer-bottom">
+          <span>© {new Date().getFullYear()} Nàng Gốm</span>
+          <span>Crafted with care by nglowji.</span>
+          <Link to="/">Về nhà Nàng ↑</Link>
+        </div>
+      </footer>
+      {!['/login', '/register', '/checkout', '/account'].includes(location.pathname) &&
+        !location.pathname.startsWith('/orders') && <ChatAssistant />}
+      <div className={notice ? 'toast visible' : 'toast'} role="status" aria-live="polite">
+        {notice}
       </div>
-    </div></header>
-    <main id="main"><Routes>
-      <Route path="/" element={<HomePage {...actions} />} />
-      <Route path="/register" element={<LoginPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/cart" element={<CartPage onClear={basket.clear} quantities={cart} onChange={basket.change} onRemove={basket.remove} />} />
-      <Route path="/checkout" element={<CheckoutPage quantities={cart} onPlaced={basket.consume} />} />
-      <Route path="/orders" element={<OrderStatusPage />} />
-      <Route path="/orders/:reference" element={<OrderStatusPage />} />
-      <Route path="/account" element={<AccountPage />} />
-      <Route path="/products" element={<ProductsPage {...actions} />} />
-      <Route path="/products/:slug" element={<ProductPage {...actions} />} />
-      <Route path="/knowledge/:id" element={<KnowledgeSourcePage />} />
-      <Route path="/stories" element={<StoriesPage />} />
-      <Route path="/stories/:slug" element={<StoryPage />} />
-      <Route path="*" element={<section className="container empty-state not-found"><h1>Không tìm thấy trang</h1><Link className="button primary" to="/">Về trang chủ <Icon name="arrow" /></Link></section>} />
-    </Routes></main>
-    <footer className="site-footer">{location.pathname === '/' && <SiteLocation />}<div className="container footer-main"><div className="footer-brand"><Brand /><p>Một chút mộc cho nhà.<br />Một chút thương cho những ngày bình thường.</p></div><div className="footer-column"><h2>Ghé nhà Nàng</h2><Link to="/orders">Tra cứu đơn hàng</Link><Link to="/products">Tất cả sản phẩm</Link><Link to="/#collections">Những bộ sưu tập</Link><Link to="/#story">Câu chuyện Nàng Gốm</Link><Link to="/#location">Địa chỉ & bản đồ</Link></div><div className="footer-column"><h2>Ở lại một chút</h2><Link to="/stories">Chuyện của gốm</Link><Link to="/#craft">Từ đất đến gốm</Link><Link to="/products?category=B%E1%BB%99%20s%C6%B0u%20t%E1%BA%ADp">Một món quà nhỏ</Link></div><div className="footer-message"><p className="eyebrow">THƯƠNG NHÀ, THƯƠNG MÌNH</p><p>Nhà không cần thật lớn.<br />Chỉ cần có những điều mình yêu.</p><span>Nàng Gốm</span></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Nàng Gốm</span><span>Crafted with care by nglowji.</span><Link to="/">Về nhà Nàng ↑</Link></div></footer>
-    {!['/login','/register','/checkout','/account'].includes(location.pathname) && !location.pathname.startsWith('/orders') && <ChatAssistant />}
-    <div className={notice ? 'toast visible' : 'toast'} role="status" aria-live="polite">{notice}</div>
-
-  </>
+    </>
+  )
 }

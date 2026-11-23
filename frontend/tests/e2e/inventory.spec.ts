@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { randomUUID } from 'node:crypto'
 
-test('admin receives, adjusts, changes threshold and reads durable stock history', async ({ page }) => {
+test('admin receives, adjusts, changes threshold and reads durable stock history', async ({
+  page,
+}) => {
   await page.goto('/login')
   await page.getByLabel('Email', { exact: true }).fill(process.env.E2E_ADMIN_EMAIL!)
   await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.E2E_ADMIN_PASSWORD!)
@@ -10,10 +12,31 @@ test('admin receives, adjusts, changes threshold and reads durable stock history
   const key = 'STOCK-' + randomUUID().slice(0, 8).toUpperCase()
   const categories = await (await page.request.get('/api/v1/admin/catalog/categories')).json()
   const csrf = async () => (await (await page.request.get('/api/v1/auth/csrf')).json()).requestToken
-  const created = await page.request.post('/api/v1/admin/catalog/products', { headers: { 'X-CSRF-TOKEN': await csrf() }, data: {
-    categoryId: categories[0].id, name: key, slug: key.toLowerCase(), description: 'Browser inventory fixture', craftStory: '', material: 'Ceramic', handmadeNote: '', label: '', published: true,
-    variants: [{ sku: key, name: 'Standard', glaze: 'Green', intendedUse: 'Drink', priceVnd: 100000, active: true }], images: [{ url: '/images/slow-living/cup.jpg', alt: 'Cup' }]
-  } })
+  const created = await page.request.post('/api/v1/admin/catalog/products', {
+    headers: { 'X-CSRF-TOKEN': await csrf() },
+    data: {
+      categoryId: categories[0].id,
+      name: key,
+      slug: key.toLowerCase(),
+      description: 'Browser inventory fixture',
+      craftStory: '',
+      material: 'Ceramic',
+      handmadeNote: '',
+      label: '',
+      published: true,
+      variants: [
+        {
+          sku: key,
+          name: 'Standard',
+          glaze: 'Green',
+          intendedUse: 'Drink',
+          priceVnd: 100000,
+          active: true,
+        },
+      ],
+      images: [{ url: '/images/slow-living/cup.jpg', alt: 'Cup' }],
+    },
+  })
   expect(created.status()).toBe(201)
   const product = await created.json()
   await page.getByRole('link', { name: 'Quản lý kho', exact: true }).click()
@@ -49,6 +72,9 @@ test('admin receives, adjusts, changes threshold and reads durable stock history
   await page.screenshot({ path: 'test-results/admin-inventory-mobile.png', fullPage: true })
   const publicProduct = await (await page.request.get('/api/v1/products/' + product.slug)).json()
   expect(publicProduct.variants[0].stockQty).toBe(28)
-  const archived = await page.request.delete(`/api/v1/admin/catalog/products/${product.id}?revision=${product.revision}`, { headers: { 'X-CSRF-TOKEN': await csrf() } })
+  const archived = await page.request.delete(
+    `/api/v1/admin/catalog/products/${product.id}?revision=${product.revision}`,
+    { headers: { 'X-CSRF-TOKEN': await csrf() } },
+  )
   expect(archived.status()).toBe(204)
 })

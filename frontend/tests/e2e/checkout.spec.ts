@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { randomUUID } from 'node:crypto'
 
-test('guest checkout survives a lost success response and retries without creating another order', async ({ page }) => {
+test('guest checkout survives a lost success response and retries without creating another order', async ({
+  page,
+}) => {
   const product = await (await page.request.get('/api/v1/products/nang-coc-suong-mai')).json()
   const variant = product.variants[0]
   await page.goto('/products/' + product.slug)
@@ -21,22 +23,31 @@ test('guest checkout survives a lost success response and retries without creati
   await expect(submit).toBeDisabled()
   await page.getByRole('checkbox').check()
   await expect(submit).toBeEnabled()
-  let firstKey = ''; let firstReference = ''
-  await page.route('**/api/v1/orders', async route => {
-    firstKey = route.request().headers()['idempotency-key']
-    const response = await route.fetch()
-    expect(response.status()).toBe(201)
-    firstReference = (await response.json()).reference
-    await route.abort('failed')
-  }, { times: 1 })
-  await submit.evaluate(button => {
+  let firstKey = ''
+  let firstReference = ''
+  await page.route(
+    '**/api/v1/orders',
+    async (route) => {
+      firstKey = route.request().headers()['idempotency-key']
+      const response = await route.fetch()
+      expect(response.status()).toBe(201)
+      firstReference = (await response.json()).reference
+      await route.abort('failed')
+    },
+    { times: 1 },
+  )
+  await submit.evaluate((button) => {
     const form = (button as HTMLButtonElement).form!
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
   })
-  await expect(page.getByRole('button', { name: 'Kiểm tra lại đơn đã gửi', exact: true })).toBeEnabled()
+  await expect(
+    page.getByRole('button', { name: 'Kiểm tra lại đơn đã gửi', exact: true }),
+  ).toBeEnabled()
   await page.reload()
-  const requestPromise = page.waitForRequest(r => r.method() === 'POST' && r.url().endsWith('/api/v1/orders'))
+  const requestPromise = page.waitForRequest(
+    (r) => r.method() === 'POST' && r.url().endsWith('/api/v1/orders'),
+  )
   await page.getByRole('button', { name: 'Kiểm tra lại đơn đã gửi', exact: true }).click()
   expect((await requestPromise).headers()['idempotency-key']).toBe(firstKey)
   await expect(page).toHaveURL('/orders/' + firstReference)
@@ -56,24 +67,48 @@ test('guest checkout survives a lost success response and retries without creati
 test('server quote blocks excessive quantities and cart removal persists', async ({ page }) => {
   const product = await (await page.request.get('/api/v1/products/nang-coc-nau-mat')).json()
   await page.goto('/products')
-  await page.evaluate(id => localStorage.setItem('nang-gom-cart-v1', JSON.stringify({ [id]: 99 })), product.variants[0].id)
+  await page.evaluate(
+    (id) => localStorage.setItem('nang-gom-cart-v1', JSON.stringify({ [id]: 99 })),
+    product.variants[0].id,
+  )
   await page.goto('/cart')
   await expect(page.getByRole('alert')).toContainText('Chỉ còn')
   await expect(page.getByRole('link', { name: 'Tiến hành đặt hàng', exact: true })).toHaveCount(0)
   await page.getByRole('button', { name: /^Xóa / }).click()
-  await expect(page.getByRole('heading', { name: 'Giỏ hàng đang trống', exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Giỏ hàng đang trống', exact: true }),
+  ).toBeVisible()
   await page.reload()
-  await expect(page.getByRole('heading', { name: 'Giỏ hàng đang trống', exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Giỏ hàng đang trống', exact: true }),
+  ).toBeVisible()
 })
 
-test('guessing an order reference cannot expose shipping details; private code grants access', async ({ page }) => {
+test('guessing an order reference cannot expose shipping details; private code grants access', async ({
+  page,
+}) => {
   const product = await (await page.request.get('/api/v1/products/nang-binh-may-trang')).json()
   const csrf = async () => (await (await page.request.get('/api/v1/auth/csrf')).json()).requestToken
-  const quoted = await page.request.post('/api/v1/cart/quote', { headers: { 'X-CSRF-TOKEN': await csrf() }, data: { items: [{ variantId: product.variants[0].id, quantity: 1 }] } })
+  const quoted = await page.request.post('/api/v1/cart/quote', {
+    headers: { 'X-CSRF-TOKEN': await csrf() },
+    data: { items: [{ variantId: product.variants[0].id, quantity: 1 }] },
+  })
   const quote = await quoted.json()
-  const placed = await page.request.post('/api/v1/orders', { headers: { 'X-CSRF-TOKEN': await csrf(), 'Idempotency-Key': randomUUID() }, data: {
-    quoteToken: quote.quoteToken, acceptTerms: true, contact: { name: 'Người nhận riêng tư', phone: '0901234567', email: '', province: 'Trà Vinh', address: '123 Địa chỉ kiểm thử riêng tư', note: '' }
-  } })
+  const placed = await page.request.post('/api/v1/orders', {
+    headers: { 'X-CSRF-TOKEN': await csrf(), 'Idempotency-Key': randomUUID() },
+    data: {
+      quoteToken: quote.quoteToken,
+      acceptTerms: true,
+      contact: {
+        name: 'Người nhận riêng tư',
+        phone: '0901234567',
+        email: '',
+        province: 'Trà Vinh',
+        address: '123 Địa chỉ kiểm thử riêng tư',
+        note: '',
+      },
+    },
+  })
   expect(placed.status()).toBe(201)
   const receipt = await placed.json()
   expect((await page.request.get(`/api/v1/orders/${receipt.reference}/status`)).status()).toBe(404)
@@ -83,5 +118,11 @@ test('guessing an order reference cannot expose shipping details; private code g
   await page.getByRole('button', { name: 'Tra cứu đơn hàng', exact: true }).click()
   await expect(page.locator('.order-info')).toContainText('123 Địa chỉ kiểm thử riêng tư')
   expect(page.url()).not.toContain(receipt.accessToken)
-  expect((await page.request.get(`/api/v1/orders/${receipt.reference}/status`, { headers: { 'X-Order-Token': 'incorrect' } })).status()).toBe(404)
+  expect(
+    (
+      await page.request.get(`/api/v1/orders/${receipt.reference}/status`, {
+        headers: { 'X-Order-Token': 'incorrect' },
+      })
+    ).status(),
+  ).toBe(404)
 })

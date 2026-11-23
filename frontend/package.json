@@ -13,7 +13,9 @@
     "preview": "vite preview --host 127.0.0.1",
     "test:e2e": "playwright test",
     "predev": "node scripts/image-manifest.mjs",
-    "prebuild": "node scripts/image-manifest.mjs"
+    "prebuild": "node scripts/image-manifest.mjs",
+    "format": "prettier --write src scripts tests *.ts *.json",
+    "format:check": "prettier --check src scripts tests *.ts *.json"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -26,6 +28,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "prettier": "3.6.2",
     "typescript": "~5.9.0",
     "vite": "^7.0.0"
   }
