@@ -357,3 +357,69 @@
   outline: 3px solid #d7ab5e;
   outline-offset: 3px;
 }
+
+@media (max-width: 1200px) {
+  .admin-ai-page {
+    padding: 28px;
+  }
+  .admin-ai-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-ai-intro {
+    display: none;
+  }
+  .admin-ai-prompts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin-ai-scope {
+    padding-bottom: 0;
+  }
+}
+@media (max-width: 760px) {
+  .admin-ai-page {
+    padding: 24px 16px;
+  }
+  .admin-ai-page .dashboard-heading {
+    align-items: flex-start;
+  }
+  .admin-ai-prompts {
+    gap: 8px;
+  }
+  .admin-ai-prompts button {
+    padding: 14px;
+  }
+  .admin-ai-prompts span {
+    display: none;
+  }
+  .admin-ai-toolbar {
+    padding: 18px;
+    flex-wrap: wrap;
+  }
+  .admin-ai-toolbar label {
+    flex-wrap: wrap;
+  }
+  .admin-ai-conversation {
+    padding: 18px;
+    max-height: 620px;
+  }
+  .admin-ai-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-ai-composer {
+    padding: 18px;
+  }
+  .admin-ai-composer > div {
+    flex-wrap: wrap;
+  }
+  .admin-ai-composer small {
+    font-size: 11px;
+  }
+  .admin-ai-welcome {
+    margin-block: 30px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-ai-conversation {
+    scroll-behavior: auto;
+  }
+}
