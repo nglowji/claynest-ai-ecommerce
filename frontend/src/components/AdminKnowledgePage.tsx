@@ -1,3 +1,4 @@
+import AdminActionButton from './AdminActionButton'
 import { useEffect, useRef, useState } from 'react'
 import { AuthError } from '../auth/api'
 import { useAuth } from '../auth/AuthContext'
@@ -408,9 +409,12 @@ export default function AdminKnowledgePage() {
                       : statuses[latest.indexStatus]}
                   </p>
                 </div>
-                <button className="knowledge-secondary" disabled={busy || retry} onClick={edit}>
-                  Tạo phiên bản mới
-                </button>
+                <AdminActionButton
+                  icon="edit"
+                  label="Tạo phiên bản mới"
+                  disabled={busy || retry}
+                  onClick={edit}
+                />
               </div>
               <div className="knowledge-detail-body">
                 <div className="knowledge-metadata">

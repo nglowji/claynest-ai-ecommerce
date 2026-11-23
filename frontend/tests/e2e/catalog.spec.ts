@@ -58,6 +58,16 @@ test('admin creates draft, publishes, edits price, uploads image and archives; s
   await page.getByLabel('Tìm tên hoặc SKU').fill(key)
   const row = page.getByRole('row').filter({ hasText: 'E2E Gốm ' + key })
   await expect(row).toBeVisible()
+  await expect(row.locator('.admin-product-cell img')).toBeVisible()
+  expect(
+    await row.locator('.admin-product-cell img').evaluate(async (image) => {
+      await (image as HTMLImageElement).decode()
+      return (image as HTMLImageElement).naturalWidth > 0
+    }),
+  ).toBe(true)
+  await expect(
+    row.getByRole('button', { name: 'Sửa sản phẩm E2E Gốm ' + key, exact: true }),
+  ).toHaveAttribute('title', 'Sửa sản phẩm E2E Gốm ' + key)
   page.once('dialog', (dialog) => dialog.accept())
   await row.getByRole('button', { name: 'Lưu trữ sản phẩm E2E Gốm ' + key, exact: true }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Đã lưu trữ' })).toBeVisible()

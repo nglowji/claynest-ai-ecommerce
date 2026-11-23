@@ -1,3 +1,4 @@
+import AdminActionButton from './AdminActionButton'
 import { useSearchParams } from 'react-router-dom'
 import SiteImage from './SiteImage'
 import { useEffect, useRef, useState } from 'react'
@@ -280,9 +281,12 @@ export default function AdminInventoryPage() {
                       </td>
                       <td data-label="Ngưỡng thấp">{item.lowStockThreshold}</td>
                       <td>
-                        <button disabled={pending} onClick={() => choose(item)}>
-                          Quản lý
-                        </button>
+                        <AdminActionButton
+                          icon="edit"
+                          label="Quản lý"
+                          disabled={pending}
+                          onClick={() => choose(item)}
+                        />
                       </td>
                     </tr>
                   ))}
