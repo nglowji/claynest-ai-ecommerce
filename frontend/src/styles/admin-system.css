@@ -539,3 +539,182 @@
   font-size: 12px;
   color: #617184;
 }
+
+.admin-workspace .knowledge-form,
+.admin-workspace .knowledge-form label {
+  font-size: 13px;
+}
+.admin-workspace .knowledge-list-row strong {
+  font-size: 14px;
+}
+.admin-workspace .knowledge-list-row small,
+.admin-workspace .knowledge-metadata,
+.admin-workspace .detail-note {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #617184;
+}
+.admin-workspace .knowledge-detail .dashboard-panel-heading,
+.admin-workspace .dashboard-panel-heading {
+  padding: 20px 24px;
+}
+.admin-workspace .knowledge-detail h2 {
+  font-size: 18px;
+}
+.admin-workspace .dashboard-panel-heading h2 {
+  font-size: 17px;
+}
+.admin-workspace .inventory-editor {
+  scroll-margin-top: 150px;
+}
+.admin-workspace a:focus-visible,
+.admin-workspace button:focus-visible {
+  outline: 3px solid #a5c8b3;
+  outline-offset: 3px;
+}
+@media (max-width: 1300px) {
+  .admin-workspace .admin-workspace-top {
+    flex-wrap: wrap;
+    padding: 14px 24px;
+    gap: 12px;
+  }
+  .admin-global-search {
+    order: 3;
+    width: 100%;
+    flex-basis: 100%;
+  }
+  .admin-workspace .inventory-layout,
+  .admin-workspace .fulfilment-layout,
+  .admin-workspace .knowledge-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-workspace .inventory-editor,
+  .admin-workspace .fulfilment-actions {
+    position: static;
+  }
+}
+@media (max-width: 900px) {
+  .admin-shell.admin-workspace {
+    display: block;
+  }
+  .admin-workspace .admin-sidebar {
+    display: none;
+  }
+  .admin-menu-toggle {
+    display: inline-grid;
+  }
+  .admin-workspace .admin-breadcrumb > span {
+    display: inline;
+  }
+  .admin-workspace .admin-breadcrumb a {
+    display: none;
+  }
+  .admin-workspace .admin-breadcrumb > span {
+    display: none;
+  }
+  .admin-workspace #admin-main > .container,
+  .admin-workspace :is(.admin-dashboard, .admin-ai-page) {
+    padding: 26px 20px;
+  }
+  .admin-workspace .report-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .admin-workspace .admin-workspace-top {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  .admin-top-context {
+    gap: 5px;
+  }
+  .admin-top-actions {
+    gap: 8px;
+  }
+  .admin-workspace .admin-profile-chip > div,
+  .admin-store-link {
+    display: none;
+  }
+  .admin-workspace #admin-main > .container,
+  .admin-workspace :is(.admin-dashboard, .admin-ai-page) {
+    padding: 24px 16px;
+  }
+  .admin-workspace :is(.admin-heading, .report-heading, .knowledge-heading, .dashboard-heading) {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .admin-workspace #admin-main h1 {
+    font-size: 25px;
+    letter-spacing: -0.7px;
+  }
+  .admin-workspace :is(.order-admin-filters, .inventory-filters, .report-filters) {
+    padding: 16px;
+    gap: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admin-workspace :is(.order-admin-filters, .report-filters) > label {
+    flex: auto;
+  }
+  .admin-workspace
+    :is(.order-admin-filters, .inventory-filters, .report-filters)
+    :is(input:not([type='checkbox']), select) {
+    width: 100%;
+  }
+  .admin-workspace
+    :is(
+      .admin-list-section,
+      .category-editor,
+      .inventory-editor,
+      .fulfilment-panel,
+      .fulfilment-actions
+    ) {
+    padding: 18px;
+  }
+  .admin-workspace .catalog-table {
+    display: table;
+    min-width: 680px;
+    width: 100%;
+  }
+  .admin-workspace .catalog-table thead {
+    display: table-header-group;
+  }
+  .admin-workspace .catalog-table tbody {
+    display: table-row-group;
+  }
+  .admin-workspace .catalog-table tr {
+    display: table-row;
+  }
+  .admin-workspace .catalog-table :is(td, th) {
+    display: table-cell;
+    text-align: left;
+    padding: 14px;
+  }
+  .admin-workspace .catalog-table td::before {
+    display: none;
+  }
+  .admin-workspace .catalog-pagination {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .admin-workspace .editor-fields,
+  .admin-workspace .knowledge-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-editor-dialog {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 10px;
+  }
+  .admin-editor-dialog .catalog-editor {
+    padding: 18px;
+  }
+  .admin-editor-dialog .editor-actions {
+    bottom: -18px;
+  }
+  .admin-workspace .report-metrics strong {
+    font-size: 20px;
+    overflow-wrap: anywhere;
+  }
+}

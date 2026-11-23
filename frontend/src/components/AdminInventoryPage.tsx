@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom'
 import SiteImage from './SiteImage'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { catalogRequest, type PageResult } from '../catalog/api'
 import { AuthError } from '../auth/api'
 import { useAuth } from '../auth/AuthContext'
@@ -38,6 +38,7 @@ const kindNames: Record<string, string> = {
 }
 export default function AdminInventoryPage() {
   const auth = useAuth()
+  const editor = useRef<HTMLElement>(null)
   const [params] = useSearchParams()
   const queryParam = params.get('q') || ''
   const lowParam = params.get('lowOnly') === 'true'
@@ -54,6 +55,12 @@ export default function AdminInventoryPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selected, setSelected] = useState<StockItem | null>(null)
+  useEffect(() => {
+    if (selected && window.matchMedia('(max-width: 1300px)').matches) {
+      editor.current?.scrollIntoView({ block: 'start' })
+      editor.current?.focus({ preventScroll: true })
+    }
+  }, [selected?.variantId])
   const [kind, setKind] = useState('receipt')
   const [delta, setDelta] = useState('1')
   const [threshold, setThreshold] = useState('5')
@@ -299,6 +306,8 @@ export default function AdminInventoryPage() {
           </div>
         </div>
         <aside
+          ref={editor}
+          tabIndex={-1}
           className={selected ? 'inventory-editor has-selection' : 'inventory-editor'}
           id="stock-editor"
         >
