@@ -138,49 +138,51 @@ export default function AdminOrdersPage() {
       )}
       {!loading && !error && data && (
         <>
-          <table className="catalog-table admin-orders-table">
-            <thead>
-              <tr>
-                <th scope="col">Mã đơn / Ngày đặt</th>
-                <th scope="col">Người nhận</th>
-                <th scope="col">Trạng thái</th>
-                <th scope="col">Tổng thanh toán</th>
-                <th scope="col">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.items.map((order) => (
-                <tr key={order.id}>
-                  <td>
-                    <Link className="order-reference-link" to={'/admin/orders/' + order.id}>
-                      {order.reference}
-                    </Link>
-                    <small>{timestamp(order.createdAt)}</small>
-                  </td>
-                  <td>
-                    <strong>{order.customerName}</strong>
-                    <small>
-                      {order.province} · {order.itemCount} món
-                    </small>
-                  </td>
-                  <td>
-                    <Badge status={order.status} />
-                  </td>
-                  <td>
-                    <strong>{money(order.grandTotalVnd)}</strong>
-                    <small>
-                      {order.paymentStatus === 'paid' ? 'Đã thu COD' : 'Chưa thanh toán'}
-                    </small>
-                  </td>
-                  <td>
-                    <Link className="text-link" to={'/admin/orders/' + order.id}>
-                      Xem đơn <Icon name="arrow" />
-                    </Link>
-                  </td>
+          <div className="admin-table-viewport">
+            <table className="catalog-table admin-orders-table">
+              <thead>
+                <tr>
+                  <th scope="col">Mã đơn / Ngày đặt</th>
+                  <th scope="col">Người nhận</th>
+                  <th scope="col">Trạng thái</th>
+                  <th scope="col">Tổng thanh toán</th>
+                  <th scope="col">Thao tác</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.items.map((order) => (
+                  <tr key={order.id}>
+                    <td>
+                      <Link className="order-reference-link" to={'/admin/orders/' + order.id}>
+                        {order.reference}
+                      </Link>
+                      <small>{timestamp(order.createdAt)}</small>
+                    </td>
+                    <td>
+                      <strong>{order.customerName}</strong>
+                      <small>
+                        {order.province} · {order.itemCount} món
+                      </small>
+                    </td>
+                    <td>
+                      <Badge status={order.status} />
+                    </td>
+                    <td>
+                      <strong>{money(order.grandTotalVnd)}</strong>
+                      <small>
+                        {order.paymentStatus === 'paid' ? 'Đã thu COD' : 'Chưa thanh toán'}
+                      </small>
+                    </td>
+                    <td>
+                      <Link className="text-link" to={'/admin/orders/' + order.id}>
+                        Xem đơn <Icon name="arrow" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {data.totalCount === 0 && (
             <div className="empty-state">
               <Icon name="bag" />
