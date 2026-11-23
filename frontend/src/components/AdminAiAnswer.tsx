@@ -38,9 +38,33 @@ export default function AdminAiAnswer({ entry }: { entry: AdminExchange }) {
             ))}
           </div>
         )}
+        {!!answer.plans?.length && (
+          <section className="admin-ai-sources" aria-label="Giải pháp đề xuất">
+            <h3>Phân tích & giải pháp</h3>
+            {answer.plans.map((plan, index) => (
+              <div className="admin-ai-question" key={index}>
+                <h3>{plan.title}</h3>
+                <p>{plan.reason}</p>
+                <ol>
+                  {plan.steps.map((step, i) => (
+                    <li key={i}>{step}</li>
+                  ))}
+                </ol>
+                <small>
+                  Căn cứ:{' '}
+                  {plan.factIds
+                    .map((id) => answer.insights.find((f) => f.id === id))
+                    .filter((f) => !!f)
+                    .map((f) => `${f.title}: ${f.value}`)
+                    .join(' · ')}
+                </small>
+              </div>
+            ))}
+          </section>
+        )}
         {answer.sources.length > 0 && (
           <section className="admin-ai-sources" aria-label="Nguồn câu trả lời">
-            <h3>Hướng dẫn & nguồn đối chiếu</h3>
+            <h3>Định nghĩa & nguồn đối chiếu</h3>
             {answer.sources.map((source) => (
               <details key={source.url + source.version} open>
                 <summary>

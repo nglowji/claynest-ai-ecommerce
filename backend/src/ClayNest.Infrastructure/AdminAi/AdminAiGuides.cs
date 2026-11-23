@@ -6,6 +6,8 @@ public static class AdminAiGuides
     public const string Version = "2026-11-23.1";
     public static IReadOnlyList<AdminAiGuide> All { get; } = Array.AsReadOnly(new[]
     {
+        new AdminAiGuide("database", "Cấu trúc dữ liệu kinh doanh",
+            "Products thuộc Category, có nhiều ProductVariants (SKU, giá, tồn) và ProductImages. Orders có OrderItems chụp tên và giá tại lúc đặt; mỗi dòng nối VariantId với SKU. StockMovements lưu biến động tồn, OrderStatusChanges lưu lịch sử xử lý. Doanh thu lấy đơn completed theo CompletedAt, đơn đặt lấy CreatedAt. Không có dữ liệu chi phí, traffic hay quảng cáo nên không thể suy ra lợi nhuận, chuyển đổi hoặc nguyên nhân doanh thu. Dùng số liệu đã truy vấn, không suy đoán toàn bộ database.", "/admin"),
         new AdminAiGuide("orders", "Xử lý đơn COD",
             "Mở Đơn hàng, lọc trạng thái chờ xác nhận và kiểm tra chi tiết. Luồng xử lý: chờ xác nhận → đã xác nhận → đã đóng gói → đang giao → hoàn tất. Chỉ hoàn tất khi đã giao và xác nhận thu COD. Hủy đơn cần lý do; hệ thống hoàn kho một lần. Không đổi trạng thái hàng loạt qua trợ lý.", "/admin/orders"),
         new AdminAiGuide("inventory", "Nhập và điều chỉnh tồn kho",

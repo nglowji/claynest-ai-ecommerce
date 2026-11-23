@@ -29,7 +29,16 @@ public sealed class AdminAiService(IAdminAiSnapshot snapshot, IAdminAiGateway ga
             decision.GuideKeys.Distinct().Count() != decision.GuideKeys.Count ||
             decision.ChunkIds.Distinct().Count() != decision.ChunkIds.Count)
             throw new ChatUnavailableException();
+        var plans = decision.Plans ?? [];
+        bool InvalidText(string? value, int limit) => string.IsNullOrWhiteSpace(value) || value.Length > limit;
+        if (plans.Count > 3 || plans.Any(p => p is null || InvalidText(p.Title, 120) || InvalidText(p.Reason, 600) ||
+            p.Steps is null || p.Steps.Count is < 1 or > 5 || p.Steps.Any(s => InvalidText(s, 350)) ||
+            p.FactIds is null || p.FactIds.Count is < 1 or > 5 ||
+            p.FactIds.Any(id => string.IsNullOrWhiteSpace(id) || !facts.ContainsKey(id)) ||
+            p.FactIds.Distinct().Count() != p.FactIds.Count)) throw new ChatUnavailableException();
         var insights = decision.FactIds.Select(id => facts[id]).ToList();
+        foreach (var id in plans.SelectMany(p => p.FactIds).Distinct())
+            if (insights.All(f => f.Id != id)) insights.Add(facts[id]);
         var sources = decision.GuideKeys.Select(key => guides[key])
             .Select(g => new AdminAiSource(g.Title, AdminAiGuides.Version, g.Content, g.Url)).ToList();
         if (decision.ChunkIds.Count > 0)
@@ -40,8 +49,8 @@ public sealed class AdminAiService(IAdminAiSnapshot snapshot, IAdminAiGateway ga
                 "Phiên bản " + e.Version + " · " + e.Section, e.Content, ChatService.SourceUrl(e))));
         }
         var message = insights.Count + sources.Count > 0
-            ? "Thông tin liên quan đến câu hỏi của bạn. Mở từng nguồn để đối chiếu và thực hiện bước tiếp theo."
+            ? "Phân tích từ dữ liệu cửa hàng trong kỳ đã chọn. Các đề xuất bên dưới gắn với số liệu làm căn cứ."
             : "Chưa có dữ liệu hoặc nguồn đã duyệt phù hợp. Bạn có thể hỏi về doanh thu, đơn hàng, tồn kho hoặc cách vận hành hệ thống.";
-        return new(message, context.From, context.To, context.GeneratedAt, context.IsDemo, insights, sources);
+        return new(message, context.From, context.To, context.GeneratedAt, context.IsDemo, insights, sources, plans);
     }
 }

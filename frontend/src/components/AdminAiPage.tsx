@@ -19,8 +19,8 @@ const prompts = [
     message: 'Những SKU nào cần kiểm tra tồn kho? Tôi nên xử lý thế nào?',
   },
   {
-    title: 'Hiểu cách vận hành',
-    message: 'Hướng dẫn cập nhật và duyệt tài liệu kiến thức cho AI.',
+    title: 'Tìm vấn đề & giải pháp',
+    message: 'So sánh doanh thu kỳ trước, tìm dấu hiệu bất thường và đề xuất hướng xử lý.',
   },
 ]
 export default function AdminAiPage() {
@@ -50,7 +50,7 @@ export default function AdminAiPage() {
           <p className="dashboard-eyebrow">NÀNG GỐM · TRỢ LÝ VẬN HÀNH</p>
           <h1>Cùng bạn quản lý cửa hàng.</h1>
           <p className="dashboard-description">
-            Từ câu hỏi đến số liệu, từ kiến thức đến việc cần làm.
+            Hiểu dữ liệu cửa hàng. Nhìn ra vấn đề. Chọn hướng xử lý.
           </p>
         </div>
         <button
@@ -72,8 +72,8 @@ export default function AdminAiPage() {
             </i>
             <h2>Một góc nhìn rõ hơn.</h2>
             <p>
-              Hỏi về doanh thu, hàng đợi xử lý, tồn kho hoặc cách dùng hệ thống. Mỗi câu hỏi được
-              đối chiếu với dữ liệu mới và nguồn đã duyệt.
+              Phân tích doanh thu, tỷ lệ hủy, đơn tồn đọng, SKU hết hàng và sản phẩm chưa bán. Mỗi
+              câu hỏi được đối chiếu với dữ liệu mới và nguồn đã duyệt.
             </p>
           </div>
           <h2 className="admin-ai-sidebar-label">BẮT ĐẦU TỪ MỘT CÂU HỎI</h2>

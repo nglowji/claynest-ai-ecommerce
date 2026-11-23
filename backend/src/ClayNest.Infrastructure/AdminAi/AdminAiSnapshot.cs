@@ -43,6 +43,7 @@ public sealed class AdminAiSnapshot(IReportService reports, CommerceDbContext db
         foreach (var item in report.TopVariants.Take(3))
             facts.Add(new("top-" + item.VariantId, item.ProductName + " · " + item.Sku,
                 item.Quantity.ToString("N0", Vi) + " món", "Số lượng bán trong đơn hoàn tất của kỳ; cân nhắc theo dõi tồn trước khi bổ sung hàng.", url));
+        facts.AddRange(await DatabaseDiagnostics.ReadAsync(db, reports, report.Period, metrics.CompletedSalesVnd, clock.GetUtcNow(), ct));
         return new(ChatService.Redact(request.Message.Trim()), report.Period.From, report.Period.To,
             clock.GetUtcNow(), report.IsDemo, facts, AdminAiGuides.All.ToList());
     }

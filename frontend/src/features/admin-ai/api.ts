@@ -7,6 +7,7 @@ export type AdminAnswer = {
   generatedAt: string
   isDemo: boolean
   insights: { id: string; title: string; value: string; detail: string; url: string }[]
+  plans?: { title: string; reason: string; steps: string[]; factIds: string[] }[]
   sources: { title: string; version: string; content: string; url: string }[]
 }
 export const askAdmin = (question: AdminQuestion, signal: AbortSignal) =>
