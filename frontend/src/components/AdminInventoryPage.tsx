@@ -181,11 +181,10 @@ export default function AdminInventoryPage() {
       <div className="admin-heading">
         <div>
           <p className="eyebrow">NÀNG GỐM / QUẢN LÝ KHO</p>
-          <h1>
-            Từng món gốm,
-            <br />
-            <em>được chăm chút.</em>
-          </h1>
+          <h1>Quản lý tồn kho</h1>
+          <p className="admin-page-description">
+            Theo dõi số lượng, nhập hàng và kiểm tra lịch sử biến động theo SKU.
+          </p>
         </div>
         <button
           className="text-link"

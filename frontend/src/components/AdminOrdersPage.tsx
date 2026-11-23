@@ -68,11 +68,10 @@ export default function AdminOrdersPage() {
       <div className="admin-heading">
         <div>
           <p className="eyebrow">NÀNG GỐM / ĐƠN HÀNG</p>
-          <h1>
-            Từ nhà Nàng,
-            <br />
-            <em>đến tay bạn.</em>
-          </h1>
+          <h1>Quản lý đơn hàng</h1>
+          <p className="admin-page-description">
+            Tìm kiếm, theo dõi và xử lý từng đơn từ lúc đặt đến khi giao xong.
+          </p>
         </div>
         <button className="text-link" disabled={loading} onClick={() => setAttempt((n) => n + 1)}>
           Tải lại đơn hàng <Icon name="arrow" />
