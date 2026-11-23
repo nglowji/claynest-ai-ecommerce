@@ -182,3 +182,178 @@
   font-size: 12px;
   color: #64776f;
 }
+
+.admin-ai-exchange + .admin-ai-exchange {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid #e4ebe2;
+}
+.admin-ai-question {
+  margin-bottom: 22px;
+  padding: 18px 20px;
+  background: #f0f4ea;
+  border-radius: 10px;
+}
+.admin-ai-question > span,
+.admin-ai-answer-label {
+  color: #64776f;
+  font-size: 12px;
+}
+.admin-ai-question h2 {
+  font-size: 15px;
+  margin-top: 7px;
+  font-weight: 500;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.admin-ai-answer-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.admin-ai-answer-label > span {
+  color: #386146;
+  font-weight: 600;
+}
+.admin-ai-answer > p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+.admin-ai-period {
+  display: block;
+  font-size: 12px;
+  color: #64776f;
+  margin-top: 10px;
+}
+.admin-ai-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+.admin-ai-facts > a {
+  border: 1px solid #dfe7d7;
+  border-radius: 10px;
+  padding: 18px;
+  background: #fafbf7;
+  overflow-wrap: anywhere;
+}
+.admin-ai-facts > a:hover {
+  border-color: #9ab18e;
+}
+.admin-ai-facts span,
+.admin-ai-facts small {
+  display: block;
+  font-size: 12px;
+  color: #5b7252;
+}
+.admin-ai-facts strong {
+  display: block;
+  font-size: 24px;
+  letter-spacing: -0.5px;
+  margin-block: 8px;
+}
+.admin-ai-facts p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #64776f;
+  margin-bottom: 12px;
+}
+.admin-ai-sources {
+  margin-top: 24px;
+}
+.admin-ai-sources h3 {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.admin-ai-sources details {
+  border: 1px solid #e4ebe2;
+  border-radius: 9px;
+  padding: 16px;
+  margin-top: 10px;
+}
+.admin-ai-sources summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+.admin-ai-sources summary small {
+  display: block;
+  font-size: 12px;
+  color: #64776f;
+  margin-top: 5px;
+}
+.admin-ai-sources blockquote {
+  margin: 16px 0;
+  padding-left: 14px;
+  border-left: 2px solid #c4d5b6;
+  color: #52664f;
+  font-size: 13px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.admin-ai-sources a {
+  color: #35694e;
+  font-size: 13px;
+  text-decoration: underline;
+}
+.admin-ai-working,
+.admin-ai-notice {
+  padding: 16px;
+  border-radius: 8px;
+  background: #f5f7f1;
+  font-size: 13px;
+  color: #536a4a;
+  margin-top: 18px;
+}
+.admin-ai-composer {
+  padding: 22px 24px;
+  border-top: 1px solid #e4ebe2;
+  background: #fafbf8;
+}
+.admin-ai-composer > label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.admin-ai-composer textarea {
+  display: block;
+  width: 100%;
+  resize: vertical;
+  min-height: 90px;
+  max-height: 260px;
+  padding: 14px;
+  border: 1px solid #cbd8c5;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  background: #fff;
+  color: #203a34;
+}
+.admin-ai-composer > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+.admin-ai-composer small {
+  color: #64776f;
+  font-size: 12px;
+}
+.admin-ai-composer button {
+  padding: 11px 20px;
+  background: #244d3a;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  min-height: 44px;
+}
+.admin-ai-page :is(button, textarea, select, a):focus-visible {
+  outline: 3px solid #d7ab5e;
+  outline-offset: 3px;
+}
