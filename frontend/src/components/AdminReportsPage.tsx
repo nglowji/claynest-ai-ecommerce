@@ -18,7 +18,7 @@ const fullDate = (date: string) => shortDate(date) + '/' + date.slice(0, 4)
 const number = (value: number) => value.toLocaleString('vi-VN')
 const quantities = (value: string) => new Intl.NumberFormat('vi-VN').format(BigInt(value))
 
-function SalesChart({ report }: { report: SalesReport }) {
+export function SalesChart({ report }: { report: SalesReport }) {
   const [active, setActive] = useState<number | null>(null)
   const max = Math.max(...report.trend.map((p) => Number(p.salesVnd)), 1)
   const width = 800,
