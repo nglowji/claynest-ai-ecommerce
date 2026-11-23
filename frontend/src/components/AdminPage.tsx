@@ -38,6 +38,10 @@ export default function AdminPage() {
           <p className="dashboard-description">Một góc nhìn rõ ràng, cho mỗi ngày vận hành.</p>
         </div>
         <div className="dashboard-heading-actions">
+          <Link className="admin-ai-entry" to="/admin/assistant">
+            <AdminIcon name="assistant" />
+            Hỏi trợ lý
+          </Link>
           <button onClick={refresh} disabled={summary.loading || report.loading}>
             <AdminIcon name="refresh" />
             Làm mới

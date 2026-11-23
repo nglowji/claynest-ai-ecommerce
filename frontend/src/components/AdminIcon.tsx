@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 export type AdminIconName =
+  | 'assistant'
   | 'reports'
   | 'download'
   | 'knowledge'
@@ -15,6 +16,12 @@ export type AdminIconName =
   | 'check'
   | 'clock'
 const paths: Record<AdminIconName, ReactNode> = {
+  assistant: (
+    <>
+      <path d="M4 4h16v12H9l-5 4V4Z" />
+      <path d="M8 8h8M8 12h5" />
+    </>
+  ),
   reports: (
     <>
       <path d="M3 3v18h18M7 16v-4M12 16V8M17 16V5" />

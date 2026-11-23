@@ -46,17 +46,19 @@ export default function AdminLayout() {
   if (auth.status === 'unavailable') return <SessionUnavailable />
   if (!auth.user) return <Navigate to="/login" replace />
   if (auth.user.role !== 'Admin' || denied) return <Navigate to="/account" replace />
-  const section = location.pathname.startsWith('/admin/reports')
-    ? 'Báo cáo bán hàng'
-    : location.pathname.startsWith('/admin/knowledge')
-      ? 'Kho kiến thức AI'
-      : location.pathname.startsWith('/admin/products')
-        ? 'Sản phẩm & danh mục'
-        : location.pathname.startsWith('/admin/inventory')
-          ? 'Quản lý kho'
-          : location.pathname.startsWith('/admin/orders')
-            ? 'Đơn hàng'
-            : 'Tổng quan'
+  const section = location.pathname.startsWith('/admin/assistant')
+    ? 'Trợ lý quản trị'
+    : location.pathname.startsWith('/admin/reports')
+      ? 'Báo cáo bán hàng'
+      : location.pathname.startsWith('/admin/knowledge')
+        ? 'Kho kiến thức AI'
+        : location.pathname.startsWith('/admin/products')
+          ? 'Sản phẩm & danh mục'
+          : location.pathname.startsWith('/admin/inventory')
+            ? 'Quản lý kho'
+            : location.pathname.startsWith('/admin/orders')
+              ? 'Đơn hàng'
+              : 'Tổng quan'
   return (
     <div className="admin-shell admin-workspace">
       <a className="skip-link" href="#admin-main">
@@ -87,6 +89,10 @@ export default function AdminLayout() {
           <NavLink to="/admin/reports">
             <AdminIcon name="reports" />
             Báo cáo bán hàng
+          </NavLink>
+          <NavLink to="/admin/assistant">
+            <AdminIcon name="assistant" />
+            Trợ lý quản trị
           </NavLink>
           <NavLink to="/admin/knowledge">
             <AdminIcon name="knowledge" />
