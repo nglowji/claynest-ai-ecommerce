@@ -1,3 +1,5 @@
+import AdminActionButton from './AdminActionButton'
+import AdminProductCell from './AdminProductCell'
 import AdminEditorDialog from './AdminEditorDialog'
 import SiteImage from './SiteImage'
 import { useEffect, useState, type FormEvent } from 'react'
@@ -478,17 +480,17 @@ export default function AdminCatalogPage() {
                     </label>
                   </details>
                   {!v.id && draft.variants.length > 1 && (
-                    <button
-                      type="button"
+                    <AdminActionButton
+                      icon="trash"
+                      label={'Bỏ biến thể mới ' + (index + 1)}
+                      danger
                       onClick={() =>
                         setDraft({
                           ...draft,
                           variants: draft.variants.filter((_, i) => i !== index),
                         })
                       }
-                    >
-                      Bỏ biến thể mới
-                    </button>
+                    />
                   )}
                 </div>
               ))}
@@ -556,14 +558,14 @@ export default function AdminCatalogPage() {
                   >
                     Lên trước
                   </button>
-                  <button
-                    type="button"
+                  <AdminActionButton
+                    icon="trash"
+                    label={'Gỡ ảnh ' + (index + 1)}
+                    danger
                     onClick={() =>
                       setDraft({ ...draft, images: draft.images.filter((_, n) => n !== index) })
                     }
-                  >
-                    Gỡ ảnh
-                  </button>
+                  />
                 </div>
               ))}
               <button
@@ -647,9 +649,19 @@ export default function AdminCatalogPage() {
                 <tbody>
                   {list.items.map((p) => (
                     <tr key={p.id}>
-                      <td>{p.name}</td>
+                      <td>
+                        <AdminProductCell product={p} />
+                      </td>
                       <td>{p.category}</td>
-                      <td>{money(Math.min(...p.variants.map((v) => v.priceVnd)))}</td>
+                      <td>
+                        {p.variants.some((v) => v.active)
+                          ? money(
+                              Math.min(
+                                ...p.variants.filter((v) => v.active).map((v) => v.priceVnd),
+                              ),
+                            )
+                          : 'Chưa có giá'}
+                      </td>
                       <td>
                         <span
                           className={
@@ -661,12 +673,21 @@ export default function AdminCatalogPage() {
                         </span>
                       </td>
                       <td>
-                        <button disabled={busy || p.archived} onClick={() => edit(p)}>
-                          Sửa
-                        </button>{' '}
-                        <button disabled={busy || p.archived} onClick={() => void archive(p)}>
-                          Lưu trữ
-                        </button>
+                        <div className="admin-row-actions">
+                          <AdminActionButton
+                            icon="edit"
+                            label={'Sửa sản phẩm ' + p.name}
+                            disabled={busy || p.archived}
+                            onClick={() => edit(p)}
+                          />
+                          <AdminActionButton
+                            icon="archive"
+                            label={'Lưu trữ sản phẩm ' + p.name}
+                            danger
+                            disabled={busy || p.archived}
+                            onClick={() => void archive(p)}
+                          />
+                        </div>
                       </td>
                     </tr>
                   ))}

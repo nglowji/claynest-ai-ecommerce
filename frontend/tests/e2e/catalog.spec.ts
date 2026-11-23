@@ -59,7 +59,7 @@ test('admin creates draft, publishes, edits price, uploads image and archives; s
   const row = page.getByRole('row').filter({ hasText: 'E2E Gốm ' + key })
   await expect(row).toBeVisible()
   page.once('dialog', (dialog) => dialog.accept())
-  await row.getByRole('button', { name: 'Lưu trữ', exact: true }).click()
+  await row.getByRole('button', { name: 'Lưu trữ sản phẩm E2E Gốm ' + key, exact: true }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Đã lưu trữ' })).toBeVisible()
   expect((await page.request.get('/api/v1/products/' + slug)).status()).toBe(404)
 })
