@@ -1,3 +1,4 @@
+import SiteImage from './SiteImage'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getCategories } from '../catalog/api'
@@ -24,7 +25,7 @@ export default function ProductsPage(actions: ProductActions) {
   const page = data?.page || Number(params.get('page') || 1)
   return <section className="catalog-page container" aria-labelledby="catalog-title">
     <nav className="breadcrumbs" aria-label="Đường dẫn"><Link to="/">Trang chủ</Link><span>/</span><span>Sản phẩm</span></nav>
-    <div className="catalog-editorial"><div className="catalog-heading"><p className="eyebrow">CỬA HÀNG NÀNG GỐM</p><h1 id="catalog-title">Tất cả <em>sản phẩm.</em></h1><p>Chọn một món gốm hợp ý.<br />Để những điều bình thường cũng trở nên đáng yêu.</p></div><figure><img src="/images/slow-living/lifestyle.jpg" alt="Gốm mộc trên bàn ăn sáng ngập nắng" /><figcaption>Gốm cho từng nếp nhà.</figcaption></figure></div>
+    <div className="catalog-editorial"><div className="catalog-heading"><p className="eyebrow">CỬA HÀNG NÀNG GỐM</p><h1 id="catalog-title">Tất cả <em>sản phẩm.</em></h1><p>Chọn một món gốm hợp ý.<br />Để những điều bình thường cũng trở nên đáng yêu.</p></div><figure><SiteImage src="/images/slow-living/lifestyle.jpg" alt="Gốm mộc trên bàn ăn sáng ngập nắng" /><figcaption>Gốm cho từng nếp nhà.</figcaption></figure></div>
     <div className="catalog-discovery"><div className="catalog-controls"><div className="search-panel"><Icon name="search" /><input ref={input} value={params.get('q') || ''} onChange={e => update('q', e.target.value)} placeholder="Tìm món gốm bạn yêu…" aria-label="Tìm kiếm sản phẩm" maxLength={180} /></div><label className="sort-control">Sắp xếp<select value={params.get('sort') || 'default'} onChange={e => update('sort', e.target.value)}><option value="default">Tên sản phẩm</option><option value="price-asc">Giá tăng dần</option><option value="price-desc">Giá giảm dần</option><option value="newest">Mới nhất</option></select></label></div>
     <div className="category-tabs" role="group" aria-label="Lọc theo danh mục"><button className={!params.get('category') ? 'category-tab active' : 'category-tab'} onClick={() => update('category', '')}>Tất cả</button>{categories.map(c => <button key={c.id} className={[c.name,c.slug].includes(params.get('category') || '') ? 'category-tab active' : 'category-tab'} onClick={() => update('category', c.slug)}>{c.name}</button>)}</div>
     {categoryError && <p role="alert">Chưa tải được danh mục. <button onClick={() => setCategoryAttempt(n => n + 1)}>Thử lại danh mục</button></p>}

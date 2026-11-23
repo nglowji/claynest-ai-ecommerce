@@ -1,3 +1,4 @@
+import SiteImage from './SiteImage'
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
@@ -41,7 +42,7 @@ export default function LoginPage() {
   function switchMode() { setError(''); setNotice(''); setPassword(''); setConfirmation('') }
   return <section className="auth-page container" aria-labelledby="login-title">
     <div className="auth-layout auth-redesign">
-      <aside className="auth-photo"><img src="/images/nang-gom/flowers.jpg" alt="Một bình hoa, một góc nhà bình yên" width="1536" height="1024" /><div><span>Gốm mộc & chuyện nhà</span><p>Những điều nhỏ.<br /> Một niềm vui riêng.</p><small>Nơi những món gốm tìm thấy người thương.</small></div></aside>
+      <aside className="auth-photo"><SiteImage src="/images/nang-gom/flowers.jpg" alt="Một bình hoa, một góc nhà bình yên" width="1536" height="1024" /><div><span>Gốm mộc & chuyện nhà</span><p>Những điều nhỏ.<br /> Một niềm vui riêng.</p><small>Nơi những món gốm tìm thấy người thương.</small></div></aside>
       <div className="auth-form-panel"><Link className="auth-back" to="/">← Ghé nhà Nàng Gốm</Link>
         <nav className="auth-tabs" aria-label="Tài khoản"><Link to="/login" onClick={switchMode} aria-current={!signingUp ? 'page' : undefined}>Đăng nhập</Link><Link to="/register" onClick={switchMode} aria-current={signingUp ? 'page' : undefined}>Đăng ký</Link></nav>
         <h1 id="login-title">{signingUp ? 'Làm quen nhé,' : 'Chào bạn,'}<br /><em>{signingUp ? 'người thương gốm.' : 'mừng trở về.'}</em></h1>
