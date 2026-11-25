@@ -100,7 +100,7 @@ public sealed class DevelopmentActivitySeeder(CommerceDbContext db, UserManager<
                 var at = age >= 5 ? created.AddHours(step * 12 + random.Next(0, 4))
                     : created + TimeSpan.FromTicks((now - created).Ticks * step / 5);
                 var previous = order.Status; order.TransitionTo(state, state == "completed", at);
-                db.OrderStatusChanges.Add(new(order.Id, order.Revision, previous, state, Reason(state), null, "Cửa hàng", at, Key("event/" + index + "/" + state), OriginHash));
+                db.OrderStatusChanges.Add(new(order.Id, order.Revision, previous, state, Reason(state), Key("actor"), "Cửa hàng", at, Key("event/" + index + "/" + state), OriginHash));
             }
             if (target == "cancelled")
             {
