@@ -141,3 +141,63 @@ test('studio collection has thirty distinct products with independent images and
   expect(await image.evaluate((element: HTMLImageElement) => element.naturalWidth > 0)).toBe(true)
   await expect(page.locator('main')).not.toContainText(/DEMO|minh họa|tham khảo/i)
 })
+
+test('admin catalog combines server filters and reset restores the full list', async ({ page }) => {
+  await loginAdminWithBackoff(page)
+  await page.goto('/admin/products')
+  await expect(page.locator('.catalog-table')).toBeVisible()
+  const all = await (await page.request.get('/api/v1/admin/catalog/products?pageSize=1')).json()
+  const categories = await (await page.request.get('/api/v1/admin/catalog/categories')).json()
+  async function change(action: () => Promise<unknown>, matches: (url: URL) => boolean) {
+    const pending = page.waitForResponse(
+      (response) =>
+        response.status() === 200 &&
+        new URL(response.url()).pathname.endsWith('/admin/catalog/products') &&
+        matches(new URL(response.url())),
+    )
+    await action()
+    const result = await (await pending).json()
+    await expect(page.locator('.catalog-table tbody tr')).toHaveCount(result.items.length)
+    return result
+  }
+  const category = categories[0].id
+  const filtered = await change(
+    () => page.getByLabel('Lọc danh mục quản trị').selectOption(category),
+    (url) => url.searchParams.get('category') === category,
+  )
+  expect(
+    filtered.items.every((product: { categoryId: string }) => product.categoryId === category),
+  ).toBe(true)
+  const priced = await change(
+    () => page.getByLabel('Giá đến quản trị').fill('250000'),
+    (url) => url.searchParams.get('maxPrice') === '250000',
+  )
+  expect(
+    priced.items.every((product: { variants: { priceVnd: number }[] }) =>
+      product.variants.some((v) => v.priceVnd <= 250000),
+    ),
+  ).toBe(true)
+  await change(
+    () => page.getByLabel('Sắp xếp sản phẩm quản trị').selectOption('price-asc'),
+    (url) => url.searchParams.get('sort') === 'price-asc',
+  )
+  await change(
+    () => page.getByLabel('Còn hàng trong kho', { exact: true }).check(),
+    (url) => url.searchParams.get('inStock') === 'true',
+  )
+  const restored = await change(
+    () => page.getByRole('button', { name: 'Xóa bộ lọc sản phẩm' }).click(),
+    (url) =>
+      url.searchParams.get('category') === '' &&
+      !url.searchParams.has('maxPrice') &&
+      url.searchParams.get('inStock') === 'false',
+  )
+  expect(restored.totalCount).toBe(all.totalCount)
+  await expect(page.getByLabel('Giá đến quản trị')).toHaveValue('')
+  await expect(page.getByLabel('Còn hàng trong kho', { exact: true })).not.toBeChecked()
+  await page.goto('/admin/products?q=no-matching-product-search')
+  await expect(page.getByLabel('Tìm tên hoặc SKU')).toHaveValue('no-matching-product-search')
+  await page.getByRole('button', { name: 'Xóa bộ lọc sản phẩm' }).click()
+  await expect(page).toHaveURL('/admin/products')
+  await expect(page.locator('.catalog-table tbody tr')).toHaveCount(Math.min(12, all.totalCount))
+})

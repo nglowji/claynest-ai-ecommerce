@@ -75,14 +75,31 @@ export default function AdminCatalogPage() {
   const auth = useAuth()
   const [categories, setCategories] = useState<Category[]>([])
   const [list, setList] = useState<PageResult<CatalogProduct> | null>(null)
-  const [params] = useSearchParams()
+  const [params, setParams] = useSearchParams()
   const queryParam = params.get('q') || ''
   const [q, setQ] = useState(queryParam)
   useEffect(() => {
     setQ(queryParam)
     setPage(1)
   }, [queryParam])
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [sort, setSort] = useState('newest')
+  const [inStock, setInStock] = useState(false)
+  const [sale, setSale] = useState(false)
+  const [minPrice, setMinPrice] = useState('')
+  const [maxPrice, setMaxPrice] = useState('')
   const [page, setPage] = useState(1)
+  function resetFilters() {
+    setParams({}, { replace: true })
+    setQ('')
+    setCategoryFilter('')
+    setSort('newest')
+    setInStock(false)
+    setSale(false)
+    setMinPrice('')
+    setMaxPrice('')
+    setPage(1)
+  }
   const [attempt, setAttempt] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -117,7 +134,17 @@ export default function AdminCatalogPage() {
         Promise.all([
           getCategories(true),
           getProducts(
-            new URLSearchParams({ q, page: String(page), pageSize: '12', sort: 'newest' }),
+            new URLSearchParams({
+              q,
+              category: categoryFilter,
+              sort,
+              page: String(page),
+              pageSize: '12',
+              inStock: String(inStock),
+              sale: String(sale),
+              ...(minPrice ? { minPrice } : {}),
+              ...(maxPrice ? { maxPrice } : {}),
+            }),
             true,
           ),
         ])
@@ -139,7 +166,7 @@ export default function AdminCatalogPage() {
       active = false
       window.clearTimeout(timer)
     }
-  }, [q, page, attempt])
+  }, [q, page, attempt, categoryFilter, sort, inStock, sale, minPrice, maxPrice])
   function edit(product: CatalogProduct) {
     setEditingId(product.id)
     setDraft({
@@ -632,6 +659,95 @@ export default function AdminCatalogPage() {
             }}
           />
         </label>
+        <div className="admin-catalog-filters" role="group" aria-label="Bộ lọc sản phẩm quản trị">
+          <label>
+            Danh mục
+            <select
+              aria-label="Lọc danh mục quản trị"
+              value={categoryFilter}
+              onChange={(e) => {
+                setCategoryFilter(e.target.value)
+                setPage(1)
+              }}
+            >
+              <option value="">Tất cả danh mục</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Sắp xếp
+            <select
+              aria-label="Sắp xếp sản phẩm quản trị"
+              value={sort}
+              onChange={(e) => {
+                setSort(e.target.value)
+                setPage(1)
+              }}
+            >
+              <option value="newest">Mới tạo</option>
+              <option value="default">Tên sản phẩm</option>
+              <option value="price-asc">Giá tăng dần</option>
+              <option value="price-desc">Giá giảm dần</option>
+            </select>
+          </label>
+          <label>
+            Giá từ (VND)
+            <input
+              aria-label="Giá từ quản trị"
+              type="number"
+              min="0"
+              step="1000"
+              value={minPrice}
+              onChange={(e) => {
+                setMinPrice(e.target.value)
+                setPage(1)
+              }}
+            />
+          </label>
+          <label>
+            Giá đến (VND)
+            <input
+              aria-label="Giá đến quản trị"
+              type="number"
+              min="0"
+              step="1000"
+              value={maxPrice}
+              onChange={(e) => {
+                setMaxPrice(e.target.value)
+                setPage(1)
+              }}
+            />
+          </label>
+          <label className="admin-filter-check">
+            <input
+              type="checkbox"
+              checked={inStock}
+              onChange={(e) => {
+                setInStock(e.target.checked)
+                setPage(1)
+              }}
+            />
+            Còn hàng trong kho
+          </label>
+          <label className="admin-filter-check">
+            <input
+              type="checkbox"
+              checked={sale}
+              onChange={(e) => {
+                setSale(e.target.checked)
+                setPage(1)
+              }}
+            />
+            Có ưu đãi
+          </label>
+          <button type="button" className="text-link" onClick={resetFilters}>
+            Xóa bộ lọc sản phẩm
+          </button>
+        </div>
         {loading && <p role="status">Đang tải catalog…</p>}
         {!loading && list && (
           <>

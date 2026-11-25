@@ -815,3 +815,49 @@
   font-size: 11px;
   margin-top: 3px;
 }
+
+.admin-catalog-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #e1e7ed;
+  border-radius: 10px;
+  background: #f8fafb;
+  margin-bottom: 22px;
+  align-items: end;
+}
+.admin-catalog-filters > label {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  color: #617184;
+}
+.admin-catalog-filters :is(input:not([type='checkbox']), select) {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  border: 1px solid #d5dfe7;
+  border-radius: 7px;
+  padding: 9px;
+  background: #fff;
+  color: #263d4b;
+  font-size: 13px;
+}
+.admin-catalog-filters > .admin-filter-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+}
+@media (max-width: 1100px) {
+  .admin-catalog-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .admin-catalog-filters {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+}
