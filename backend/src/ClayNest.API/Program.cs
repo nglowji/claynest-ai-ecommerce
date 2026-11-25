@@ -7,12 +7,13 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Options;
 
+var seedActivity = args.Contains("--seed-development-activity");
 var seedReportDemo = args.Contains("--seed-report-demo");
 var removeSourceImages = args.Contains("--remove-source-images");
 var refreshCatalog = args.Contains("--refresh-catalog");
 var seedCatalog = args.Contains("--seed-catalog");
 var bootstrapAuth = args.Contains("--bootstrap-auth");
-var builder = WebApplication.CreateBuilder(args.Where(arg => arg != "--seed-report-demo" && arg != "--bootstrap-auth" && arg != "--seed-catalog" && arg != "--refresh-catalog" && arg != "--remove-source-images").ToArray());
+var builder = WebApplication.CreateBuilder(args.Where(arg => arg != "--seed-development-activity" && arg != "--seed-report-demo" && arg != "--bootstrap-auth" && arg != "--seed-catalog" && arg != "--refresh-catalog" && arg != "--remove-source-images").ToArray());
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole(options => options.IncludeScopes = true);
 builder.Services.AddOpenApi();
@@ -35,8 +36,9 @@ builder.Services.AddOptions<CorsOptions>().Configure<IOptions<ClientOptions>>((o
         .WithExposedHeaders("X-Correlation-ID", "X-Request-ID")));
 
 var app = builder.Build();
-if (bootstrapAuth || seedCatalog || refreshCatalog || removeSourceImages || seedReportDemo)
+if (seedActivity || bootstrapAuth || seedCatalog || refreshCatalog || removeSourceImages || seedReportDemo)
 {
+    if (seedActivity && !app.Environment.IsDevelopment()) throw new InvalidOperationException("Development activity is disabled outside Development.");
     await using var scope = app.Services.CreateAsyncScope();
     var database = scope.ServiceProvider.GetRequiredService<ClayNest.Infrastructure.Persistence.CommerceDbContext>();
     await Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.MigrateAsync(database.Database);
@@ -47,6 +49,7 @@ if (bootstrapAuth || seedCatalog || refreshCatalog || removeSourceImages || seed
     if (seedCatalog) await scope.ServiceProvider.GetRequiredService<ClayNest.Application.Catalog.ICatalogService>().SeedAsync(CancellationToken.None);
     if (refreshCatalog) await scope.ServiceProvider.GetRequiredService<ClayNest.Application.Catalog.ICatalogService>().RefreshContentAsync(CancellationToken.None);
     if (removeSourceImages) await scope.ServiceProvider.GetRequiredService<ClayNest.Application.Catalog.ICatalogService>().RemoveSourceImagesAsync(CancellationToken.None);
+    if (seedActivity) await scope.ServiceProvider.GetRequiredService<ClayNest.Infrastructure.Development.DevelopmentActivitySeeder>().SeedAsync(CancellationToken.None);
     if (seedReportDemo) await scope.ServiceProvider.GetRequiredService<ClayNest.Infrastructure.Reports.ReportDemoSeeder>().SeedAsync(CancellationToken.None);
     return;
 }

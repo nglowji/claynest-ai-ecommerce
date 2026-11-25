@@ -68,6 +68,7 @@ public static class DependencyInjection
         services.AddScoped<ClayNest.Application.Orders.IAdminOrderService, ClayNest.Infrastructure.Orders.AdminOrderService>();
         services.AddScoped<ClayNest.Application.Orders.IOrderService, ClayNest.Infrastructure.Orders.OrderService>();
         services.AddScoped<ClayNest.Infrastructure.Reports.ReportDemoSeeder>();
+        services.AddScoped<ClayNest.Infrastructure.Development.DevelopmentActivitySeeder>();
         services.Configure<ClayNest.Infrastructure.Reports.ReportOptions>(configuration.GetSection("Reports"));
         services.AddScoped<ClayNest.Application.Reports.IReportService, ClayNest.Infrastructure.Reports.ReportService>();
         services.AddScoped<ClayNest.Application.Inventory.IInventoryService, ClayNest.Infrastructure.Inventory.InventoryService>();
