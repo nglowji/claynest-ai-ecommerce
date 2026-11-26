@@ -31,6 +31,11 @@ test('product gallery, specifications and verified purchase reviews persist and 
     const product = catalog.items.find((p: { variants: { active: boolean; stockQty: number }[] }) =>
       p.variants.some((v) => v.active && v.stockQty > 0),
     )
+    const baseline = await (
+      await buyer.request.get(`/api/v1/products/${product.id}/reviews/`)
+    ).json()
+    const firstComment = `Màu men đẹp, kích thước vừa tay. ${randomUUID()}`
+    const editedComment = `Sau khi sử dụng, mình thích chất men. ${randomUUID()}`
     const variant = product.variants.find(
       (v: { active: boolean; stockQty: number }) => v.active && v.stockQty > 0,
     )
@@ -95,24 +100,27 @@ test('product gallery, specifications and verified purchase reviews persist and 
     expect((await eligibility.json()).eligible).toBe(true)
     await buyerPage.reload()
     await buyerPage.getByLabel('Điểm đánh giá', { exact: true }).selectOption('4')
-    await buyerPage
-      .getByLabel('Nội dung đánh giá', { exact: true })
-      .fill('Màu men đẹp, kích thước vừa tay và đóng gói cẩn thận.')
+    await buyerPage.getByLabel('Nội dung đánh giá', { exact: true }).fill(firstComment)
     await buyerPage.getByRole('button', { name: 'Gửi đánh giá', exact: true }).click()
-    await expect(buyerPage.locator('.buyer-review')).toContainText('Đã mua hàng')
-    await expect(buyerPage.locator('.buyer-review')).toContainText('Màu men đẹp')
+    await expect(
+      buyerPage.getByRole('status').filter({ hasText: 'Đã lưu đánh giá của bạn' }),
+    ).toBeVisible()
+    await expect(
+      buyerPage.locator('.buyer-review').filter({ hasText: firstComment }),
+    ).toContainText('Đã mua hàng')
     await buyerPage.reload()
     await buyerPage.getByLabel('Điểm đánh giá', { exact: true }).selectOption('3')
-    await buyerPage
-      .getByLabel('Nội dung đánh giá', { exact: true })
-      .fill('Sau khi sử dụng, mình thích chất men và cách hoàn thiện.')
+    await buyerPage.getByLabel('Nội dung đánh giá', { exact: true }).fill(editedComment)
     await buyerPage.getByRole('button', { name: 'Cập nhật đánh giá', exact: true }).click()
-    await expect(buyerPage.locator('.buyer-review')).toHaveCount(1)
-    await expect(buyerPage.locator('.buyer-review')).toContainText('Sau khi sử dụng')
+    await expect(
+      buyerPage.getByRole('status').filter({ hasText: 'Đã lưu đánh giá của bạn' }),
+    ).toBeVisible()
+    await expect(
+      buyerPage.locator('.buyer-review').filter({ hasText: editedComment }),
+    ).toBeVisible()
     await buyerPage.getByLabel('Lọc đánh giá', { exact: true }).selectOption('5')
-    await expect(buyerPage.locator('.review-empty')).toContainText(
-      'Chưa có đánh giá với số sao này',
-    )
+    const fiveStars = baseline.distribution.find((r: { rating: number }) => r.rating === 5).count
+    await expect(buyerPage.locator('.buyer-review')).toHaveCount(Math.min(5, fiveStars))
     await buyerPage.setViewportSize({ width: 390, height: 844 })
     expect(await buyerPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
@@ -121,8 +129,10 @@ test('product gallery, specifications and verified purchase reviews persist and 
     const publicReview = await (
       await page.request.get(`/api/v1/products/${product.id}/reviews/`)
     ).json()
-    expect(publicReview.totalCount).toBe(1)
-    expect(publicReview.averageRating).toBe(3)
+    expect(publicReview.totalCount).toBe(baseline.totalCount + 1)
+    expect(publicReview.distribution.find((r: { rating: number }) => r.rating === 3).count).toBe(
+      baseline.distribution.find((r: { rating: number }) => r.rating === 3).count + 1,
+    )
     expect(JSON.stringify(publicReview)).not.toContain(email)
   } finally {
     await buyer.close().catch(() => {})
