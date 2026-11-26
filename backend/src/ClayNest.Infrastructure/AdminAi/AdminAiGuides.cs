@@ -8,8 +8,8 @@ public static class AdminAiGuides
     {
         new AdminAiGuide("database", "Cấu trúc dữ liệu kinh doanh",
             "Products thuộc Category, có nhiều ProductVariants (SKU, giá, tồn) và ProductImages. Orders có OrderItems chụp tên và giá tại lúc đặt; mỗi dòng nối VariantId với SKU. StockMovements lưu biến động tồn, OrderStatusChanges lưu lịch sử xử lý. Doanh thu lấy đơn completed theo CompletedAt, đơn đặt lấy CreatedAt. Không có dữ liệu chi phí, traffic hay quảng cáo nên không thể suy ra lợi nhuận, chuyển đổi hoặc nguyên nhân doanh thu. Dùng số liệu đã truy vấn, không suy đoán toàn bộ database.", "/admin"),
-        new AdminAiGuide("orders", "Xử lý đơn COD",
-            "Mở Đơn hàng, lọc trạng thái chờ xác nhận và kiểm tra chi tiết. Luồng xử lý: chờ xác nhận → đã xác nhận → đã đóng gói → đang giao → hoàn tất. Chỉ hoàn tất khi đã giao và xác nhận thu COD. Hủy đơn cần lý do; hệ thống hoàn kho một lần. Không đổi trạng thái hàng loạt qua trợ lý.", "/admin/orders"),
+        new AdminAiGuide("orders", "Xử lý đơn hàng",
+            "Mở Đơn hàng, lọc trạng thái chờ xác nhận và kiểm tra chi tiết. Luồng xử lý: chờ xác nhận → đã xác nhận → đã đóng gói → đang giao → hoàn tất. Chỉ hoàn tất khi đã giao và xác nhận thanh toán: COD thu khi giao, ZaloPay phải được máy chủ xác minh. Không xử lý giao hàng khi ZaloPay còn chưa thanh toán. Đơn trực tuyến đã trả tiền không hủy trực tiếp; cần đối soát/hoàn tiền. Hủy đơn cần lý do; hệ thống hoàn kho một lần. Không đổi trạng thái hàng loạt qua trợ lý.", "/admin/orders"),
         new AdminAiGuide("inventory", "Nhập và điều chỉnh tồn kho",
             "Mở Quản lý kho, tìm sản phẩm hoặc SKU. Chọn nhập kho khi nhận thêm hàng, điều chỉnh khi kiểm kê; ghi số lượng, lý do và ngưỡng cảnh báo. Kiểm tra lịch sử biến động. Nếu dữ liệu đã thay đổi, tải lại trước khi gửi. Tồn kho hiện tại không bị giới hạn bởi kỳ doanh thu.", "/admin/inventory"),
         new AdminAiGuide("reports", "Đọc báo cáo bán hàng",

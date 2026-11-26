@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClayNest.Infrastructure.Orders;
 
-public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider protection, TimeProvider clock) : IOrderService
+public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider protection, TimeProvider clock, Microsoft.Extensions.Options.IOptions<ClayNest.Infrastructure.Payments.ZaloOptions> zalo) : IOrderService
 {
     private readonly IDataProtector quotes = protection.CreateProtector("NangGom.Checkout.Quote.v1");
     private readonly IDataProtector secrets = protection.CreateProtector("NangGom.Order.Access.v1");
@@ -63,6 +63,7 @@ public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider p
         if (idempotencyKey == Guid.Empty || !request.AcceptTerms || request.Contact is null || string.IsNullOrWhiteSpace(request.QuoteToken) || request.QuoteToken.Length > 20000)
             throw new OrderRuleException("Cần báo giá hợp lệ, thông tin giao hàng và xác nhận điều kiện đặt hàng.");
         if (request.PaymentMethod is not ("cod" or "zalopay")) throw new OrderRuleException("Phương thức thanh toán không hợp lệ.");
+        if (request.PaymentMethod == "zalopay" && !zalo.Value.Enabled) throw new OrderRuleException("ZaloPay chưa được bật. Vui lòng chọn COD.");
         var contact = request.Contact.Normalize();
         // Preserve hashes for existing COD retries across this deployment.
         var payloadHash = request.PaymentMethod == "cod"
@@ -118,7 +119,7 @@ public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider p
         await db.SaveChangesAsync(ct); await transaction.CommitAsync(ct);
         return Receipt(order);
     }
-    private OrderReceipt Receipt(Order order) => new(order.Reference, secrets.Unprotect(order.AccessTokenProtected), order.AccessExpiresAt, order.GrandTotalVnd, order.Status, order.PaymentMethod);
+    private OrderReceipt Receipt(Order order) => new(order.Reference, secrets.Unprotect(order.AccessTokenProtected), order.AccessExpiresAt, order.GrandTotalVnd, "pending", order.PaymentMethod);
 
     private async Task<Order?> Accessible(string reference, string? token, Guid? customerId, CancellationToken ct)
     {

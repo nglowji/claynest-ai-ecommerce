@@ -22,7 +22,7 @@ public sealed class CustomerOrders(CommerceDbContext db) : ICustomerOrders
             .ToDictionaryAsync(v => v.Id, ct);
         var rows = orders.Select(o => new PurchaseRow(o.Reference, o.Status, o.PaymentStatus, o.GrandTotalVnd, o.CreatedAt,
             o.Items.OrderBy(i => i.Sku).Select(i => new PurchaseItem(i.VariantId, current.GetValueOrDefault(i.VariantId)?.Slug, i.ProductName, i.VariantName, i.Image,
-                i.Quantity, i.LineTotalVnd, current.GetValueOrDefault(i.VariantId)?.StockQty ?? 0)).ToList())).ToList();
+                i.Quantity, i.LineTotalVnd, current.GetValueOrDefault(i.VariantId)?.StockQty ?? 0)).ToList(), o.PaymentMethod)).ToList();
         return new(new(rows, page, 5, count), counts);
     }
 }

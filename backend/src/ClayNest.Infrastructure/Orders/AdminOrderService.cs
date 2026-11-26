@@ -82,7 +82,7 @@ public sealed class AdminOrderService(CommerceDbContext db, TimeProvider clock) 
             return await Detail(order, ct);
         }
         if (order.Revision != input.Revision) throw new OrderConflictException("order_conflict", "Đơn đã được cập nhật bởi thao tác khác. Vui lòng tải lại trước khi xử lý.");
-        if (!(await Allowed(order, ct)).Contains(input.Status)) throw new OrderRuleException("Đơn chưa đủ điều kiện chuyển trạng thái. Đơn ZaloPay cần xác nhận thanh toán; giao dịch còn hiệu lực chưa được hủy.");
+        if (order.PaymentMethod == "zalopay" && !(await Allowed(order, ct)).Contains(input.Status)) throw new OrderRuleException("Đơn chưa đủ điều kiện chuyển trạng thái. Đơn ZaloPay cần xác nhận thanh toán; giao dịch còn hiệu lực chưa được hủy.");
         var from = order.Status;
         order.TransitionTo(input.Status, input.ConfirmCodCollected, clock.GetUtcNow());
         if (input.Status == "cancelled")

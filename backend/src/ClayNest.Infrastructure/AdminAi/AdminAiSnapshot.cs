@@ -33,7 +33,7 @@ public sealed class AdminAiSnapshot(IReportService reports, CommerceDbContext db
             ("pending", "Chờ xác nhận", "Ưu tiên kiểm tra và xác nhận các đơn mới."),
             ("confirmed", "Cần đóng gói", "Chuẩn bị sản phẩm và đóng gói chống vỡ."),
             ("packed", "Chờ bàn giao", "Kiểm tra kiện hàng trước khi giao vận chuyển."),
-            ("shipped", "Đang giao hàng", "Theo dõi giao hàng; chỉ hoàn tất khi đã giao và thu COD."),
+            ("shipped", "Đang giao hàng", "Theo dõi giao hàng; chỉ hoàn tất khi đã giao và xác nhận thanh toán COD/ZaloPay."),
         }) facts.Add(new(status, label, counts.GetValueOrDefault(status).ToString("N0", Vi),
             "Tất cả đơn hiện tại, không giới hạn theo kỳ. " + detail, "/admin/orders?status=" + status));
         foreach (var item in report.LowStock.Take(3))
