@@ -1,0 +1,170 @@
+name: nanggom-production
+x-api-image: &api-image
+  image: ${RELEASE_IMAGE_PREFIX:-nanggom-release}-api:${RELEASE_TAG:-local}
+  build:
+    context: ./backend
+    target: runtime
+x-api-environment: &api-environment
+  ASPNETCORE_ENVIRONMENT: Production
+  AllowedHosts: ${SITE_DOMAIN:?Set SITE_DOMAIN};localhost;api
+  Cors__AllowedOrigins__0: https://${SITE_DOMAIN}
+  Proxy__Address: ${PROXY_ADDRESS:-172.30.92.2}
+  DataProtection__KeysPath: /app/keys
+  Catalog__ImagePath: /app/media/catalog
+  AccountMail__FrontendUrl: https://${SITE_DOMAIN}
+  AccountMail__Host: ${SMTP_HOST:?Configure production SMTP}
+  AccountMail__Port: ${SMTP_PORT:-587}
+  AccountMail__Username: ${SMTP_USERNAME:-}
+  AccountMail__Password: ${SMTP_PASSWORD:-}
+  AccountMail__From: ${SMTP_FROM:?Set SMTP_FROM}
+  AccountMail__RequireConfirmedEmail: "true"
+  Ai__BaseUrl: http://ai-service:8001
+  Ai__GatewaySecret: ${AI_GATEWAY_SECRET:?Set service secret}
+  Ai__KnowledgeAdminSecret: ${AI_KNOWLEDGE_ADMIN_SECRET:?Set service secret}
+  Ai__ToolSecret: ${AI_TOOL_SECRET:?Set service secret}
+  Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command: Warning
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: release_owner
+      POSTGRES_DB: nanggom
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set database secret}
+      COMMERCE_DB_PASSWORD: ${COMMERCE_DB_PASSWORD:?Set migration secret}
+      AI_DB_PASSWORD: ${AI_DB_PASSWORD:?Set migration secret}
+    volumes:
+      - database:/var/lib/postgresql/data
+      - ./infra/postgres:/docker-entrypoint-initdb.d:ro
+    networks: [backend]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -h 127.0.0.1 -U release_owner -d nanggom']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+  api-migrate:
+    <<: *api-image
+    environment:
+      <<: *api-environment
+      ConnectionStrings__Commerce: Host=db;Database=nanggom;Username=commerce_app;Password=${COMMERCE_DB_PASSWORD}
+    command: [--migrate]
+    networks: [backend]
+    depends_on:
+      db:
+        condition: service_healthy
+  ai-migrate:
+    image: ${RELEASE_IMAGE_PREFIX:-nanggom-release}-ai:${RELEASE_TAG:-local}
+    build: ./ai-service
+    environment:
+      AI_DATABASE_URL: postgresql+psycopg://ai_app:${AI_DB_PASSWORD}@db:5432/nanggom
+    command: [python, -m, app.db.migrate]
+    networks: [backend]
+    depends_on:
+      db:
+        condition: service_healthy
+  runtime-grants:
+    image: pgvector/pgvector:pg17
+    environment:
+      PGHOST: db
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: release_owner
+      POSTGRES_DB: nanggom
+      COMMERCE_RUNTIME_PASSWORD: ${COMMERCE_RUNTIME_PASSWORD:?Set runtime secret}
+      AI_RUNTIME_PASSWORD: ${AI_RUNTIME_PASSWORD:?Set runtime secret}
+    volumes:
+      - ./infra/production:/scripts:ro
+    entrypoint: [sh, /scripts/grant-runtime.sh]
+    networks: [backend]
+    depends_on:
+      api-migrate:
+        condition: service_completed_successfully
+      ai-migrate:
+        condition: service_completed_successfully
+  api:
+    <<: *api-image
+    environment:
+      <<: *api-environment
+      ConnectionStrings__Commerce: Host=db;Database=nanggom;Username=commerce_runtime;Password=${COMMERCE_RUNTIME_PASSWORD}
+    volumes:
+      - keys:/app/keys
+      - images:/app/media/catalog
+    networks: [backend, edge]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, --max-time, '5', 'http://localhost:8080/ready']
+      interval: 5s
+      timeout: 6s
+      retries: 20
+    depends_on:
+      runtime-grants:
+        condition: service_completed_successfully
+    restart: unless-stopped
+  ai-service:
+    image: ${RELEASE_IMAGE_PREFIX:-nanggom-release}-ai:${RELEASE_TAG:-local}
+    build: ./ai-service
+    command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, '8001', --no-access-log]
+    environment:
+      AI_DATABASE_URL: postgresql+psycopg://ai_runtime:${AI_RUNTIME_PASSWORD}@db:5432/nanggom
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      AI_GEMINI_MODEL: ${AI_GEMINI_MODEL:-gemini-3.5-flash-lite}
+      AI_GATEWAY_SECRET: ${AI_GATEWAY_SECRET}
+      AI_KNOWLEDGE_ADMIN_SECRET: ${AI_KNOWLEDGE_ADMIN_SECRET}
+      AI_TOOL_SECRET: ${AI_TOOL_SECRET}
+      AI_COMMERCE_BASE_URL: http://api:8080
+      AI_DAILY_TURN_LIMIT: ${AI_DAILY_TURN_LIMIT:-100}
+    networks: [backend, outbound]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    depends_on:
+      runtime-grants:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen("http://localhost:8001/ready", timeout=5)']
+      interval: 5s
+      timeout: 6s
+      retries: 20
+    restart: unless-stopped
+  web:
+    image: ${RELEASE_IMAGE_PREFIX:-nanggom-release}-web:${RELEASE_TAG:-local}
+    build:
+      context: .
+      dockerfile: infra/web/Dockerfile
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - certificates:/data
+      - caddy_config:/config
+    networks:
+      edge:
+        ipv4_address: ${PROXY_ADDRESS:-172.30.92.2}
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  database:
+  keys:
+  images:
+  certificates:
+  caddy_config:
+networks:
+  backend:
+    internal: true
+  outbound:
+  edge:
+    ipam:
+      config:
+        - subnet: ${PROXY_SUBNET:-172.30.92.0/24}
