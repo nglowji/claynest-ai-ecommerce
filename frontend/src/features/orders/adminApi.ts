@@ -12,7 +12,7 @@ export const actionLabels: Record<string, string> = {
   confirmed: 'Xác nhận đơn',
   packed: 'Xác nhận đóng gói',
   shipped: 'Bàn giao vận chuyển',
-  completed: 'Hoàn tất & ghi nhận COD',
+  completed: 'Hoàn tất đơn hàng',
   cancelled: 'Hủy đơn & hoàn kho',
 }
 export type OrderRow = {
@@ -38,6 +38,7 @@ export type OrderEvent = {
   createdAt: string
 }
 export type AdminOrder = {
+  paymentMethod?: string
   id: string
   reference: string
   status: string

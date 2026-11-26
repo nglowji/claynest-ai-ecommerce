@@ -14,6 +14,7 @@ export type Purchase = {
   reference: string
   status: string
   paymentStatus: string
+  paymentMethod?: string
   grandTotalVnd: number
   createdAt: string
   items: PurchaseItem[]

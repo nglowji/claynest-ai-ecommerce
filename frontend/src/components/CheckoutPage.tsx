@@ -1,10 +1,20 @@
+import ZaloPaymentPanel from './ZaloPaymentPanel'
+import { activeZalo, rememberZalo, paymentMethods } from '../features/checkout/zalopay'
 import CheckoutSummary from './CheckoutSummary'
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { AuthError } from '../auth/api'
 import type { Cart } from '../features/cart/useCart'
-import { placeOrder, saveReceipt, type Checkout, type Contact } from '../features/checkout/api'
+import {
+  placeOrder,
+  saveReceipt,
+  lookupOrder,
+  savedToken,
+  type Receipt,
+  type Checkout,
+  type Contact,
+} from '../features/checkout/api'
 import { useQuote } from '../features/checkout/useQuote'
 import Icon from './Icon'
 
@@ -37,7 +47,58 @@ export default function CheckoutPage({
 }) {
   const auth = useAuth()
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const resume = params.get('pay') || ''
+  const [activePayment, setActivePayment] = useState<Receipt | null>(activeZalo)
+  const [resumeError, setResumeError] = useState('')
+  const [zaloEnabled, setZaloEnabled] = useState(false)
+  const [method, setMethod] = useState<'cod' | 'zalopay'>(() =>
+    restore()?.command.paymentMethod === 'zalopay' ? 'zalopay' : 'cod',
+  )
   const quote = useQuote(quantities)
+  useEffect(() => {
+    const abort = new AbortController()
+    paymentMethods(abort.signal)
+      .then((value) => {
+        if (!abort.signal.aborted) setZaloEnabled(value.zaloPayEnabled)
+      })
+      .catch(() => {})
+    return () => abort.abort()
+  }, [])
+  useEffect(() => {
+    if (!resume || activePayment?.reference === resume) return
+    const abort = new AbortController()
+    setResumeError('')
+    lookupOrder(resume, savedToken(resume), abort.signal)
+      .then((order) => {
+        if (abort.signal.aborted) return
+        if (order.paymentMethod !== 'zalopay' || order.status === 'cancelled') {
+          setResumeError('Đơn này không có giao dịch ZaloPay đang chờ thanh toán.')
+          return
+        }
+        if (order.paymentStatus === 'paid') {
+          navigate('/orders/' + order.reference, { replace: true })
+          return
+        }
+        const receipt: Receipt = {
+          reference: order.reference,
+          accessToken: savedToken(resume),
+          accessExpiresAt: new Date(Date.parse(order.createdAt) + 30 * 86400000).toISOString(),
+          grandTotalVnd: order.grandTotalVnd,
+          status: order.status,
+          paymentMethod: 'zalopay',
+        }
+        rememberZalo(receipt)
+        setActivePayment(receipt)
+      })
+      .catch((failure) => {
+        if (!abort.signal.aborted)
+          setResumeError(
+            failure instanceof Error ? failure.message : 'Chưa tải được đơn thanh toán.',
+          )
+      })
+    return () => abort.abort()
+  }, [resume])
   const [pending, setPending] = useState<Attempt | null>(restore)
   const [contact, setContact] = useState<Contact>(
     () =>
@@ -90,7 +151,12 @@ export default function CheckoutPage({
       return
     const attempt = pending || {
       key: crypto.randomUUID(),
-      command: { quoteToken: quote.data!.quoteToken!, contact, acceptTerms: true },
+      command: {
+        quoteToken: quote.data!.quoteToken!,
+        contact,
+        acceptTerms: true,
+        paymentMethod: method,
+      },
       cart: { ...quantities },
     }
     submittingRef.current = true
@@ -100,6 +166,13 @@ export default function CheckoutPage({
     try {
       const receipt = await placeOrder(attempt.key, attempt.command)
       saveReceipt(receipt)
+      if (receipt.paymentMethod === 'zalopay') {
+        rememberZalo(receipt)
+        setActivePayment(receipt)
+        remember(null)
+        onPlaced(attempt.cart)
+        return
+      }
       remember(null)
       onPlaced(attempt.cart)
       navigate('/orders/' + receipt.reference, { replace: true, state: receipt })
@@ -130,6 +203,30 @@ export default function CheckoutPage({
       setSubmitting(false)
     }
   }
+  if (resume && activePayment?.reference !== resume)
+    return (
+      <section className="container checkout-page">
+        {resumeError ? (
+          <p role="alert">{resumeError}</p>
+        ) : (
+          <p role="status">Đang kiểm tra đơn thanh toán…</p>
+        )}
+        <Link to="/orders">Tra cứu đơn hàng</Link>
+      </section>
+    )
+  if (activePayment)
+    return (
+      <section className="container checkout-page">
+        <ZaloPaymentPanel
+          receipt={activePayment}
+          onDone={() => {
+            rememberZalo(null)
+            setActivePayment(null)
+            navigate('/orders/' + activePayment.reference, { replace: true, state: activePayment })
+          }}
+        />
+      </section>
+    )
   if (!Object.keys(quantities).length && !pending)
     return (
       <section className="container basket-page">
@@ -241,13 +338,37 @@ export default function CheckoutPage({
                 />
               </label>
             </div>
-            <div className="cod-method">
-              <Icon name="bag" />
-              <div>
-                <strong>Thanh toán khi nhận hàng (COD)</strong>
-                <p>Thanh toán cho đơn vị giao hàng khi nhận sản phẩm.</p>
-              </div>
-            </div>
+            <fieldset className="checkout-payment-methods">
+              <legend>Phương thức thanh toán</legend>
+              <label className="payment-choice">
+                <input
+                  type="radio"
+                  name="payment-method"
+                  value="cod"
+                  checked={method === 'cod'}
+                  onChange={() => setMethod('cod')}
+                />
+                <span>
+                  <strong>Thanh toán khi nhận hàng (COD)</strong>
+                  <small>Thanh toán cho đơn vị giao hàng khi nhận sản phẩm.</small>
+                </span>
+              </label>
+              {zaloEnabled && (
+                <label className="payment-choice">
+                  <input
+                    type="radio"
+                    name="payment-method"
+                    value="zalopay"
+                    checked={method === 'zalopay'}
+                    onChange={() => setMethod('zalopay')}
+                  />
+                  <span>
+                    <strong>ZaloPay · Quét mã QR</strong>
+                    <small>Sandbox · Tạo QR và theo dõi thanh toán ngay tại đây.</small>
+                  </span>
+                </label>
+              )}
+            </fieldset>
             <label className="checkout-consent">
               <input
                 type="checkbox"
@@ -281,7 +402,9 @@ export default function CheckoutPage({
               ? 'Đang xác nhận đơn…'
               : pending
                 ? 'Kiểm tra lại đơn đã gửi'
-                : 'Xác nhận đặt hàng COD'}{' '}
+                : method === 'zalopay'
+                  ? 'Tạo mã QR ZaloPay'
+                  : 'Xác nhận đặt hàng COD'}{' '}
             <Icon name="arrow" />
           </button>
           <Link className="checkout-back" to="/cart">
