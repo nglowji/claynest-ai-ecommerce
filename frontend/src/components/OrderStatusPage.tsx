@@ -104,7 +104,9 @@ export default function OrderStatusPage() {
         </h1>
         <p>
           {data
-            ? 'Trạng thái từ cửa hàng · Tự làm mới mỗi 30 giây khi bạn đang xem.'
+            ? ['completed', 'cancelled'].includes(data.status)
+              ? 'Đơn hàng đã kết thúc. Thông tin và lịch sử được lưu bên dưới.'
+              : 'Trạng thái từ cửa hàng · Tự làm mới mỗi 30 giây khi bạn đang xem.'
             : 'Nhập mã đơn và mã truy cập riêng được cấp khi đặt hàng.'}
         </p>
       </div>

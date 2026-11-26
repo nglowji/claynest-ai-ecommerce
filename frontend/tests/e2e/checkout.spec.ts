@@ -118,6 +118,8 @@ test('guessing an order reference cannot expose shipping details; private code g
   await page.getByRole('button', { name: 'Tra cứu đơn hàng', exact: true }).click()
   await expect(page.locator('.order-info')).toContainText('123 Địa chỉ kiểm thử riêng tư')
   expect(page.url()).not.toContain(receipt.accessToken)
+  await page.goto('/orders/' + receipt.reference)
+  await expect(page.locator('.order-info')).toContainText('123 Địa chỉ kiểm thử riêng tư')
   expect(
     (
       await page.request.get(`/api/v1/orders/${receipt.reference}/status`, {
