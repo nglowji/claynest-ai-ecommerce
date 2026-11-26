@@ -11,7 +11,7 @@ def compose(*args):
 
 
 def backend():
-    compose("--profile", "e2e", "stop", "e2e-api", "e2e-ai")
+    compose("--profile", "e2e", "stop", "e2e-api", "e2e-ai", "db-test")
     compose("--profile", "test", "build", "api-tests", "ai-tests")
     try:
         compose("--profile", "test", "run", "--rm", "api-tests", "--logger", "console;verbosity=minimal")
