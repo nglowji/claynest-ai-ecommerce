@@ -16,6 +16,21 @@ test('shared admin workspace searches real screens and mobile menu supports keyb
   await expect(page.locator('.admin-shell')).toHaveClass(/admin-sidebar-compact/)
   await page.getByRole('button', { name: 'Mở rộng menu quản trị' }).click()
   await expect(page.locator('.admin-shell')).not.toHaveClass(/admin-sidebar-compact/)
+  await page.goto('/admin/products')
+  const pagination = page.getByRole('navigation', { name: 'Phân trang danh sách' })
+  await expect(page.locator('.catalog-table tbody tr')).toHaveCount(10)
+  const firstName = await page.locator('.admin-product-cell strong').first().innerText()
+  await pagination.getByRole('button', { name: 'Trang 2', exact: true }).click()
+  await expect(pagination.getByRole('button', { name: 'Trang 2', exact: true })).toHaveAttribute(
+    'aria-current',
+    'page',
+  )
+  await expect(page.locator('.admin-product-cell strong').first()).not.toHaveText(firstName)
+  await pagination.getByRole('button', { name: 'Trang trước', exact: true }).click()
+  await expect(page.locator('.admin-product-cell strong').first()).toHaveText(firstName)
+  await expect(page.getByLabel('Tên danh mục', { exact: true })).not.toBeVisible()
+  await page.getByText('Quản lý danh mục', { exact: true }).click()
+  await expect(page.getByLabel('Tên danh mục', { exact: true })).toBeVisible()
   await page.getByLabel('Phạm vi tìm kiếm').selectOption('customers')
   await page.getByLabel('Từ khóa tìm kiếm quản trị').fill('unmatched-customer-query')
   await page.getByRole('button', { name: 'Tìm trong quản trị' }).click()

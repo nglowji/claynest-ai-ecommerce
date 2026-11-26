@@ -196,7 +196,9 @@ test('admin catalog combines server filters and reset restores the full list', a
   await expect(page.getByLabel('Giá đến quản trị')).toHaveValue('')
   await expect(page.getByLabel('Còn hàng trong kho', { exact: true })).not.toBeChecked()
   await page.goto('/admin/products?q=no-matching-product-search')
-  await expect(page.getByLabel('Tìm tên hoặc mã sản phẩm')).toHaveValue('no-matching-product-search')
+  await expect(page.getByLabel('Tìm tên hoặc mã sản phẩm')).toHaveValue(
+    'no-matching-product-search',
+  )
   await page.getByRole('button', { name: 'Xóa bộ lọc sản phẩm' }).click()
   await expect(page).toHaveURL('/admin/products')
   await expect(page.locator('.catalog-table tbody tr')).toHaveCount(Math.min(12, all.totalCount))
