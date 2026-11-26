@@ -99,7 +99,7 @@ test('customer returns to checkout, sees private purchase history, filters, page
   await page.getByRole('button', { name: 'Mua lại', exact: true }).click()
   await expect(page).toHaveURL('/cart')
   await expect(page.getByRole('link', { name: 'Giỏ hàng, 1 sản phẩm', exact: true })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Tiến hành đặt hàng', exact: true })).toBeEnabled()
+  await expect(page.getByRole('link', { name: 'Tiến hành đặt hàng', exact: true })).toBeEnabled()
 })
 
 test('reorder preserves existing cart and respects stock, quantity and line limits', () => {

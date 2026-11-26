@@ -255,7 +255,7 @@ export default function CheckoutPage({
                 checked={accepted}
                 onChange={(e) => setAccepted(e.target.checked)}
               />{' '}
-              Tôi đã kiểm tra thông tin, đồng ý phí giao hàng và cách đóng gói bên cạnh.
+              Tôi đã kiểm tra thông tin, đồng ý phí giao hàng và cách đóng gói của đơn hàng.
             </label>
           </fieldset>
           {error && (

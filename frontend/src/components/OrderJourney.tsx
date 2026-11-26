@@ -1,5 +1,5 @@
 import type { OrderStatus } from '../features/checkout/api'
-import { purchaseDate } from '../features/checkout/purchases'
+import { purchaseDate, purchaseLabels } from '../features/checkout/purchases'
 const stages = [
   { key: 'pending', label: 'Chờ xác nhận' },
   { key: 'confirmed', label: 'Đã xác nhận' },
@@ -13,13 +13,23 @@ export default function OrderJourney({ order }: { order: OrderStatus }) {
   const index = stages.findIndex((s) => s.key === order.status)
   if (order.status === 'cancelled')
     return (
-      <section className="order-cancelled">
-        <h2>Đơn hàng đã hủy</h2>
-        <p>
-          {order.cancelledAt ? purchaseDate(order.cancelledAt) : 'Đơn đã dừng xử lý'} · Không thu
-          tiền COD.
-        </p>
-      </section>
+      <>
+        <section className="order-cancelled">
+          <h2>Đơn hàng đã hủy</h2>
+          <p>
+            {order.cancelledAt ? purchaseDate(order.cancelledAt) : 'Đơn đã dừng xử lý'} · Không thu
+            tiền COD.
+          </p>
+        </section>
+        <ol className="order-progress" aria-label="Lịch sử đơn đã hủy">
+          {order.timeline.map((event, index) => (
+            <li key={index}>
+              <strong>{purchaseLabels[event.status] || event.status}</strong>
+              <time dateTime={event.changedAt}>{purchaseDate(event.changedAt)}</time>
+            </li>
+          ))}
+        </ol>
+      </>
     )
   return (
     <ol className="order-progress order-journey" aria-label="Hành trình đơn hàng">
