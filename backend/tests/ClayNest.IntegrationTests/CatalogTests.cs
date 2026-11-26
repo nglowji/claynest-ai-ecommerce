@@ -114,6 +114,8 @@ public sealed class CatalogTests
         await using var s = await Session.Create();
         await using var scope = s.Factory.Services.CreateAsyncScope();
         var service = scope.ServiceProvider.GetRequiredService<ICatalogService>();
+        var existingStock = await scope.ServiceProvider.GetRequiredService<CommerceDbContext>().Set<ProductVariant>()
+            .Where(v => v.Sku == "NG-STUDIO-001").Select(v => (int?)v.StockQty).SingleOrDefaultAsync();
         await service.SeedAsync(CancellationToken.None);
         var db = scope.ServiceProvider.GetRequiredService<CommerceDbContext>();
         var before = await db.Products.AsNoTracking().Where(p => p.Variants.Any(v => v.Sku.StartsWith("NG-STUDIO-"))).OrderBy(p => p.Id).Select(p => new { p.Id, p.Revision }).ToListAsync();
@@ -128,7 +130,7 @@ public sealed class CatalogTests
         Assert.Equal(310000, studio.Variants.Single().OriginalPriceVnd);
         Assert.Equal(300, studio.Variants.Single().CapacityMl); Assert.Equal(9.5m, studio.Variants.Single().HeightCm);
         Assert.Equal(8.5m, studio.Variants.Single().WidthCm); Assert.Equal(320, studio.Variants.Single().WeightG);
-        Assert.False(studio.Variants.Single().CareVerified); Assert.Equal(30, studio.Variants.Single().StockQty);
+        Assert.False(studio.Variants.Single().CareVerified); Assert.Equal(existingStock ?? 30, studio.Variants.Single().StockQty);
         using var hidden = await s.Client.GetAsync("/api/v1/products/ban-nhap-demo");
         Assert.Equal(HttpStatusCode.NotFound, hidden.StatusCode);
         var product = await s.Save(s.Input()); var id = product.Variants.Single().Id;
