@@ -62,7 +62,7 @@ test('admin fulfils COD, resolves stale state and cancels once despite double-su
   await expect(page.getByRole('option', { name: 'Hủy đơn & hoàn kho', exact: true })).toHaveCount(0)
   await page.getByRole('button', { name: 'Bàn giao vận chuyển', exact: true }).click()
   await expect(page.locator('.order-detail-heading .fulfilment-badge')).toHaveText('Đang giao hàng')
-  const finish = page.getByRole('button', { name: 'Hoàn tất & ghi nhận COD', exact: true })
+  const finish = page.getByRole('button', { name: 'Hoàn tất đơn hàng', exact: true })
   await expect(finish).toBeDisabled()
   await page
     .getByRole('checkbox', { name: 'Đơn đã giao và đã thu đủ tiền COD.', exact: true })

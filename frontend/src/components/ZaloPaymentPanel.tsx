@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import QRCode from 'qrcode'
 import { money } from '../data/products'
 import type { Receipt } from '../features/checkout/api'
 import { zaloPayment, type ZaloPayment } from '../features/checkout/zalopay'
@@ -49,7 +48,11 @@ export default function ZaloPaymentPanel({
       return
     }
     let active = true
-    QRCode.toDataURL(data.qrPayload, { width: 320, margin: 4, errorCorrectionLevel: 'M' })
+    const payload = data.qrPayload
+    import('qrcode')
+      .then(({ default: QRCode }) =>
+        QRCode.toDataURL(payload, { width: 320, margin: 4, errorCorrectionLevel: 'M' }),
+      )
       .then((value) => {
         if (active) setImage(value)
       })
