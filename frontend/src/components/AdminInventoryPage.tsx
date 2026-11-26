@@ -1,3 +1,4 @@
+import AdminPagination from './AdminPagination'
 import AdminActionButton from './AdminActionButton'
 import { useSearchParams } from 'react-router-dom'
 import SiteImage from './SiteImage'
@@ -84,7 +85,12 @@ export default function AdminInventoryPage() {
     const timer = window.setTimeout(() => {
       catalogRequest<PageResult<StockItem>>(
         'admin/inventory/?' +
-          new URLSearchParams({ q: query, lowOnly: String(lowOnly), page: String(page) }),
+          new URLSearchParams({
+            q: query,
+            lowOnly: String(lowOnly),
+            page: String(page),
+            pageSize: '10',
+          }),
         { signal: controller.signal },
       )
         .then((result) => {
@@ -191,7 +197,7 @@ export default function AdminInventoryPage() {
           <p className="eyebrow">NÀNG GỐM / QUẢN LÝ KHO</p>
           <h1>Quản lý tồn kho</h1>
           <p className="admin-page-description">
-            Theo dõi số lượng, nhập hàng và kiểm tra lịch sử biến động theo SKU.
+            Theo dõi số lượng, nhập hàng và kiểm tra lịch sử biến động theo mã sản phẩm (SKU).
           </p>
         </div>
         <button
@@ -207,7 +213,7 @@ export default function AdminInventoryPage() {
       </div>
       <div className="inventory-filters">
         <label>
-          Tìm sản phẩm hoặc SKU
+          Tìm sản phẩm hoặc mã
           <input
             value={query}
             maxLength={180}
@@ -215,7 +221,7 @@ export default function AdminInventoryPage() {
               setQuery(e.target.value)
               setPage(1)
             }}
-            placeholder="Tên sản phẩm, mã SKU…"
+            placeholder="Tên sản phẩm, mã sản phẩm…"
           />
         </label>
         <label className="inventory-check">
@@ -242,7 +248,7 @@ export default function AdminInventoryPage() {
             <table className="catalog-table">
               <thead>
                 <tr>
-                  <th scope="col">Sản phẩm / SKU</th>
+                  <th scope="col">Sản phẩm / Mã</th>
                   <th scope="col">Tồn kho</th>
                   <th scope="col">Ngưỡng thấp</th>
                   <th scope="col">Thao tác</th>
@@ -296,18 +302,13 @@ export default function AdminInventoryPage() {
           {!loading && !error && data?.totalCount === 0 && (
             <p className="empty-state">Không có biến thể phù hợp bộ lọc.</p>
           )}
-          <div className="catalog-pagination">
-            <button disabled={loading || page <= 1} onClick={() => setPage((p) => p - 1)}>
-              Trước
-            </button>
-            <span>Trang {page}</span>
-            <button
-              disabled={loading || !data || page * data.pageSize >= data.totalCount}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              Sau
-            </button>
-          </div>
+          <AdminPagination
+            page={page}
+            pageSize={data?.pageSize || 10}
+            totalCount={data?.totalCount || 0}
+            loading={loading}
+            onPage={setPage}
+          />
         </div>
         <aside
           ref={editor}

@@ -1,3 +1,4 @@
+import AdminPagination from './AdminPagination'
 import SiteImage from './SiteImage'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
@@ -37,7 +38,13 @@ export default function AdminOrdersPage() {
     setLoading(true)
     setError('')
     const timer = setTimeout(() => {
-      listOrders(new URLSearchParams(signature), controller.signal)
+      listOrders(
+        new URLSearchParams({
+          ...Object.fromEntries(new URLSearchParams(signature)),
+          pageSize: '10',
+        }),
+        controller.signal,
+      )
         .then((result) => {
           if (!controller.signal.aborted) {
             setData(result)
@@ -190,18 +197,13 @@ export default function AdminOrdersPage() {
               <p>Đơn khách đặt sẽ xuất hiện tại đây để Nàng xác nhận và chuẩn bị.</p>
             </div>
           )}
-          <div className="catalog-pagination">
-            <button disabled={page <= 1} onClick={() => update('page', String(page - 1))}>
-              Trang trước
-            </button>
-            <span>Trang {page}</span>
-            <button
-              disabled={page * data.pageSize >= data.totalCount}
-              onClick={() => update('page', String(page + 1))}
-            >
-              Trang sau
-            </button>
-          </div>
+          <AdminPagination
+            page={page}
+            pageSize={data?.pageSize || 10}
+            totalCount={data?.totalCount || 0}
+            loading={loading}
+            onPage={(value) => update('page', String(value))}
+          />
         </>
       )}
     </section>

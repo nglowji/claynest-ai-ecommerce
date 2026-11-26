@@ -1,3 +1,4 @@
+import AdminPagination from './AdminPagination'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { catalogRequest, type PageResult } from '../catalog/api'
@@ -154,20 +155,13 @@ export default function AdminCustomersPage() {
               </div>
             )}
           </div>
-          <div className="catalog-pagination">
-            <button disabled={page <= 1} onClick={() => move(page - 1)}>
-              Trang trước
-            </button>
-            <span>
-              Trang {page} · {data.totalCount} khách hàng
-            </span>
-            <button
-              disabled={page * data.pageSize >= data.totalCount}
-              onClick={() => move(page + 1)}
-            >
-              Trang sau
-            </button>
-          </div>
+          <AdminPagination
+            page={page}
+            pageSize={data?.pageSize || 10}
+            totalCount={data?.totalCount || 0}
+            loading={loading}
+            onPage={move}
+          />
           <p className="admin-customer-note">
             Giá trị đã mua gồm tiền hàng và phí giao hàng của các đơn hoàn tất. Đơn khách vãng lai
             không nằm trong danh sách tài khoản này.
