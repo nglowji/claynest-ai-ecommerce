@@ -77,6 +77,14 @@ def permissions():
             ensure(result.returncode != 0 and b"42501" in result.stderr, "Runtime identity unexpectedly obtained DDL privileges")
 
 
+def network_boundary():
+    for service in ("db", "api", "ai-service"):
+        container = compose("ps", "--quiet", service).stdout.decode().strip()
+        ensure(bool(container), "Rehearsal service is not running")
+        result = subprocess.run(["docker", "inspect", "--format", "{{json .HostConfig.PortBindings}}", container], capture_output=True, check=True)
+        ensure(not json.loads(result.stdout), "A private service unexpectedly publishes a host port")
+
+
 def smoke():
     public = Client()
     code, headers, body = public.request("/")
@@ -122,8 +130,13 @@ def smoke():
         "reason": "Local HTTPS deployment verification", "requestId": str(uuid4()), "confirmCodCollected": False}, method="PATCH")
     ensure(public.get("/api/v1/products/" + product["slug"])["variants"][0]["stockQty"] == variant["stockQty"], "Cancellation did not restore stock")
     permissions()
+    network_boundary()
+    _, cors, _ = public.request("/api/v1/auth/me", method="OPTIONS", headers={"Origin": BASE, "Access-Control-Request-Method": "GET"})
+    ensure(cors.get("Access-Control-Allow-Origin") == BASE, "Release origin was not applied")
+    _, cors, _ = public.request("/api/v1/auth/me", method="OPTIONS", headers={"Origin": "http://127.0.0.1:5173", "Access-Control-Request-Method": "GET"})
+    ensure(cors.get("Access-Control-Allow-Origin") is None, "Development origin remains enabled in production")
     report = {"verifiedTls": True, "secureSession": True, "isolatedRuntimePrivileges": True, "checkoutReplay": True,
-              "privateTracking": True, "cancellationRestock": True, "staticRoutes": True, "proxyBoundary": True}
+              "privateTracking": True, "cancellationRestock": True, "staticRoutes": True, "proxyBoundary": True, "privateServicePorts": True, "releaseCors": True}
     (ROOT / ".local/release-smoke.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print("HTTPS release smoke passed: secure session, checkout/replay, private tracking, restock and runtime privilege checks.")
 

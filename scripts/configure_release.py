@@ -23,7 +23,8 @@ def configure(rehearsal=False, domain=None):
         SMTP_PORT="587", SMTP_USERNAME="", SMTP_PASSWORD="", SMTP_FROM="Nàng Gốm <no-reply@nanggom.local>",
         GEMINI_API_KEY="", AI_GEMINI_MODEL="gemini-3.5-flash-lite", AI_DAILY_TURN_LIMIT="100",
         PROXY_ADDRESS="172.30.93.2" if rehearsal else "172.30.92.2",
-        PROXY_SUBNET="172.30.93.0/24" if rehearsal else "172.30.92.0/24")
+        PROXY_SUBNET="172.30.93.0/24" if rehearsal else "172.30.92.0/24",
+        PROXY_DYNAMIC_RANGE="172.30.93.128/25" if rehearsal else "172.30.92.128/25")
     header = "# Private deployment settings. Never commit or print credentials.\n"
     if rehearsal: header += "# Local HTTPS rehearsal only. SMTP is intentionally not connected.\n"
     else: header += "# Fill SITE_DOMAIN, SMTP settings and real administrator email before deployment.\n"

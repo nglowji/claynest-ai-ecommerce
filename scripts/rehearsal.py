@@ -2,6 +2,7 @@
 import argparse
 from pathlib import Path
 import subprocess
+import time
 from configure_release import configure
 from ops_common import ROOT
 
@@ -22,18 +23,21 @@ def compose(*args, stdin=None, check=True):
 def up():
     configure(rehearsal=True)
     compose("config", "--quiet")
+    # Recreate only rehearsal containers/networks; persistent volumes are retained.
+    compose("down", "--remove-orphans")
     print("Building isolated production images...", flush=True)
     compose("build", "api", "ai-service", "web")
-    print("Applying migrations with deployment identities...", flush=True)
-    compose("up", "-d", "--wait", "db")
-    compose("run", "--rm", "--no-deps", "api-migrate")
-    compose("run", "--rm", "--no-deps", "ai-migrate")
-    compose("run", "--rm", "--no-deps", "runtime-grants")
-    # Seed only this disposable rehearsal project, never the main or public production database.
-    compose("--profile", "setup", "run", "--rm", "--no-deps", "bootstrap", "--bootstrap-auth", "--seed-catalog")
-    print("Starting HTTPS proxy and restricted application identities...", flush=True)
+    print("Applying migrations, provisioning the administrator and starting restricted services...", flush=True)
     compose("up", "-d", "--wait", "api", "ai-service", "web")
-    certificate = compose("exec", "-T", "web", "cat", "/data/caddy/pki/authorities/local/root.crt").stdout
+    # Seed only this disposable rehearsal project, never a public production database.
+    compose("run", "--rm", "--no-deps", "bootstrap", "--bootstrap-auth", "--seed-catalog")
+    certificate = b""
+    for _ in range(20):
+        probe = compose("exec", "-T", "web", "cat", "/data/caddy/pki/authorities/local/root.crt", check=False)
+        if probe.returncode == 0 and b"BEGIN CERTIFICATE" in probe.stdout:
+            certificate = probe.stdout; break
+        time.sleep(0.3)
+    if not certificate: raise RuntimeError("Local certificate authority was not initialized")
     (ROOT / ".local/rehearsal-ca.crt").write_bytes(certificate)
     print("Rehearsal ready at https://localhost:8443. CA saved locally; system trust was not changed.")
 

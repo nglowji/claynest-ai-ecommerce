@@ -55,7 +55,6 @@ services:
         condition: service_healthy
   bootstrap:
     <<: *api-image
-    profiles: [setup]
     environment:
       <<: *api-environment
       ConnectionStrings__Commerce: Host=db;Database=nanggom;Username=commerce_app;Password=${COMMERCE_DB_PASSWORD}
@@ -70,6 +69,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      api-migrate:
+        condition: service_completed_successfully
   ai-migrate:
     image: ${RELEASE_IMAGE_PREFIX:-nanggom-release}-ai:${RELEASE_TAG:-local}
     build: ./ai-service
@@ -118,6 +119,8 @@ services:
       retries: 20
     depends_on:
       runtime-grants:
+        condition: service_completed_successfully
+      bootstrap:
         condition: service_completed_successfully
     restart: unless-stopped
   ai-service:
@@ -186,3 +189,4 @@ networks:
     ipam:
       config:
         - subnet: ${PROXY_SUBNET:-172.30.92.0/24}
+          ip_range: ${PROXY_DYNAMIC_RANGE:-172.30.92.128/25}

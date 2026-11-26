@@ -8,3 +8,6 @@ https://localhost:8443 {
     tls internal
     import application
 }
+http://localhost:8088 {
+    redir https://localhost:8443{uri} 308
+}
