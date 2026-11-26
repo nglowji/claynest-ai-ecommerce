@@ -317,3 +317,10 @@
     font-size: 25px;
   }
 }
+
+.product-page-v2 .product-detail {
+  margin-top: 0;
+}
+.product-page-v2 .product-detail > div {
+  padding: 0;
+}

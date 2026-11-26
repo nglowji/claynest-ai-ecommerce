@@ -103,7 +103,7 @@ export default function ProductPage({ onAdd }: ProductActions) {
             </select>
           </label>
           <p>
-            SKU: {variant.sku} ·{' '}
+            M? s?n ph?m: {variant.sku} ·{' '}
             {variant.stockQty > 0
               ? `Còn ${variant.stockQty} sản phẩm`
               : data.sourceUrl

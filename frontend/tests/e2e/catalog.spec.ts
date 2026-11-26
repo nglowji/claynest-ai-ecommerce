@@ -136,7 +136,7 @@ test('studio collection has thirty distinct products with independent images and
   await expect(page.locator('.product-specs')).toContainText('300 ml')
   await expect(page.locator('.product-specs')).toContainText('320 g')
   await expect(page.locator('.product-specs')).toContainText('Gốm sành')
-  const image = page.locator('.product-gallery>img')
+  const image = page.locator('.product-photo-open > img')
   await expect(image).toHaveJSProperty('complete', true)
   expect(await image.evaluate((element: HTMLImageElement) => element.naturalWidth > 0)).toBe(true)
   await expect(page.locator('main')).not.toContainText(/DEMO|minh họa|tham khảo/i)

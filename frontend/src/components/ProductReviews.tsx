@@ -156,6 +156,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
           <label className="review-filter">
             Lọc đánh giá
             <select
+              aria-label="Lọc đánh giá"
               value={filter}
               onChange={(e) => {
                 setFilter(e.target.value)
@@ -243,7 +244,11 @@ export default function ProductReviews({ productId }: { productId: string }) {
               <fieldset disabled={busy}>
                 <label>
                   Điểm đánh giá
-                  <select value={rating} onChange={(e) => setRating(e.target.value)}>
+                  <select
+                    aria-label="Điểm đánh giá"
+                    value={rating}
+                    onChange={(e) => setRating(e.target.value)}
+                  >
                     {[5, 4, 3, 2, 1].map((n) => (
                       <option key={n} value={n}>
                         {n} sao

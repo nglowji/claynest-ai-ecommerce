@@ -10,6 +10,7 @@ test('product gallery, specifications and verified purchase reviews persist and 
   const buyer = await browser.newContext({ baseURL: 'http://127.0.0.1:4173' })
   try {
     const buyerPage = await buyer.newPage()
+    buyerPage.setDefaultTimeout(15000)
     const csrf = async () =>
       (await (await buyer.request.get('/api/v1/auth/csrf')).json()).requestToken
     const email = `review-${randomUUID()}@example.test`,
@@ -89,6 +90,9 @@ test('product gallery, specifications and verified purchase reviews persist and 
       expect(changed.status()).toBe(200)
       revision = (await changed.json()).revision
     }
+    const eligibility = await buyer.request.get(`/api/v1/products/${product.id}/reviews/mine`)
+    expect(eligibility.status()).toBe(200)
+    expect((await eligibility.json()).eligible).toBe(true)
     await buyerPage.reload()
     await buyerPage.getByLabel('Điểm đánh giá', { exact: true }).selectOption('4')
     await buyerPage
@@ -121,6 +125,6 @@ test('product gallery, specifications and verified purchase reviews persist and 
     expect(publicReview.averageRating).toBe(3)
     expect(JSON.stringify(publicReview)).not.toContain(email)
   } finally {
-    await buyer.close()
+    await buyer.close().catch(() => {})
   }
 })
