@@ -9,7 +9,7 @@
         -Server
     }
     route {
-        @internal path /api/v1/internal/* /docs /docs/* /openapi/*
+        @internal path /internal /internal/* /api/v1/internal /api/v1/internal/* /docs /docs/* /openapi /openapi/*
         respond @internal 404
         handle /healthz {
             rewrite * /ready

@@ -97,7 +97,7 @@ def smoke():
     ensure(code == 200 and "immutable" in asset_headers.get("Cache-Control", ""), "Hashed asset is not served correctly")
     ensure(public.request("/assets/missing-file.js")[0] == 404, "Missing module must not return SPA HTML")
     ensure(public.request("/account/orders")[0] == 200, "SPA deep link failed")
-    ensure(public.request("/api/v1/internal/catalog/search")[0] == 404, "Internal tools exposed by public proxy")
+    ensure(public.request("/internal/ai/tools/search", body={}, method="POST")[0] == 404, "Internal tools exposed by public proxy")
     ensure(public.request("/openapi/v1.json")[0] == 404, "Development OpenAPI exposed")
     ensure(public.get("/healthz")["status"] == "ready", "Proxy readiness failed")
     code, redirected, _ = public.request("http://localhost:8088/account")
