@@ -126,6 +126,23 @@ services:
         condition: service_completed_successfully
     restart: unless-stopped
 
+  db-restore:
+    profiles: ["recovery"]
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: restore_owner
+      POSTGRES_DB: claynest_restore
+      POSTGRES_PASSWORD: ${TEST_POSTGRES_PASSWORD:?Run python scripts/configure.py first}
+    tmpfs:
+      - /var/lib/postgresql/data
+    volumes:
+      - ./infra/recovery:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U restore_owner -d claynest_restore"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
   db-test:
     profiles: ["test", "e2e"]
     image: pgvector/pgvector:pg17
@@ -245,7 +262,10 @@ services:
       dockerfile: Dockerfile.e2e
     init: true
     shm_size: 1gb
+    volumes:
+      - ./.local/test-mail:/mail:ro
     environment:
+      E2E_MAIL_DIR: /mail
       API_PROXY_TARGET: http://e2e-api:8080
       E2E_ADMIN_EMAIL: ${E2E_ADMIN_EMAIL}
       E2E_ADMIN_PASSWORD: ${E2E_ADMIN_PASSWORD}

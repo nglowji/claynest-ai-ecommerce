@@ -2,10 +2,11 @@ import { test, expect } from '@playwright/test'
 import { readFileSync, readdirSync } from 'node:fs'
 import { loginAdminWithBackoff as loginAdmin } from './support/adminLogin'
 
+const mailbox = process.env.E2E_MAIL_DIR || '../.local/test-mail'
 function mailLink(email: string, path: string) {
-  for (const name of readdirSync('../.local/test-mail')) {
+  for (const name of readdirSync(mailbox)) {
     if (!name.endsWith('.eml')) continue
-    const message = readFileSync('../.local/test-mail/' + name, 'utf8')
+    const message = readFileSync(mailbox + '/' + name, 'utf8')
     if (!message.includes(email)) continue
     const body = Buffer.from(
       message
