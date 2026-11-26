@@ -9,6 +9,7 @@ const groups: { title: string; links: { to: string; label: string; icon: AdminIc
       { to: '/admin', label: 'Tổng quan', icon: 'overview' },
       { to: '/admin/orders', label: 'Đơn hàng', icon: 'orders' },
       { to: '/admin/products', label: 'Sản phẩm & danh mục', icon: 'products' },
+      { to: '/admin/customers', label: 'Khách hàng', icon: 'customers' },
       { to: '/admin/inventory', label: 'Quản lý kho', icon: 'inventory' },
     ],
   },
@@ -33,7 +34,14 @@ export default function AdminNavigation({ onNavigate }: { onNavigate?: () => voi
           <div className="admin-nav-group" key={group.title}>
             <p>{group.title}</p>
             {group.links.map((link) => (
-              <NavLink key={link.to} to={link.to} end={link.to === '/admin'} onClick={onNavigate}>
+              <NavLink
+                key={link.to}
+                to={link.to}
+                end={link.to === '/admin'}
+                onClick={onNavigate}
+                aria-label={link.label}
+                title={link.label}
+              >
                 <AdminIcon name={link.icon} />
                 <span>{link.label}</span>
               </NavLink>
@@ -43,4 +51,14 @@ export default function AdminNavigation({ onNavigate }: { onNavigate?: () => voi
       </nav>
     </>
   )
+}
+
+export function adminSection(path: string) {
+  const match = groups
+    .flatMap((group) => group.links)
+    .filter((link) =>
+      link.to === '/admin' ? path === link.to : path === link.to || path.startsWith(link.to + '/'),
+    )
+    .sort((a, b) => b.to.length - a.to.length)[0]
+  return match?.label || 'Quản trị'
 }

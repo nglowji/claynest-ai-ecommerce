@@ -6,6 +6,7 @@ import SiteLocation from './components/SiteLocation'
 import LoginPage from './components/LoginPage'
 import AdminLayout from './components/AdminLayout'
 import AdminPage from './components/AdminPage'
+import AdminCustomersPage from './components/AdminCustomersPage'
 import AdminAiPage from './components/AdminAiPage'
 import AdminReportsPage from './components/AdminReportsPage'
 import AdminKnowledgePage from './components/AdminKnowledgePage'
@@ -33,6 +34,7 @@ export default function App() {
       <Routes>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminPage />} />
+          <Route path="customers" element={<AdminCustomersPage />} />
           <Route path="assistant" element={<AdminAiPage />} />
           <Route path="reports" element={<AdminReportsPage />} />
           <Route path="knowledge" element={<AdminKnowledgePage />} />

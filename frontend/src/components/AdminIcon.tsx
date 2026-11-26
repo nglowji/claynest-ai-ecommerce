@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 export type AdminIconName =
+  | 'customers'
   | 'edit'
   | 'trash'
   | 'archive'
@@ -19,6 +20,12 @@ export type AdminIconName =
   | 'check'
   | 'clock'
 const paths: Record<AdminIconName, ReactNode> = {
+  customers: (
+    <>
+      <circle cx="9" cy="7" r="4" />
+      <path d="M2 21v-3a7 7 0 0 1 14 0v3M16 3a4 4 0 0 1 0 8M18 14a6 6 0 0 1 4 6" />
+    </>
+  ),
   edit: (
     <>
       <path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14v6Z" />
