@@ -1,9 +1,12 @@
+import AdminEditorDialog from './AdminEditorDialog'
+import AdminTabs from './AdminTabs'
+import InventorySummary from './InventorySummary'
 import InventoryHistory, { type StockMovement } from './InventoryHistory'
 import AdminPagination from './AdminPagination'
 import AdminActionButton from './AdminActionButton'
 import { useSearchParams } from 'react-router-dom'
 import SiteImage from './SiteImage'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { catalogRequest, type PageResult } from '../catalog/api'
 import { AuthError } from '../auth/api'
 import { useAuth } from '../auth/AuthContext'
@@ -23,29 +26,25 @@ type StockItem = {
 }
 export default function AdminInventoryPage() {
   const auth = useAuth()
-  const editor = useRef<HTMLElement>(null)
-  const [params] = useSearchParams()
-  const queryParam = params.get('q') || ''
-  const lowParam = params.get('lowOnly') === 'true'
-  const [query, setQuery] = useState(queryParam)
-  const [lowOnly, setLowOnly] = useState(lowParam)
-  const [page, setPage] = useState(1)
-  useEffect(() => {
-    setQuery(queryParam)
-    setLowOnly(lowParam)
-    setPage(1)
-  }, [queryParam, lowParam])
+  const [params, setParams] = useSearchParams()
+  const query = params.get('q') || ''
+  const lowOnly = params.get('lowOnly') === 'true'
+  const rawPage = Number(params.get('page') || 1)
+  const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1
+  function filter(key: string, value: string) {
+    const next = new URLSearchParams(params)
+    if (value) next.set(key, value)
+    else next.delete(key)
+    if (key !== 'page') next.delete('page')
+    setParams(next, { replace: key === 'q' })
+  }
+  const setPage = (value: number) => filter('page', String(value))
+  const [editorView, setEditorView] = useState('update')
   const [attempt, setAttempt] = useState(0)
   const [data, setData] = useState<PageResult<StockItem> | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selected, setSelected] = useState<StockItem | null>(null)
-  useEffect(() => {
-    if (selected && window.matchMedia('(max-width: 1300px)').matches) {
-      editor.current?.scrollIntoView({ block: 'start' })
-      editor.current?.focus({ preventScroll: true })
-    }
-  }, [selected?.variantId])
   const [kind, setKind] = useState('receipt')
   const [delta, setDelta] = useState('1')
   const [threshold, setThreshold] = useState('5')
@@ -111,14 +110,9 @@ export default function AdminInventoryPage() {
       })
     return () => controller.abort()
   }, [selected?.variantId, selected?.revision, historyPage, historyAttempt])
-  useEffect(() => {
-    if (selected && window.innerWidth <= 900)
-      document
-        .getElementById('stock-editor')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }, [selected?.variantId])
   function choose(item: StockItem) {
     setSelected(item)
+    setEditorView('update')
     setHistoryPage(1)
     setKind('receipt')
     setDelta('1')
@@ -130,6 +124,15 @@ export default function AdminInventoryPage() {
   async function save(event: React.FormEvent) {
     event.preventDefault()
     if (!selected || pending) return
+    if (
+      kind !== 'threshold' &&
+      (!Number.isSafeInteger(Number(delta)) ||
+        Number(delta) === 0 ||
+        selected.stockQty + Number(delta) < 0)
+    ) {
+      setSaveError('Số lượng phải là số nguyên khác 0 và không thể trừ quá tồn kho.')
+      return
+    }
     setPending(true)
     setSaveError('')
     setNotice('')
@@ -194,6 +197,11 @@ export default function AdminInventoryPage() {
           Tải lại dữ liệu <Icon name="arrow" />
         </button>
       </div>
+      <InventorySummary
+        revision={attempt}
+        lowOnly={lowOnly}
+        onFilter={(low) => filter('lowOnly', low ? 'true' : '')}
+      />
       <div className="inventory-filters">
         <label>
           Tìm sản phẩm hoặc mã
@@ -201,8 +209,7 @@ export default function AdminInventoryPage() {
             value={query}
             maxLength={180}
             onChange={(e) => {
-              setQuery(e.target.value)
-              setPage(1)
+              filter('q', e.target.value)
             }}
             placeholder="Tên sản phẩm, mã sản phẩm…"
           />
@@ -212,12 +219,16 @@ export default function AdminInventoryPage() {
             type="checkbox"
             checked={lowOnly}
             onChange={(e) => {
-              setLowOnly(e.target.checked)
-              setPage(1)
+              filter('lowOnly', e.target.checked ? 'true' : '')
             }}
           />{' '}
           Chỉ xem sắp hết hàng
         </label>
+        {(query || lowOnly) && (
+          <button className="text-link" onClick={() => setParams({})}>
+            Xóa bộ lọc kho
+          </button>
+        )}
         <span role="status">{loading ? 'Đang tải…' : `${data?.totalCount || 0} biến thể`}</span>
       </div>
       {error && (
@@ -225,7 +236,7 @@ export default function AdminInventoryPage() {
           {error} <button onClick={() => setAttempt((n) => n + 1)}>Thử lại</button>
         </p>
       )}
-      <div className="inventory-layout">
+      <div className="inventory-workspace">
         <div className="inventory-list">
           <div className="inventory-table-scroll">
             <table className="catalog-table">
@@ -234,6 +245,7 @@ export default function AdminInventoryPage() {
                   <th scope="col">Sản phẩm / Mã</th>
                   <th scope="col">Tồn kho</th>
                   <th scope="col">Ngưỡng thấp</th>
+                  <th scope="col">Tình trạng</th>
                   <th scope="col">Thao tác</th>
                 </tr>
               </thead>
@@ -270,6 +282,24 @@ export default function AdminInventoryPage() {
                       </td>
                       <td data-label="Ngưỡng thấp">{item.lowStockThreshold}</td>
                       <td>
+                        <span
+                          className={
+                            'inventory-state ' +
+                            (item.stockQty === 0
+                              ? 'empty'
+                              : item.stockQty <= item.lowStockThreshold
+                                ? 'low'
+                                : 'ready')
+                          }
+                        >
+                          {item.stockQty === 0
+                            ? 'Hết hàng'
+                            : item.stockQty <= item.lowStockThreshold
+                              ? 'Cần bổ sung'
+                              : 'Đủ hàng'}
+                        </span>
+                      </td>
+                      <td>
                         <AdminActionButton
                           icon="edit"
                           label="Quản lý"
@@ -293,106 +323,128 @@ export default function AdminInventoryPage() {
             onPage={setPage}
           />
         </div>
-        <aside
-          ref={editor}
-          tabIndex={-1}
-          className={selected ? 'inventory-editor has-selection' : 'inventory-editor'}
-          id="stock-editor"
-        >
-          {selected ? (
-            <>
-              <p className="eyebrow">{selected.sku}</p>
-              <h2>{selected.productName}</h2>
-              <p className="inventory-balance">
-                Tồn hiện tại <strong>{selected.stockQty}</strong>
-              </p>
-              <form onSubmit={save}>
-                <fieldset disabled={pending}>
-                  <label>
-                    Thao tác
-                    <select
-                      aria-label="Thao tác"
-                      value={kind}
-                      onChange={(e) => {
-                        setKind(e.target.value)
-                        setDelta('1')
-                      }}
-                    >
-                      <option value="receipt">Nhập kho</option>
-                      <option value="adjustment">Điều chỉnh tăng / giảm</option>
-                      <option value="threshold">Đổi ngưỡng cảnh báo</option>
-                    </select>
-                  </label>
-                  {kind !== 'threshold' && (
+        {selected && (
+          <AdminEditorDialog
+            titleId="stock-editor-title"
+            className="inventory-dialog"
+            busy={pending}
+            error={saveError}
+            notice={notice}
+            onClose={() => setSelected(null)}
+          >
+            <div className="inventory-dialog-heading">
+              <div>
+                <p className="eyebrow">{selected.sku}</p>
+                <h2 id="stock-editor-title">{selected.productName}</h2>
+              </div>
+              <button
+                className="text-link"
+                aria-label="Đóng quản lý kho"
+                disabled={pending}
+                onClick={() => setSelected(null)}
+              >
+                <Icon name="close" />
+              </button>
+            </div>
+            <p className="inventory-balance">
+              Tồn hiện tại <strong>{selected.stockQty}</strong>
+            </p>
+            <AdminTabs
+              id="stock-view"
+              label="Thông tin kho"
+              value={editorView}
+              options={[
+                { value: 'update', label: 'Cập nhật tồn' },
+                { value: 'history', label: 'Lịch sử' },
+              ]}
+              onChange={setEditorView}
+            />
+            <div id="stock-view-panel" role="tabpanel" aria-labelledby={'stock-view-' + editorView}>
+              {editorView === 'update' ? (
+                <form onSubmit={save}>
+                  <fieldset disabled={pending}>
                     <label>
-                      {kind === 'receipt' ? 'Số lượng nhập' : 'Số lượng thay đổi (âm để giảm)'}
+                      Thao tác
+                      <select
+                        aria-label="Thao tác"
+                        value={kind}
+                        onChange={(e) => {
+                          setKind(e.target.value)
+                          setDelta('1')
+                        }}
+                      >
+                        <option value="receipt">Nhập kho</option>
+                        <option value="adjustment">Điều chỉnh tăng / giảm</option>
+                        <option value="threshold">Đổi ngưỡng cảnh báo</option>
+                      </select>
+                    </label>
+                    {kind !== 'threshold' && (
+                      <label>
+                        {kind === 'receipt' ? 'Số lượng nhập' : 'Số lượng thay đổi (âm để giảm)'}
+                        <input
+                          type="number"
+                          required
+                          min={kind === 'receipt' ? 1 : -1000000}
+                          max="1000000"
+                          step="1"
+                          value={delta}
+                          onChange={(e) => setDelta(e.target.value)}
+                        />
+                      </label>
+                    )}
+                    <label>
+                      Ngưỡng cảnh báo tồn thấp
                       <input
                         type="number"
                         required
-                        min={kind === 'receipt' ? 1 : -1000000}
+                        min="0"
                         max="1000000"
                         step="1"
-                        value={delta}
-                        onChange={(e) => setDelta(e.target.value)}
+                        value={threshold}
+                        onChange={(e) => setThreshold(e.target.value)}
                       />
                     </label>
-                  )}
-                  <label>
-                    Ngưỡng cảnh báo tồn thấp
-                    <input
-                      type="number"
-                      required
-                      min="0"
-                      max="1000000"
-                      step="1"
-                      value={threshold}
-                      onChange={(e) => setThreshold(e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Lý do
-                    <textarea
-                      aria-label="Lý do"
-                      required
-                      minLength={3}
-                      maxLength={500}
-                      rows={3}
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                      placeholder="Nhập hàng, kiểm kê, hư hỏng…"
-                    />
-                  </label>
-                  <button className="button primary" type="submit">
-                    {pending ? 'Đang lưu…' : 'Lưu thay đổi kho'}
-                  </button>
-                </fieldset>
-              </form>
-              {saveError && (
-                <p className="auth-error" role="alert">
-                  {saveError}
-                </p>
+                    <label>
+                      Lý do
+                      <textarea
+                        aria-label="Lý do"
+                        required
+                        minLength={3}
+                        maxLength={500}
+                        rows={3}
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                        placeholder="Nhập hàng, kiểm kê, hư hỏng…"
+                      />
+                    </label>
+                    <div className="inventory-preview" aria-live="polite">
+                      <span>Tồn sau thay đổi</span>
+                      <strong>
+                        {kind === 'threshold'
+                          ? selected.stockQty
+                          : Number.isSafeInteger(Number(delta))
+                            ? selected.stockQty + Number(delta)
+                            : '—'}
+                      </strong>
+                      <small>Ngưỡng cảnh báo: {threshold || '—'}</small>
+                    </div>
+                    <button className="button primary" type="submit">
+                      {pending ? 'Đang lưu…' : 'Lưu thay đổi kho'}
+                    </button>
+                  </fieldset>
+                </form>
+              ) : (
+                <InventoryHistory
+                  history={history}
+                  historyError={historyError}
+                  historyPage={historyPage}
+                  setHistoryPage={setHistoryPage}
+                  retry={() => setHistoryAttempt((n) => n + 1)}
+                />
               )}
-              {notice && (
-                <p className="inventory-success" role="status">
-                  {notice}
-                </p>
-              )}
-              <InventoryHistory
-                history={history}
-                historyError={historyError}
-                historyPage={historyPage}
-                setHistoryPage={setHistoryPage}
-                retry={() => setHistoryAttempt((n) => n + 1)}
-              />
-            </>
-          ) : (
-            <div className="inventory-placeholder">
-              <Icon name="bag" />
-              <h2>Chọn một món gốm</h2>
-              <p>Nhập kho, điều chỉnh số lượng và xem lịch sử tại đây.</p>
             </div>
-          )}
-        </aside>
+          </AdminEditorDialog>
+        )}
       </div>
     </section>
   )
