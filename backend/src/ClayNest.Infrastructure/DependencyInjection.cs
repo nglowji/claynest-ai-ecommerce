@@ -72,6 +72,7 @@ public static class DependencyInjection
         services.Configure<ClayNest.Infrastructure.Reports.ReportOptions>(configuration.GetSection("Reports"));
         services.AddScoped<ClayNest.Application.Reports.IReportService, ClayNest.Infrastructure.Reports.ReportService>();
         services.AddScoped<ClayNest.Application.Inventory.IInventoryService, ClayNest.Infrastructure.Inventory.InventoryService>();
+        services.AddScoped<ClayNest.Application.Customers.ICustomerDirectory, ClayNest.Infrastructure.Customers.CustomerDirectory>();
         return services;
     }
 }

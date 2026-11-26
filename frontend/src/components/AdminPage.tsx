@@ -23,6 +23,22 @@ export default function AdminPage() {
           <p className="dashboard-description">Một góc nhìn rõ ràng, cho mỗi ngày vận hành.</p>
         </div>
         <div className="dashboard-heading-actions">
+          <label className="dashboard-period">
+            <span>Kỳ thống kê</span>
+            <select
+              aria-label="Kỳ thống kê dashboard"
+              value={period}
+              onChange={(e) => {
+                const next = new URLSearchParams(params)
+                next.set('days', e.target.value)
+                setParams(next)
+              }}
+            >
+              <option value="7">7 ngày gần nhất</option>
+              <option value="30">30 ngày gần nhất</option>
+              <option value="90">90 ngày gần nhất</option>
+            </select>
+          </label>
           <Link className="admin-ai-entry" to="/admin/assistant">
             <AdminIcon name="assistant" />
             Hỏi trợ lý
@@ -63,6 +79,11 @@ export default function AdminPage() {
           <button onClick={refresh}>Thử lại hoạt động</button>
         </div>
       )}
+      <section className="dashboard-business-summary" aria-label="Kết quả kinh doanh">
+        <p className="admin-section-caption">KẾT QUẢ KINH DOANH · {period} NGÀY</p>
+        <RevenueMetrics report={report.data} loading={report.loading} />
+      </section>
+      <p className="admin-section-caption">HOẠT ĐỘNG CỬA HÀNG · HIỆN TẠI</p>
       <OperationMetrics summary={summary.data} loading={summary.loading} />
       <div className="dashboard-overview-grid">
         <section
@@ -74,24 +95,7 @@ export default function AdminPage() {
               <p className="dashboard-section-label">HIỆU QUẢ KINH DOANH</p>
               <h2 id="dashboard-sales-title">Doanh thu cửa hàng</h2>
             </div>
-            <label className="dashboard-period">
-              <span>Kỳ thống kê</span>
-              <select
-                aria-label="Kỳ thống kê dashboard"
-                value={period}
-                onChange={(e) => {
-                  const next = new URLSearchParams(params)
-                  next.set('days', e.target.value)
-                  setParams(next)
-                }}
-              >
-                <option value="7">7 ngày gần nhất</option>
-                <option value="30">30 ngày gần nhất</option>
-                <option value="90">90 ngày gần nhất</option>
-              </select>
-            </label>
           </div>
-          <RevenueMetrics report={report.data} loading={report.loading} />
           {report.loading ? (
             <p className="dashboard-chart-loading" role="status">
               Đang tải doanh thu…

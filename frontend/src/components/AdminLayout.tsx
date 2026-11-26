@@ -3,20 +3,34 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { adminSession, AuthError } from '../auth/api'
-import AdminNavigation from './AdminNavigation'
+import AdminNavigation, { adminSection } from './AdminNavigation'
 import AdminToolbar from './AdminToolbar'
 import AdminIcon from './AdminIcon'
 
 export default function AdminLayout() {
   const auth = useAuth()
   const location = useLocation()
+  const [compact, setCompact] = useState(() => {
+    try {
+      return localStorage.getItem('nang-gom-admin-sidebar') === 'compact'
+    } catch {
+      return false
+    }
+  })
+  useEffect(() => {
+    try {
+      localStorage.setItem('nang-gom-admin-sidebar', compact ? 'compact' : 'expanded')
+    } catch {
+      /* Layout remains usable without storage. */
+    }
+  }, [compact])
   const [verifiedPath, setVerifiedPath] = useState('')
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
   const [denied, setDenied] = useState(false)
   useEffect(() => {
-    document.title = 'Quản trị | Nàng Gốm'
-  }, [])
+    document.title = adminSection(location.pathname) + ' | Nàng Gốm'
+  }, [location.pathname])
   useEffect(() => {
     let active = true
     if (auth.user?.role !== 'Admin') return
@@ -47,21 +61,9 @@ export default function AdminLayout() {
   if (auth.status === 'unavailable') return <SessionUnavailable />
   if (!auth.user) return <Navigate to="/login" replace />
   if (auth.user.role !== 'Admin' || denied) return <Navigate to="/account" replace />
-  const section = location.pathname.startsWith('/admin/assistant')
-    ? 'Trợ lý quản trị'
-    : location.pathname.startsWith('/admin/reports')
-      ? 'Báo cáo bán hàng'
-      : location.pathname.startsWith('/admin/knowledge')
-        ? 'Kho kiến thức AI'
-        : location.pathname.startsWith('/admin/products')
-          ? 'Sản phẩm & danh mục'
-          : location.pathname.startsWith('/admin/inventory')
-            ? 'Quản lý kho'
-            : location.pathname.startsWith('/admin/orders')
-              ? 'Đơn hàng'
-              : 'Tổng quan'
+  const section = adminSection(location.pathname)
   return (
-    <div className="admin-shell admin-workspace">
+    <div className={'admin-shell admin-workspace' + (compact ? ' admin-sidebar-compact' : '')}>
       <a className="skip-link" href="#admin-main">
         Đến nội dung quản trị
       </a>
@@ -76,7 +78,11 @@ export default function AdminLayout() {
         </div>
       </aside>
       <div className="admin-workspace-body">
-        <AdminToolbar section={section} />
+        <AdminToolbar
+          section={section}
+          compact={compact}
+          onToggleSidebar={() => setCompact((value) => !value)}
+        />
         <main id="admin-main">
           {error ? (
             <section className="account-page container">

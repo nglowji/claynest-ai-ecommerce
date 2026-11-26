@@ -5,7 +5,15 @@ import AdminNavigation from './AdminNavigation'
 import AdminIcon from './AdminIcon'
 import Icon from './Icon'
 
-export default function AdminToolbar({ section }: { section: string }) {
+export default function AdminToolbar({
+  section,
+  compact,
+  onToggleSidebar,
+}: {
+  section: string
+  compact: boolean
+  onToggleSidebar: () => void
+}) {
   const auth = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -45,6 +53,14 @@ export default function AdminToolbar({ section }: { section: string }) {
       <header className="admin-workspace-top">
         <div className="admin-top-context">
           <button
+            className="admin-collapse-toggle"
+            onClick={onToggleSidebar}
+            aria-label={compact ? 'Mở rộng menu quản trị' : 'Thu gọn menu quản trị'}
+            aria-pressed={compact}
+          >
+            <Icon name="menu" />
+          </button>
+          <button
             className="admin-menu-toggle"
             onClick={() => menu.current?.showModal()}
             aria-label="Mở menu quản trị"
@@ -67,18 +83,27 @@ export default function AdminToolbar({ section }: { section: string }) {
           <select
             aria-label="Phạm vi tìm kiếm"
             value={scope}
-            onChange={(e) => setScope(e.target.value)}
+            onChange={(e) => {
+              setScope(e.target.value)
+              setQuery((value) =>
+                value.slice(
+                  0,
+                  e.target.value === 'orders' ? 32 : e.target.value === 'customers' ? 120 : 180,
+                ),
+              )
+            }}
           >
             <option value="orders">Đơn hàng</option>
             <option value="products">Sản phẩm</option>
             <option value="inventory">SKU / kho</option>
+            <option value="customers">Khách hàng</option>
           </select>
           <input
             type="search"
             aria-label="Từ khóa tìm kiếm quản trị"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            maxLength={scope === 'orders' ? 32 : 180}
+            maxLength={scope === 'orders' ? 32 : scope === 'customers' ? 120 : 180}
             placeholder="Tìm trong cửa hàng…"
           />
           <button type="submit" aria-label="Tìm trong quản trị">
