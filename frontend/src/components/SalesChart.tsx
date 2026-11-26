@@ -3,7 +3,13 @@ import { reportMoney, type SalesReport } from '../features/reports/api'
 import { fullDate, reportNumber as number } from '../features/reports/utils'
 import AdminIcon from './AdminIcon'
 import AdminPagination from './AdminPagination'
-export default function SalesChart({ report }: { report: SalesReport }) {
+export default function SalesChart({
+  report,
+  showTable = true,
+}: {
+  report: SalesReport
+  showTable?: boolean
+}) {
   const gradientId = useId()
   const [page, setPage] = useState(1)
   const [active, setActive] = useState<number | null>(null)
@@ -128,38 +134,40 @@ export default function SalesChart({ report }: { report: SalesReport }) {
           </div>
         </div>
       )}
-      <details className="report-data-details">
-        <summary>Xem bảng số liệu</summary>
-        <div className="report-table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Kỳ</th>
-                <th className="report-numeric">Đơn hoàn tất</th>
-                <th className="report-numeric">Doanh thu</th>
-              </tr>
-            </thead>
-            <tbody>
-              {report.trend.slice((page - 1) * 10, page * 10).map((p) => (
-                <tr key={p.bucketStart}>
-                  <td>
-                    {fullDate(p.from)}
-                    {p.to !== p.from ? ' – ' + fullDate(p.to) : ''}
-                  </td>
-                  <td className="report-numeric">{number(p.completedOrders)}</td>
-                  <td className="report-numeric">{reportMoney(p.salesVnd)}</td>
+      {showTable && (
+        <details className="report-data-details">
+          <summary>Xem bảng số liệu</summary>
+          <div className="report-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Kỳ</th>
+                  <th className="report-numeric">Đơn hoàn tất</th>
+                  <th className="report-numeric">Doanh thu</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <AdminPagination
-          page={page}
-          pageSize={10}
-          totalCount={report.trend.length}
-          onPage={setPage}
-        />
-      </details>
+              </thead>
+              <tbody>
+                {report.trend.slice((page - 1) * 10, page * 10).map((p) => (
+                  <tr key={p.bucketStart}>
+                    <td>
+                      {fullDate(p.from)}
+                      {p.to !== p.from ? ' – ' + fullDate(p.to) : ''}
+                    </td>
+                    <td className="report-numeric">{number(p.completedOrders)}</td>
+                    <td className="report-numeric">{reportMoney(p.salesVnd)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <AdminPagination
+            page={page}
+            pageSize={10}
+            totalCount={report.trend.length}
+            onPage={setPage}
+          />
+        </details>
+      )}
     </>
   )
 }

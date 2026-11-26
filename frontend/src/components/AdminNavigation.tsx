@@ -16,7 +16,7 @@ const groups: { title: string; links: { to: string; label: string; icon: AdminIc
   {
     title: 'PHÂN TÍCH & HỖ TRỢ',
     links: [
-      { to: '/admin/reports', label: 'Báo cáo bán hàng', icon: 'reports' },
+      { to: '/admin/reports', label: 'Báo cáo & phân tích', icon: 'reports' },
       { to: '/admin/assistant', label: 'Trợ lý quản trị', icon: 'assistant' },
       { to: '/admin/knowledge', label: 'Kho kiến thức AI', icon: 'knowledge' },
     ],

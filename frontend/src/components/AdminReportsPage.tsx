@@ -1,36 +1,31 @@
+import AdminTabs from './AdminTabs'
+import ReportMetrics from './ReportMetrics'
+import ReportBreakdown from './ReportBreakdown'
+import ReportInsights from './ReportInsights'
+import ReportTrendTable from './ReportTrendTable'
+import { useReports } from '../features/reports/useReports'
+import { todayVN, previousDay, fullDate } from '../features/reports/utils'
 import SalesChart from './SalesChart'
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { AuthError } from '../auth/api'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
-import { getSalesReport, reportMoney, type SalesReport } from '../features/reports/api'
+import { reportMoney } from '../features/reports/api'
 import AdminIcon from './AdminIcon'
-
-function todayVN() {
-  return new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10)
-}
-function previousDay(date: string, days: number) {
-  const value = new Date(date + 'T00:00:00Z')
-  value.setUTCDate(value.getUTCDate() - days)
-  return value.toISOString().slice(0, 10)
-}
-const shortDate = (date: string) => date.slice(8, 10) + '/' + date.slice(5, 7)
-const fullDate = (date: string) => shortDate(date) + '/' + date.slice(0, 4)
-const number = (value: number) => value.toLocaleString('vi-VN')
-const quantities = (value: string) => new Intl.NumberFormat('vi-VN').format(BigInt(value))
 
 export { default as SalesChart } from './SalesChart'
 
 export default function AdminReportsPage() {
   const auth = useAuth()
   const [params, setParams] = useSearchParams()
-  const signature = params.toString()
+  const signature = new URLSearchParams(
+    [...params].filter(([key]) => ['from', 'to', 'grain'].includes(key)),
+  ).toString()
+  const view = ['trend', 'products', 'stock'].includes(params.get('view') || '')
+    ? params.get('view')!
+    : 'revenue'
   const [from, setFrom] = useState(params.get('from') || previousDay(todayVN(), 29))
   const [to, setTo] = useState(params.get('to') || todayVN())
   const [grain, setGrain] = useState(params.get('grain') || 'day')
-  const [report, setReport] = useState<SalesReport | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState('')
@@ -39,29 +34,14 @@ export default function AdminReportsPage() {
     setTo(params.get('to') || todayVN())
     setGrain(params.get('grain') || 'day')
   }, [signature])
-  useEffect(() => {
-    const controller = new AbortController()
-    setLoading(true)
-    setError('')
-    setReport(null)
-    getSalesReport(new URLSearchParams(signature), controller.signal)
-      .then((data) => {
-        if (!controller.signal.aborted) {
-          setReport(data)
-          setLoading(false)
-        }
-      })
-      .catch((failure) => {
-        if (!controller.signal.aborted) {
-          if (failure instanceof AuthError && failure.status === 401) auth.expire()
-          setError(failure instanceof Error ? failure.message : 'Chưa tải được báo cáo.')
-          setLoading(false)
-        }
-      })
-    return () => controller.abort()
-  }, [signature, attempt])
+  const { report, previous, loading, comparing, error, comparisonError } = useReports(
+    signature,
+    attempt,
+    auth.expire,
+  )
   function apply(start = from, end = to, group = grain) {
-    setParams(new URLSearchParams({ from: start, to: end, grain: group }))
+    setExportError('')
+    setParams(new URLSearchParams({ from: start, to: end, grain: group, view }))
     if (signature === new URLSearchParams({ from: start, to: end, grain: group }).toString())
       setAttempt((v) => v + 1)
   }
@@ -99,7 +79,7 @@ export default function AdminReportsPage() {
       <header className="report-heading">
         <div>
           <p className="dashboard-eyebrow">SỐ LIỆU KINH DOANH</p>
-          <h1>Báo cáo bán hàng</h1>
+          <h1>Báo cáo &amp; phân tích</h1>
           <p>Theo dõi doanh thu đã ghi nhận và hiệu quả từng sản phẩm.</p>
         </div>
         <div className="report-heading-actions">
@@ -210,143 +190,64 @@ export default function AdminReportsPage() {
                 })}
               </span>
             </div>
-            <div className="report-metrics">
-              <article>
-                <span>Doanh thu hoàn tất</span>
-                <strong data-testid="completed-sales">
-                  {reportMoney(report.metrics.completedSalesVnd)}
-                </strong>
-                <small>Gồm tiền hàng và phí giao hàng</small>
-              </article>
-              <article>
-                <span>Đơn đã hoàn tất</span>
-                <strong data-testid="completed-count">
-                  {number(report.metrics.completedOrders)}
-                </strong>
-                <small>Đã giao xong và thu tiền COD</small>
-              </article>
-              <article>
-                <span>Giá trị đơn trung bình</span>
-                <strong data-testid="average-order-value">
-                  {report.metrics.averageOrderValueVnd === null
-                    ? '—'
-                    : reportMoney(report.metrics.averageOrderValueVnd)}
-                </strong>
-                <small>
-                  {report.metrics.averageOrderValueVnd === null
-                    ? 'Chưa có đơn hoàn tất để tính AOV'
-                    : 'Doanh thu hoàn tất / số đơn hoàn tất'}
-                </small>
-              </article>
-              <article>
-                <span>Giá trị đơn mới đặt</span>
-                <strong data-testid="gross-placed">
-                  {reportMoney(report.metrics.grossPlacedOrderValueVnd)}
-                </strong>
-                <small>
-                  {number(report.metrics.placedOrders)} đơn theo ngày đặt, gồm cả đơn hủy
-                </small>
-              </article>
+            <ReportMetrics report={report} previous={previous} comparing={comparing} />
+            <div className="report-comparison-period" role="status">
+              {previous ? (
+                <>
+                  So sánh kỳ trước: {fullDate(previous.period.from)} –{' '}
+                  {fullDate(previous.period.to)} · Cùng số ngày, tính theo giờ Việt Nam
+                </>
+              ) : (
+                comparisonError || (comparing ? 'Đang tải kỳ so sánh…' : 'Chưa có kỳ so sánh')
+              )}
             </div>
-            <div className="report-chart-panel dashboard-panel">
-              <div className="dashboard-panel-heading">
-                <div>
-                  <h2>
-                    Doanh thu theo{' '}
-                    {report.period.grain === 'day'
-                      ? 'ngày'
-                      : report.period.grain === 'week'
-                        ? 'tuần'
-                        : 'tháng'}
-                  </h2>
-                  <p>Tính theo ngày hoàn tất · chưa áp dụng điều chỉnh hoàn tiền</p>
+            <AdminTabs
+              id="reports-view"
+              label="Nội dung báo cáo"
+              value={view}
+              options={[
+                { value: 'revenue', label: 'Doanh thu' },
+                { value: 'trend', label: 'Xu hướng' },
+                { value: 'products', label: 'Sản phẩm' },
+                { value: 'stock', label: 'Cảnh báo kho' },
+              ]}
+              onChange={(value) => {
+                const next = new URLSearchParams(params)
+                next.set('view', value)
+                setParams(next)
+              }}
+            />
+            <div id="reports-view-panel" role="tabpanel" aria-labelledby={'reports-view-' + view}>
+              {view === 'revenue' ? (
+                <div className="reports-revenue-layout">
+                  <section className="report-chart-panel dashboard-panel">
+                    <div className="dashboard-panel-heading">
+                      <div>
+                        <h2>
+                          Doanh thu theo{' '}
+                          {report.period.grain === 'day'
+                            ? 'ngày'
+                            : report.period.grain === 'week'
+                              ? 'tuần'
+                              : 'tháng'}
+                        </h2>
+                        <p>Theo ngày hoàn tất · gồm tiền hàng và phí giao hàng</p>
+                      </div>
+                      <span className="report-currency">VND</span>
+                    </div>
+                    <SalesChart report={report} key={signature + attempt} showTable={false} />
+                  </section>
+                  <ReportInsights report={report} />
                 </div>
-                <span className="report-currency">VND</span>
-              </div>
-              <SalesChart report={report} key={signature + attempt} />
-            </div>
-            <div className="report-bottom-grid">
-              <section className="dashboard-panel">
-                <div className="dashboard-panel-heading">
-                  <div>
-                    <h2>Sản phẩm bán chạy</h2>
-                    <p>Tối đa 10 biến thể · xếp theo số lượng của đơn hoàn tất</p>
-                  </div>
-                </div>
-                {report.topVariants.length ? (
-                  <div className="report-table-wrap">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Sản phẩm / Mã</th>
-                          <th className="report-numeric">Số lượng</th>
-                          <th className="report-numeric">Tiền hàng</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {report.topVariants.map((variant) => (
-                          <tr key={variant.variantId}>
-                            <td>
-                              <strong>{variant.productName}</strong>
-                              <small>
-                                {variant.sku} · {variant.variantName}
-                              </small>
-                            </td>
-                            <td className="report-numeric">{quantities(variant.quantity)}</td>
-                            <td className="report-numeric">
-                              {reportMoney(variant.productSalesVnd)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="report-empty">Chưa có sản phẩm bán ra từ đơn hoàn tất trong kỳ.</p>
-                )}
-              </section>
-              <section className="dashboard-panel">
-                <div className="dashboard-panel-heading">
-                  <div>
-                    <h2>Tồn kho cần chú ý</h2>
-                    <p>{number(report.lowStockTotal)} SKU chạm ngưỡng tại thời điểm báo cáo</p>
-                  </div>
-                  <Link to="/admin/inventory">
-                    Xem kho <AdminIcon name="arrow" />
-                  </Link>
-                </div>
-                {report.lowStock.length ? (
-                  <div className="report-table-wrap">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Sản phẩm / Mã</th>
-                          <th className="report-numeric">Tồn</th>
-                          <th className="report-numeric">Ngưỡng</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {report.lowStock.map((variant) => (
-                          <tr key={variant.variantId}>
-                            <td>
-                              <strong>{variant.productName}</strong>
-                              <small>
-                                {variant.sku} · {variant.variantName}
-                              </small>
-                            </td>
-                            <td className="report-numeric">
-                              <span className="report-stock-badge">{variant.stockQty}</span>
-                            </td>
-                            <td className="report-numeric">{variant.threshold}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="report-empty">Không có SKU nào chạm ngưỡng cảnh báo.</p>
-                )}
-              </section>
+              ) : view === 'trend' ? (
+                <ReportTrendTable key={signature + attempt} report={report} />
+              ) : (
+                <ReportBreakdown
+                  key={view + signature + attempt}
+                  report={report}
+                  view={view === 'products' ? 'products' : 'stock'}
+                />
+              )}
             </div>
             <details className="report-definitions">
               <summary>Cách tính và phạm vi báo cáo</summary>
