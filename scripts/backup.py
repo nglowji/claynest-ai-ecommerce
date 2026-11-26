@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import shutil
-import subprocess
 import uuid
 from ops_common import ROOT, archive_contents, compose, run, running_apps, sha256, snapshot
 

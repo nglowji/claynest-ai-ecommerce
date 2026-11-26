@@ -33,7 +33,7 @@ def query(service, sql):
 
 def snapshot(service):
     sql = r"""
-    SELECT format('SELECT jsonb_build_object(''table'',%L,''rows'',count(*),''hash'',md5(coalesce(string_agg(md5(to_jsonb(t)::text), ORDER BY md5(to_jsonb(t)::text)),))) FROM %I.%I t;',
+    SELECT format($sql$SELECT jsonb_build_object('table',%L,'rows',count(*),'hash',md5(coalesce(string_agg(md5(to_jsonb(t)::text),'' ORDER BY md5(to_jsonb(t)::text)),''))) FROM %I.%I t;$sql$,
         schemaname || '.' || tablename, schemaname, tablename)
     FROM pg_tables WHERE schemaname IN ('commerce','ai') ORDER BY schemaname, tablename
     \gexec
