@@ -80,7 +80,7 @@ test('public catalog filters on server and retries a network error', async ({ pa
     p.variants.some((v) => v.priceVnd <= 1000000),
   ).length
   await page.goto('/products')
-  await expect(page.locator('.product-card')).toHaveCount(Math.min(12, all.totalCount))
+  await expect(page.locator('.product-card')).toHaveCount(Math.min(10, all.totalCount))
   await page.locator('.catalog-refine summary').click()
   await page.getByLabel('Giá đến', { exact: true }).fill('1000000')
   await expect(page.locator('.product-card')).toHaveCount(Math.min(12, affordable))
@@ -101,7 +101,7 @@ test('catalog is readable on mobile', async ({ page }) => {
   const all = await (await page.request.get('/api/v1/products?pageSize=48')).json()
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/products')
-  await expect(page.locator('.product-card')).toHaveCount(Math.min(12, all.totalCount))
+  await expect(page.locator('.product-card')).toHaveCount(Math.min(10, all.totalCount))
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   )
@@ -201,5 +201,5 @@ test('admin catalog combines server filters and reset restores the full list', a
   )
   await page.getByRole('button', { name: 'Xóa bộ lọc sản phẩm' }).click()
   await expect(page).toHaveURL('/admin/products')
-  await expect(page.locator('.catalog-table tbody tr')).toHaveCount(Math.min(12, all.totalCount))
+  await expect(page.locator('.catalog-table tbody tr')).toHaveCount(Math.min(10, all.totalCount))
 })
