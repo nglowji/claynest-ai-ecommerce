@@ -52,6 +52,23 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  bootstrap:
+    <<: *api-image
+    profiles: [setup]
+    environment:
+      <<: *api-environment
+      ConnectionStrings__Commerce: Host=db;Database=nanggom;Username=commerce_app;Password=${COMMERCE_DB_PASSWORD}
+      Bootstrap__Email: ${RELEASE_ADMIN_EMAIL:?Set administrator email}
+      Bootstrap__Password: ${RELEASE_ADMIN_PASSWORD:?Set administrator password}
+      Bootstrap__DisplayName: Quản trị Nàng Gốm
+    command: [--bootstrap-auth]
+    volumes:
+      - keys:/app/keys
+      - images:/app/media/catalog
+    networks: [backend]
+    depends_on:
+      db:
+        condition: service_healthy
   ai-migrate:
     image: ${RELEASE_IMAGE_PREFIX:-nanggom-release}-ai:${RELEASE_TAG:-local}
     build: ./ai-service

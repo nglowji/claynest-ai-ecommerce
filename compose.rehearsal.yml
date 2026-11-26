@@ -1,0 +1,11 @@
+name: nanggom-rehearsal
+services:
+  api:
+    environment:
+      AccountMail__FrontendUrl: https://localhost:8443
+      Cors__AllowedOrigins__0: https://localhost:8443
+  web:
+    command: [caddy, run, --config, /etc/caddy/Caddyfile.local]
+    ports: !override
+      - '127.0.0.1:8088:80'
+      - '127.0.0.1:8443:443'
