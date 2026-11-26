@@ -85,6 +85,7 @@ app.MapChatEndpoints();
 app.MapAdminAiEndpoints();
 app.MapKnowledgeEndpoints();
 app.MapReportEndpoints();
+app.MapCustomerEndpoints();
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.Run();
 

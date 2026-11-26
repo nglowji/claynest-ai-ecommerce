@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 namespace ClayNest.IntegrationTests;
 public sealed class ReportAuthorizationTests
 {
-    private sealed class TestAuth(IOptionsMonitor<AuthenticationSchemeOptions> options,Microsoft.Extensions.Logging.ILoggerFactory logger,UrlEncoder encoder) : AuthenticationHandler<AuthenticationSchemeOptions>(options,logger,encoder)
+    internal sealed class TestAuth(IOptionsMonitor<AuthenticationSchemeOptions> options,Microsoft.Extensions.Logging.ILoggerFactory logger,UrlEncoder encoder) : AuthenticationHandler<AuthenticationSchemeOptions>(options,logger,encoder)
     {
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
