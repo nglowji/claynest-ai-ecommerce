@@ -87,6 +87,7 @@ app.MapKnowledgeEndpoints();
 app.MapReportEndpoints();
 app.MapCustomerEndpoints();
 app.MapReviewEndpoints();
+app.MapCustomerOrderEndpoints();
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.Run();
 

@@ -74,6 +74,7 @@ public static class DependencyInjection
         services.AddScoped<ClayNest.Application.Inventory.IInventoryService, ClayNest.Infrastructure.Inventory.InventoryService>();
         services.AddScoped<ClayNest.Application.Customers.ICustomerDirectory, ClayNest.Infrastructure.Customers.CustomerDirectory>();
         services.AddScoped<ClayNest.Application.Reviews.IProductReviews, ClayNest.Infrastructure.Reviews.ProductReviewService>();
+        services.AddScoped<ClayNest.Application.Orders.ICustomerOrders, ClayNest.Infrastructure.Orders.CustomerOrders>();
         return services;
     }
 }
