@@ -160,6 +160,7 @@ public sealed class ChatTests
             var p = await db.Products.Include(p => p.Variants).Include(p => p.Images).SingleAsync(p => p.Id == source.ProductId); var cheap = p.Variants.Single();
             cheap.Update(cheap.Sku,"Small","Green","Drink",100,null,5,null,100000,null,true,"","",false);
             var large = new ProductVariant(p.Id,30); large.Update(source.Key+"-L","Large","Green","Drink",500,null,20,null,500000,null,true,"","",false); p.Variants.Add(large); db.Set<ProductVariant>().Add(large); p.ValidatePublication();
+            db.StockMovements.Add(new ClayNest.Domain.Inventory.StockMovement(large.Id, "opening", 30, 30, large.LowStockThreshold, "Chat fixture opening", null, "Test"));
             await db.SaveChangesAsync();
         });
         await using var scope = source.Factory.Services.CreateAsyncScope(); var catalog = scope.ServiceProvider.GetRequiredService<IChatCatalog>();

@@ -54,7 +54,7 @@ public sealed class DevelopmentActivityTests
         Assert.All(await db.Users.Where(u => customerIds.Contains(u.Id)).ToListAsync(), u => { Assert.Null(u.PasswordHash); Assert.EndsWith("@example.test", u.Email); });
         var variantIds = orders.SelectMany(o => o.Items).Select(i => i.VariantId).Distinct().ToArray();
         foreach (var variant in await db.Set<ProductVariant>().Where(v => variantIds.Contains(v.Id)).ToListAsync())
-            Assert.Equal(variant.StockQty, await db.StockMovements.Where(m => m.VariantId == variant.Id).SumAsync(m => m.QuantityDelta));
+            Assert.Equal((variant.Sku, variant.StockQty), (variant.Sku, await db.StockMovements.Where(m => m.VariantId == variant.Id).SumAsync(m => m.QuantityDelta)));
         await seeder.SeedAsync(default);
         Assert.Equal(180, await db.Orders.CountAsync(o => o.PayloadHash == DevelopmentActivitySeeder.OriginHash));
         Assert.Equal(48, await db.Users.CountAsync(u => customerIds.Contains(u.Id)));
