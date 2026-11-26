@@ -1,0 +1,52 @@
+name: Verify Nàng Gốm
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Create disposable CI configuration
+        run: python scripts/configure.py
+      - name: Operations unit tests
+        run: python -m unittest discover -s scripts/tests -v
+      - name: Build and verify .NET and Python with isolated database
+        run: python scripts/ci.py backend
+      - name: Stop test services
+        if: always()
+        run: docker compose --profile test stop db-test
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Create disposable CI configuration
+        run: python scripts/configure.py
+      - name: Browser journeys and frontend production build
+        run: python scripts/ci.py browser --shard ${{ matrix.shard }} --shards 3
+      - name: Stop browser test services
+        if: always()
+        run: docker compose --profile e2e stop e2e-api e2e-ai db-test

@@ -3,5 +3,5 @@ WORKDIR /work
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN npm run format:check && npm run build
 CMD ["npm", "run", "test:e2e"]
