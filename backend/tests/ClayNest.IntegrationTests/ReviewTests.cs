@@ -38,8 +38,11 @@ public sealed class ReviewTests
         Assert.DoesNotContain("@", list.Reviews.Items[0].AuthorName);
         Assert.Equal(0, (await guest.GetFromJsonAsync<ProductReviews>(path + "/?rating=5"))!.Reviews.TotalCount);
         Assert.True((await s.Client.GetFromJsonAsync<MyReview>(path + "/mine"))!.Eligible);
-        await s.LoginCustomer();
-        using var other = await Save(); Assert.Equal(HttpStatusCode.Forbidden, other.StatusCode);
+        await using var otherBuyer = await CheckoutTests.Fixture.Create(1);
+        await otherBuyer.LoginCustomer();
+        using var otherRequest = new HttpRequestMessage(HttpMethod.Put, path + "/mine") { Content = JsonContent.Create(new ReviewInput(5, "A different authenticated account.")) };
+        otherRequest.Headers.Add("X-CSRF-TOKEN", await otherBuyer.Csrf());
+        using var other = await otherBuyer.Client.SendAsync(otherRequest); Assert.Equal(HttpStatusCode.Forbidden, other.StatusCode);
         using var badPage = await guest.GetAsync(path + "/?page=0"); Assert.Equal(HttpStatusCode.BadRequest, badPage.StatusCode);
         using var missing = await guest.GetAsync($"/api/v1/products/{Guid.NewGuid()}/reviews/"); Assert.Equal(HttpStatusCode.NotFound, missing.StatusCode);
     }
