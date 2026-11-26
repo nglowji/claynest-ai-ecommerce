@@ -9,6 +9,7 @@ import './styles/admin-system.css'
 import './styles/admin-operations.css'
 import './styles/admin-reports.css'
 import './styles/product-detail.css'
+import './styles/purchases.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

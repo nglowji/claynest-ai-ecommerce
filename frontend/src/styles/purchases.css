@@ -1,0 +1,192 @@
+.purchases-page {
+  padding-block: 28px 60px;
+}
+.commerce-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-block: 28px;
+}
+.commerce-heading h1 {
+  font-size: clamp(32px, 3.2vw, 44px);
+  margin-block: 12px;
+}
+.commerce-heading p,
+.commerce-heading > div:last-child {
+  font-size: 13px;
+  color: #78836f;
+}
+.commerce-heading > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+.commerce-heading button,
+.purchase-filters > button {
+  border: 1px solid #daddce;
+  padding: 10px 15px;
+  border-radius: 7px;
+}
+.purchase-filters {
+  display: flex;
+  gap: 20px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 20px;
+  background: #f0f2e8;
+  border-radius: 12px;
+}
+.purchase-filters label {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+  min-width: 180px;
+  max-width: 380px;
+  font-size: 12px;
+}
+.purchase-filters :is(input, select) {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #daddce;
+  border-radius: 6px;
+  background: #fffef8;
+  font: inherit;
+}
+.purchase-result,
+.purchase-footnote {
+  margin-block: 18px;
+  font-size: 12px;
+  color: #7c8772;
+  line-height: 1.8;
+}
+.purchase-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: start;
+}
+.purchase-card {
+  border: 1px solid #e0e3d5;
+  border-radius: 12px;
+  background: #fffef9;
+  overflow: hidden;
+}
+.purchase-card > header,
+.purchase-card > footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  flex-wrap: wrap;
+}
+.purchase-card > header {
+  background: #f0f2e8;
+  font-size: 13px;
+}
+.purchase-card time {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #7c8772;
+}
+.purchase-status {
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  color: #947132;
+  background: #faf1db;
+}
+.purchase-status.completed,
+.purchase-status.shipped {
+  color: #46633b;
+  background: #e3eddc;
+}
+.purchase-status.cancelled {
+  color: #9b5144;
+  background: #f7e9e4;
+}
+.purchase-card ul {
+  list-style: none;
+  padding: 0 20px;
+  margin: 0;
+}
+.purchase-card li {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding-block: 16px;
+  border-bottom: 1px solid #e5e7dc;
+  font-size: 12px;
+}
+.purchase-card li img {
+  width: 58px;
+  height: 58px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+.purchase-card li > div {
+  flex: 1;
+  min-width: 0;
+}
+.purchase-card li :is(span, small),
+.purchase-card footer small {
+  display: block;
+  font-size: 11px;
+  color: #7c8772;
+  margin-top: 5px;
+}
+.purchase-card li b {
+  font-weight: 500;
+  white-space: nowrap;
+}
+.purchase-card footer > div:last-child {
+  display: flex;
+  gap: 10px;
+}
+.purchase-card footer .button {
+  min-height: 38px;
+  padding: 10px 16px;
+  font-size: 11px;
+}
+.purchase-expand {
+  margin: 12px 20px 0;
+  font-size: 12px;
+  color: #647c53;
+}
+.purchase-empty {
+  padding: 55px 24px;
+  text-align: center;
+}
+.purchase-empty p {
+  margin: 16px auto 24px;
+  max-width: 550px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: #7c8772;
+}
+.purchases-page .admin-pagination {
+  --admin-ink: #45583b;
+  --admin-muted: #7c8772;
+  --admin-border: #daddce;
+}
+@media (max-width: 900px) {
+  .purchase-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .purchase-card li {
+    flex-wrap: wrap;
+  }
+  .purchase-card li b {
+    padding-left: 72px;
+  }
+  .purchase-card > :is(header, footer) {
+    padding: 16px;
+  }
+}
