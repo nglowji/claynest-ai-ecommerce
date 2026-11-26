@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import tarfile
 import uuid
-from backup import FILES
+from backup import ARCHIVES, FILES
 from ops_common import ROOT, archive_contents, compose, query, sha256, snapshot
 
 
@@ -19,7 +19,7 @@ def validate_bundle(folder):
     for name in FILES:
         if sha256(folder / name) != manifest["files"][name]:
             raise ValueError("Backup checksum mismatch")
-    for name in ("keys.tar.gz", "images.tar.gz"):
+    for name in ARCHIVES:
         if archive_contents(folder / name) != manifest["assets"][name]:
             raise ValueError("Backup media manifest mismatch")
     return folder, manifest
@@ -50,7 +50,7 @@ def drill(folder):
           NOT has_schema_privilege('ai_app','commerce','USAGE');""").decode().strip()
         if permissions != "t":
             raise RuntimeError("Restored schema permissions differ from the expected isolation")
-        for name, directory in (("keys.tar.gz", "keys"), ("images.tar.gz", "images")):
+        for name, directory in (("keys.tar.gz", "keys"), ("images.tar.gz", "images"), ("storefront.tar.gz", "storefront")):
             destination = output / directory
             destination.mkdir(mode=0o700)
             with tarfile.open(folder / name, "r:gz") as archive:

@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from backup import FILES, backup
+from backup import ARCHIVES, FILES, backup
 from ops_common import archive_contents, query, sha256
 from restore_drill import validate_bundle
 
@@ -25,12 +25,12 @@ class RecoveryTests(unittest.TestCase):
         self.patch.start(); self.addCleanup(self.patch.stop)
         for name in FILES:
             (self.folder / name).write_bytes(b"synthetic backup fixture")
-        for name in ("keys.tar.gz", "images.tar.gz"):
+        for name in ARCHIVES:
             with tarfile.open(self.folder / name, "w:gz") as output:
                 info = tarfile.TarInfo("file.txt"); info.size = 7
                 output.addfile(info, io.BytesIO(b"fixture"))
         self.manifest = {"format": 1, "files": {name: sha256(self.folder / name) for name in FILES},
-                         "assets": {name: archive_contents(self.folder / name) for name in ("keys.tar.gz", "images.tar.gz")}, "tables": []}
+                         "assets": {name: archive_contents(self.folder / name) for name in ARCHIVES}, "tables": []}
         self.save()
 
     def save(self):

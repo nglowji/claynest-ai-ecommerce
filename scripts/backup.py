@@ -4,10 +4,12 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import shutil
+import tarfile
 import uuid
 from ops_common import ROOT, archive_contents, compose, run, running_apps, sha256, snapshot
 
-FILES = ("database.dump", "keys.tar.gz", "images.tar.gz", "environment.env")
+ARCHIVES = ("keys.tar.gz", "images.tar.gz", "storefront.tar.gz")
+FILES = ("database.dump", *ARCHIVES, "environment.env")
 
 
 def backup():
@@ -31,9 +33,11 @@ def backup():
         for filename, source in (("keys.tar.gz", "/app/keys"), ("images.tar.gz", "/app/media/catalog")):
             with (target / filename).open("wb") as output:
                 compose("run", "--rm", "--no-deps", "-T", "--entrypoint", "tar", "api", "-czf", "-", "-C", source, ".", stdout=output)
+        with tarfile.open(target / "storefront.tar.gz", "w:gz") as archive:
+            archive.add(ROOT / "frontend/public", arcname=".")
         shutil.copyfile(ROOT / ".env", target / "environment.env")
         files = {name: sha256(target / name) for name in FILES}
-        assets = {name: archive_contents(target / name) for name in ("keys.tar.gz", "images.tar.gz")}
+        assets = {name: archive_contents(target / name) for name in ARCHIVES}
         if not assets["keys.tar.gz"]:
             raise RuntimeError("No DataProtection keys found; recovery bundle is incomplete.")
         manifest = {"format": 1, "createdAt": datetime.now(timezone.utc).isoformat(), "revision": revision,
