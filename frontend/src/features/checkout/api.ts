@@ -32,13 +32,19 @@ export type Contact = {
   address: string
   note: string
 }
-export type Checkout = { quoteToken: string; contact: Contact; acceptTerms: boolean }
+export type Checkout = {
+  quoteToken: string
+  contact: Contact
+  acceptTerms: boolean
+  paymentMethod?: 'cod' | 'zalopay'
+}
 export type Receipt = {
   reference: string
   accessToken: string
   accessExpiresAt: string
   grandTotalVnd: number
   status: string
+  paymentMethod?: 'cod' | 'zalopay'
 }
 export type OrderStatus = {
   reference: string
