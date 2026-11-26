@@ -200,7 +200,7 @@ export default function AdminInventoryPage() {
       <InventorySummary
         revision={attempt}
         lowOnly={lowOnly}
-        onFilter={(low) => filter('lowOnly', low ? 'true' : '')}
+        onFilter={(low) => setParams(low ? { lowOnly: 'true' } : {})}
       />
       <div className="inventory-filters">
         <label>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { AuthError } from '../auth/api'
 import { listOrders, orderLabels, type OrderRow } from '../features/orders/adminApi'
@@ -8,7 +8,15 @@ import { money } from '../data/products'
 type Props = { recent: OrderRow[]; loading: boolean; error: string; revision: string }
 export default function DashboardOrders({ recent, loading, error, revision }: Props) {
   const auth = useAuth()
-  const [filter, setFilter] = useState('')
+  const [params, setParams] = useSearchParams()
+  const value = params.get('orderStatus') || ''
+  const filter = ['pending', 'confirmed', 'packed', 'shipped'].includes(value) ? value : ''
+  function setFilter(value: string) {
+    const next = new URLSearchParams(params)
+    if (value) next.set('orderStatus', value)
+    else next.delete('orderStatus')
+    setParams(next)
+  }
   const [rows, setRows] = useState<OrderRow[]>([])
   const [pending, setPending] = useState(false)
   const [failure, setFailure] = useState('')
@@ -39,6 +47,8 @@ export default function DashboardOrders({ recent, loading, error, revision }: Pr
   const filters = [
     { value: '', label: 'Mới nhất' },
     { value: 'pending', label: 'Chờ xác nhận' },
+    { value: 'confirmed', label: 'Chờ đóng gói' },
+    { value: 'packed', label: 'Chờ bàn giao' },
     { value: 'shipped', label: 'Đang giao' },
   ]
   return (

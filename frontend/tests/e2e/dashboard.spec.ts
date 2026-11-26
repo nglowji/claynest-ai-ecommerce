@@ -84,6 +84,12 @@ test('dashboard period and order filters use live server data and retain the sel
   ).toHaveText(vnd(week.metrics.completedSalesVnd))
   await page.reload()
   await expect(page.getByLabel('Kỳ thống kê dashboard')).toHaveValue('7')
+  await page.getByRole('tab', { name: 'Vận hành', exact: true }).click()
+  await page.reload()
+  await expect(page.getByRole('tab', { name: 'Vận hành', exact: true })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  )
   const filters = page.getByRole('group', { name: 'Lọc đơn hàng trên tổng quan' })
   const ordersResponse = page.waitForResponse(
     (res) =>
@@ -122,7 +128,9 @@ test('report outage leaves operational dashboard usable and retry restores reven
   )
   await expect(page.locator('.dashboard-metrics')).toHaveAttribute('aria-busy', 'false')
   await expect(page.locator('.dashboard-metric').first().locator('strong')).not.toHaveText('—')
+  await page.getByRole('tab', { name: 'Vận hành', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Công việc hôm nay' })).toBeVisible()
+  await page.getByRole('tab', { name: 'Kinh doanh', exact: true }).click()
   await page.unroute('**/api/v1/admin/reports?**')
   await page.getByRole('button', { name: 'Thử lại doanh thu' }).click()
   await expect(page.locator('.dashboard-revenue-metrics')).toHaveAttribute('aria-busy', 'false')
