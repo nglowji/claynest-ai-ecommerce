@@ -478,7 +478,9 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_Order_Cancellation", "(\"Status\" = 'cancelled' AND \"CancelledAt\" IS NOT NULL AND \"RestockedAt\" IS NOT NULL) OR (\"Status\" <> 'cancelled' AND \"CancelledAt\" IS NULL AND \"RestockedAt\" IS NULL)");
 
-                            t.HasCheckConstraint("CK_Order_Completion", "(\"Status\" = 'completed' AND \"CompletedAt\" IS NOT NULL AND \"PaymentStatus\" = 'paid') OR (\"Status\" <> 'completed' AND \"CompletedAt\" IS NULL AND \"PaymentStatus\" = 'unpaid')");
+                            t.HasCheckConstraint("CK_Order_Completion", "(\"Status\" = 'completed' AND \"CompletedAt\" IS NOT NULL AND \"PaymentStatus\" = 'paid') OR (\"Status\" <> 'completed' AND \"CompletedAt\" IS NULL)");
+
+                            t.HasCheckConstraint("CK_Order_Payment", "\"PaymentMethod\" IN ('cod','zalopay') AND \"PaymentStatus\" IN ('unpaid','paid','refund_required') AND (\"PaymentMethod\" <> 'cod' OR \"Status\" = 'completed' OR \"PaymentStatus\" = 'unpaid') AND (\"PaymentStatus\" <> 'refund_required' OR (\"PaymentMethod\" = 'zalopay' AND \"Status\" = 'cancelled'))");
 
                             t.HasCheckConstraint("CK_Order_Status", "\"Status\" IN ('pending','confirmed','packed','shipped','completed','cancelled')");
 
@@ -597,6 +599,75 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                     b.ToTable("OrderStatusChanges", "commerce", t =>
                         {
                             t.HasCheckConstraint("CK_OrderChange_Sequence", "\"Sequence\" >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("ClayNest.Domain.Payments.ZaloPayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("AppId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("AppTime")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AppTransId")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("LastCheckedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("OrderUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<long?>("ProviderTransactionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("QrPayload")
+                        .IsRequired()
+                        .HasMaxLength(8192)
+                        .HasColumnType("character varying(8192)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppTransId")
+                        .IsUnique();
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.HasIndex("ProviderTransactionId")
+                        .IsUnique()
+                        .HasFilter("\"ProviderTransactionId\" IS NOT NULL");
+
+                    b.HasIndex("State", "ExpiresAt");
+
+                    b.ToTable("ZaloPayments", "commerce", t =>
+                        {
+                            t.HasCheckConstraint("CK_Zalo_Amount", "\"Amount\" > 0");
+
+                            t.HasCheckConstraint("CK_Zalo_State", "\"State\" IN ('created','pending','paid','expired')");
                         });
                 });
 
@@ -913,6 +984,15 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                 });
 
             modelBuilder.Entity("ClayNest.Domain.Orders.OrderStatusChange", b =>
+                {
+                    b.HasOne("ClayNest.Domain.Orders.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ClayNest.Domain.Payments.ZaloPayment", b =>
                 {
                     b.HasOne("ClayNest.Domain.Orders.Order", null)
                         .WithMany()
