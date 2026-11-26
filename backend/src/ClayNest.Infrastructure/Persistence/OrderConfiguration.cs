@@ -12,7 +12,8 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         b.ToTable("Orders", t =>
         {
             t.HasCheckConstraint("CK_Order_Status", "\"Status\" IN ('pending','confirmed','packed','shipped','completed','cancelled')");
-            t.HasCheckConstraint("CK_Order_Completion", "(\"Status\" = 'completed' AND \"CompletedAt\" IS NOT NULL AND \"PaymentStatus\" = 'paid') OR (\"Status\" <> 'completed' AND \"CompletedAt\" IS NULL AND \"PaymentStatus\" = 'unpaid')");
+            t.HasCheckConstraint("CK_Order_Completion", "(\"Status\" = 'completed' AND \"CompletedAt\" IS NOT NULL AND \"PaymentStatus\" = 'paid') OR (\"Status\" <> 'completed' AND \"CompletedAt\" IS NULL)");
+            t.HasCheckConstraint("CK_Order_Payment", "\"PaymentMethod\" IN ('cod','zalopay') AND \"PaymentStatus\" IN ('unpaid','paid','refund_required') AND (\"PaymentMethod\" <> 'cod' OR \"Status\" = 'completed' OR \"PaymentStatus\" = 'unpaid') AND (\"PaymentStatus\" <> 'refund_required' OR (\"PaymentMethod\" = 'zalopay' AND \"Status\" = 'cancelled'))");
             t.HasCheckConstraint("CK_Order_Cancellation", "(\"Status\" = 'cancelled' AND \"CancelledAt\" IS NOT NULL AND \"RestockedAt\" IS NOT NULL) OR (\"Status\" <> 'cancelled' AND \"CancelledAt\" IS NULL AND \"RestockedAt\" IS NULL)");
         });
         b.Property(x => x.Revision).IsConcurrencyToken();

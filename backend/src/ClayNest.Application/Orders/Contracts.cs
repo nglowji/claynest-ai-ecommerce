@@ -9,8 +9,8 @@ public sealed record CartQuote(List<QuoteLine> Items, long SubtotalVnd, long Shi
     bool CanCheckout, string? QuoteToken, DateTimeOffset ExpiresAt, string ShippingPolicy, string PackingNote);
 public sealed record AcceptedLine(Guid VariantId, int Quantity, long UnitPriceVnd);
 public sealed record QuoteSnapshot(List<AcceptedLine> Items, long ShippingFeeVnd, DateTimeOffset ExpiresAt, int PolicyVersion);
-public sealed record CheckoutRequest(string QuoteToken, ShippingContact Contact, bool AcceptTerms);
-public sealed record OrderReceipt(string Reference, string AccessToken, DateTimeOffset AccessExpiresAt, long GrandTotalVnd, string Status);
+public sealed record CheckoutRequest(string QuoteToken, ShippingContact Contact, bool AcceptTerms, string PaymentMethod = "cod");
+public sealed record OrderReceipt(string Reference, string AccessToken, DateTimeOffset AccessExpiresAt, long GrandTotalVnd, string Status, string PaymentMethod = "cod");
 public sealed record OrderLineDto(string Sku, string ProductName, string VariantName, string Image, int Quantity, long UnitPriceVnd, long LineTotalVnd);
 public sealed record OrderProgressDto(string Status, DateTimeOffset ChangedAt);
 public sealed record OrderStatusDto(string Reference, string Status, string PaymentMethod, string PaymentStatus,

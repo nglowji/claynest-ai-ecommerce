@@ -59,8 +59,10 @@ public sealed class Order
     public List<OrderItem> Items { get; private set; } = [];
     private Order() { }
     public Order(string reference, Guid? customerId, ShippingContact contact, long shippingFeeVnd,
-        Guid idempotencyKey, string payloadHash, string accessHash, string accessProtected, DateTimeOffset now)
+        Guid idempotencyKey, string payloadHash, string accessHash, string accessProtected, DateTimeOffset now, string paymentMethod = "cod")
     {
+        if (paymentMethod is not ("cod" or "zalopay")) throw new OrderRuleException("Phương thức thanh toán không hợp lệ.");
+        PaymentMethod = paymentMethod;
         if (idempotencyKey == Guid.Empty || shippingFeeVnd < 0 || payloadHash.Length != 64 || accessHash.Length != 64)
             throw new OrderRuleException("Thông tin đơn hàng không hợp lệ.");
         contact = contact.Normalize(); Reference = reference; CustomerId = customerId;
@@ -81,11 +83,22 @@ public sealed class Order
     {
         if (!OrderFlow.IsState(target)) throw new OrderRuleException("Trạng thái đích không hợp lệ.");
         if (!OrderFlow.Next(Status).Contains(target)) throw new OrderTransitionException("Không thể chuyển trạng thái đơn theo thao tác này.");
+        if (PaymentMethod == "zalopay" && target != "cancelled" && PaymentStatus != "paid")
+            throw new OrderRuleException("Cần ZaloPay xác nhận thanh toán trước khi xử lý giao hàng.");
+        if (PaymentMethod == "zalopay" && target == "cancelled" && PaymentStatus != "unpaid")
+            throw new OrderRuleException("Đơn đã thanh toán cần đối soát và hoàn tiền, không thể hủy trực tiếp.");
         if (target == "completed" && !confirmCodCollected)
-            throw new OrderRuleException("Cần xác nhận đơn đã giao và đã thu đủ tiền COD trước khi hoàn tất.");
+            throw new OrderRuleException("Cần xác nhận đơn đã giao và thanh toán trước khi hoàn tất.");
         Status = target; Revision = checked(Revision + 1); UpdatedAt = OrderFlow.Timestamp(now);
         if (target == "completed") { CompletedAt = UpdatedAt; PaymentStatus = "paid"; }
         if (target == "cancelled") CancelledAt = UpdatedAt;
+    }
+    public void ConfirmZaloPayment(DateTimeOffset now)
+    {
+        if (PaymentMethod != "zalopay") throw new OrderRuleException("Đơn không thanh toán qua ZaloPay.");
+        if (PaymentStatus is "paid" or "refund_required") return;
+        PaymentStatus = Status == "cancelled" ? "refund_required" : "paid";
+        Revision = checked(Revision + 1); UpdatedAt = OrderFlow.Timestamp(now);
     }
     public void MarkRestocked()
     {

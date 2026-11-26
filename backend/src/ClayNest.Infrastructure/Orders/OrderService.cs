@@ -62,8 +62,12 @@ public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider p
     {
         if (idempotencyKey == Guid.Empty || !request.AcceptTerms || request.Contact is null || string.IsNullOrWhiteSpace(request.QuoteToken) || request.QuoteToken.Length > 20000)
             throw new OrderRuleException("Cần báo giá hợp lệ, thông tin giao hàng và xác nhận điều kiện đặt hàng.");
+        if (request.PaymentMethod is not ("cod" or "zalopay")) throw new OrderRuleException("Phương thức thanh toán không hợp lệ.");
         var contact = request.Contact.Normalize();
-        var payloadHash = Hash(JsonSerializer.Serialize(new { customerId, request.QuoteToken, contact, request.AcceptTerms }, Json));
+        // Preserve hashes for existing COD retries across this deployment.
+        var payloadHash = request.PaymentMethod == "cod"
+            ? Hash(JsonSerializer.Serialize(new { customerId, request.QuoteToken, contact, request.AcceptTerms }, Json))
+            : Hash(JsonSerializer.Serialize(new { customerId, request.QuoteToken, contact, request.AcceptTerms, request.PaymentMethod }, Json));
         var lockId = BinaryPrimitives.ReadInt64LittleEndian(SHA256.HashData(idempotencyKey.ToByteArray()));
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
         await db.Database.ExecuteSqlInterpolatedAsync($"SELECT pg_advisory_xact_lock({lockId})", ct);
@@ -99,7 +103,7 @@ public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider p
         var now = clock.GetUtcNow();
         var access = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         var reference = $"NG-{now:yyMMdd}-{Guid.NewGuid().ToString("N")[..12].ToUpperInvariant()}";
-        var order = new Order(reference, customerId, contact, snapshot.ShippingFeeVnd, idempotencyKey, payloadHash, Hash(access), secrets.Protect(access), now);
+        var order = new Order(reference, customerId, contact, snapshot.ShippingFeeVnd, idempotencyKey, payloadHash, Hash(access), secrets.Protect(access), now, request.PaymentMethod);
         foreach (var line in snapshot.Items.OrderBy(l => l.VariantId))
         {
             var row = live.Single(r => r.Variant.Id == line.VariantId); var variant = row.Variant;
@@ -109,12 +113,12 @@ public sealed class OrderService(CommerceDbContext db, IDataProtectionProvider p
                 "Giữ hàng cho đơn " + reference, customerId, customerId is null ? "Khách vãng lai" : "Khách hàng", order.Id));
         }
         db.Orders.Add(order);
-        db.OrderStatusChanges.Add(new OrderStatusChange(order.Id, 0, "", "pending", "Khách đặt hàng COD", customerId,
+        db.OrderStatusChanges.Add(new OrderStatusChange(order.Id, 0, "", "pending", request.PaymentMethod == "cod" ? "Khách đặt hàng COD" : "Khách đặt hàng ZaloPay", customerId,
             customerId is null ? "Khách vãng lai" : "Khách hàng", order.CreatedAt));
         await db.SaveChangesAsync(ct); await transaction.CommitAsync(ct);
         return Receipt(order);
     }
-    private OrderReceipt Receipt(Order order) => new(order.Reference, secrets.Unprotect(order.AccessTokenProtected), order.AccessExpiresAt, order.GrandTotalVnd, "pending");
+    private OrderReceipt Receipt(Order order) => new(order.Reference, secrets.Unprotect(order.AccessTokenProtected), order.AccessExpiresAt, order.GrandTotalVnd, order.Status, order.PaymentMethod);
 
     private async Task<Order?> Accessible(string reference, string? token, Guid? customerId, CancellationToken ct)
     {
