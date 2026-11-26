@@ -1,0 +1,112 @@
+.account-settings {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.8rem;
+}
+.account-settings form,
+.account-email-status {
+  border-top: 1px solid #e1e5db;
+  padding-top: 1.4rem;
+}
+.account-settings h3 {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+}
+.account-settings label,
+.account-recovery label {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+.account-settings input,
+.account-recovery input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0.8rem 1rem;
+  background: #fff;
+  border: 1px solid #d5ddca;
+  border-radius: 10px;
+  color: #33422c;
+  font: inherit;
+}
+.account-settings input:focus-visible,
+.account-recovery input:focus-visible {
+  outline: 2px solid #647b51;
+  outline-offset: 2px;
+}
+.account-help {
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: #78816f;
+}
+.account-notice {
+  padding: 1rem;
+  background: #edf3e7;
+  color: #3b5631;
+  border-radius: 10px;
+  line-height: 1.7;
+}
+.account-recovery {
+  min-height: 65vh;
+  padding-block: clamp(3rem, 7vw, 6rem);
+}
+.account-recovery-card {
+  max-width: 500px;
+  margin: auto;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid #dfe4d7;
+  border-radius: 20px;
+  background: #fffefa;
+}
+.account-recovery h1 {
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  margin: 1.1rem 0;
+}
+.account-recovery .eyebrow {
+  margin-top: 1.7rem;
+}
+.account-recovery p {
+  line-height: 1.8;
+}
+.account-recovery fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.account-recovery .button {
+  width: 100%;
+  margin-top: 0.8rem;
+}
+.account-recovery .text-link {
+  display: inline-block;
+  margin: 1rem 0.8rem 0 0;
+}
+.auth-recovery-links {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  color: #5d714e;
+}
+.admin-account-page {
+  max-width: 780px;
+}
+.admin-account-page .account-settings {
+  background: #fff;
+  border: 1px solid #e2e7df;
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+@media (max-width: 480px) {
+  .account-recovery {
+    padding-block: 2rem;
+  }
+  .account-recovery-card {
+    padding: 1.25rem;
+  }
+}

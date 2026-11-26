@@ -1,3 +1,5 @@
+import AccountRecoveryPage from './components/AccountRecoveryPage'
+import { AdminAccountPage } from './components/AccountSettings'
 import CustomerOrdersPage from './components/CustomerOrdersPage'
 import { reorderCart, type PurchaseItem } from './features/checkout/purchases'
 import { useEffect, useState } from 'react'
@@ -36,6 +38,7 @@ export default function App() {
       <Routes>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminPage />} />
+          <Route path="account" element={<AdminAccountPage />} />
           <Route path="customers" element={<AdminCustomersPage />} />
           <Route path="assistant" element={<AdminAiPage />} />
           <Route path="reports" element={<AdminReportsPage />} />
@@ -197,6 +200,13 @@ function StoreApp() {
           <Route path="/" element={<HomePage {...actions} />} />
           <Route path="/register" element={<LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<AccountRecoveryPage key="forgot-password" />} />
+          <Route path="/reset-password" element={<AccountRecoveryPage key="reset-password" />} />
+          <Route path="/verify-email" element={<AccountRecoveryPage key="verify-email" />} />
+          <Route
+            path="/request-verification"
+            element={<AccountRecoveryPage key="request-verification" />}
+          />
           <Route
             path="/cart"
             element={

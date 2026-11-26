@@ -19,6 +19,7 @@ const groups: { title: string; links: { to: string; label: string; icon: AdminIc
       { to: '/admin/reports', label: 'Báo cáo & phân tích', icon: 'reports' },
       { to: '/admin/assistant', label: 'Trợ lý quản trị', icon: 'assistant' },
       { to: '/admin/knowledge', label: 'Kho kiến thức AI', icon: 'knowledge' },
+      { to: '/admin/account', label: 'Hồ sơ & bảo mật', icon: 'customers' },
     ],
   },
 ]

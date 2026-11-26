@@ -21,7 +21,9 @@ export default function LoginPage() {
   const [show, setShow] = useState(false)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState('')
-  const [notice, setNotice] = useState('')
+  const [notice, setNotice] = useState(() =>
+    typeof location.state?.notice === 'string' ? location.state.notice : '',
+  )
   if (auth.user) return <Navigate to={auth.user.role === 'Admin' ? '/admin' : returnTo} replace />
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -211,6 +213,10 @@ export default function LoginPage() {
                 {pending ? 'Đang xử lý…' : signingUp ? 'Tạo tài khoản' : 'Đăng nhập'}
                 <Icon name="arrow" />
               </button>
+              <div className="auth-recovery-links">
+                <Link to="/forgot-password">Quên mật khẩu?</Link>
+                <Link to="/request-verification">Xác minh email</Link>
+              </div>
               <p className="auth-access-note">
                 {signingUp ? 'Đã có một góc nhỏ?' : 'Lần đầu ghé Nàng?'}{' '}
                 <Link to={signingUp ? '/login' : '/register'} onClick={switchMode}>

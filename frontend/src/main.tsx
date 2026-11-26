@@ -12,6 +12,7 @@ import './styles/product-detail.css'
 import './styles/purchases.css'
 import './styles/checkout-orders.css'
 import './styles/zalopay.css'
+import './styles/account-security.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

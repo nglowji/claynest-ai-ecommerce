@@ -1,3 +1,4 @@
+import AccountSettings from './AccountSettings'
 import SessionUnavailable from './SessionUnavailable'
 import SiteImage from './SiteImage'
 import { useState } from 'react'
@@ -95,6 +96,7 @@ export default function AccountPage() {
                 <dd>Khách hàng</dd>
               </div>
             </dl>
+            <AccountSettings />
             {error && (
               <p className="auth-error" role="alert">
                 {error}
