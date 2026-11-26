@@ -9,7 +9,7 @@ namespace ClayNest.Infrastructure.Identity;
 
 public sealed class AdminAuthenticationService(
     UserManager<AdminUser> users, SignInManager<AdminUser> signIn,
-    IPasswordHasher<AdminUser> passwords, CommerceDbContext db, RoleManager<IdentityRole<Guid>> roles, TimeProvider clock) : IAdminAuthenticationService
+    IPasswordHasher<AdminUser> passwords, CommerceDbContext db, RoleManager<IdentityRole<Guid>> roles, TimeProvider clock, Microsoft.Extensions.Options.IOptions<AccountMailOptions> mail) : IAdminAuthenticationService
 {
     private static readonly AdminUser DummyUser = new();
     private static readonly string DummyHash = new PasswordHasher<AdminUser>()
@@ -25,7 +25,7 @@ public sealed class AdminAuthenticationService(
             return null;
         }
         var result = await signIn.CheckPasswordSignInAsync(user, command.Password, lockoutOnFailure: true);
-        if (!result.Succeeded) return null;
+        if (!result.Succeeded || mail.Value.RequireConfirmedEmail && !user.EmailConfirmed) return null;
         await signIn.SignInAsync(user, new AuthenticationProperties
         {
             IsPersistent = command.RememberMe,
@@ -78,5 +78,5 @@ public sealed class AdminAuthenticationService(
     }
 
     private async Task<AdminProfile> ProfileAsync(AdminUser user) => new(user.Id, user.Email!, user.DisplayName,
-        await users.IsInRoleAsync(user, CommerceRoles.Admin) ? CommerceRoles.Admin : CommerceRoles.Customer);
+        await users.IsInRoleAsync(user, CommerceRoles.Admin) ? CommerceRoles.Admin : CommerceRoles.Customer, user.EmailConfirmed);
 }

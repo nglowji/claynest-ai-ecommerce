@@ -48,3 +48,7 @@ Thumbs.db
 .r7-*.log
 
 .r8-*.log
+
+# Private local email messages and recovery tokens
+.local/
+*.eml

@@ -1,7 +1,7 @@
 namespace ClayNest.Application.Identity;
 
 public sealed record AdminLoginCommand(string Email, string Password, bool RememberMe);
-public sealed record AdminProfile(Guid Id, string Email, string DisplayName, string Role);
+public sealed record AdminProfile(Guid Id, string Email, string DisplayName, string Role, bool EmailConfirmed = false);
 
 public sealed record RegisterCommand(string DisplayName, string Email, string Password);
 public sealed record RegistrationResult(bool Succeeded);
