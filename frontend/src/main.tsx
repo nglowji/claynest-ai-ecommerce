@@ -6,6 +6,7 @@ import './styles.css'
 import './styles/admin-dashboard.css'
 import './styles/admin-assistant.css'
 import './styles/admin-system.css'
+import './styles/admin-operations.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
