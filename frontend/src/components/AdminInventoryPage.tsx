@@ -1,3 +1,4 @@
+import InventoryHistory, { type StockMovement } from './InventoryHistory'
 import AdminPagination from './AdminPagination'
 import AdminActionButton from './AdminActionButton'
 import { useSearchParams } from 'react-router-dom'
@@ -19,24 +20,6 @@ type StockItem = {
   revision: string
   active: boolean
   image: string
-}
-type Movement = {
-  id: string
-  kind: string
-  quantityDelta: number
-  balanceAfter: number
-  thresholdAfter: number
-  reason: string
-  actorName: string
-  createdAt: string
-}
-const kindNames: Record<string, string> = {
-  restock: 'Hoàn kho khi hủy',
-  sale: 'Đặt hàng',
-  opening: 'Số dư đầu kỳ',
-  receipt: 'Nhập kho',
-  adjustment: 'Điều chỉnh',
-  threshold: 'Đổi ngưỡng cảnh báo',
 }
 export default function AdminInventoryPage() {
   const auth = useAuth()
@@ -71,7 +54,7 @@ export default function AdminInventoryPage() {
   const [saveError, setSaveError] = useState('')
   const [notice, setNotice] = useState('')
   const [historyPage, setHistoryPage] = useState(1)
-  const [history, setHistory] = useState<PageResult<Movement> | null>(null)
+  const [history, setHistory] = useState<PageResult<StockMovement> | null>(null)
   const [historyError, setHistoryError] = useState('')
   const [historyAttempt, setHistoryAttempt] = useState(0)
   function failure(e: unknown) {
@@ -116,7 +99,7 @@ export default function AdminInventoryPage() {
     const controller = new AbortController()
     setHistory(null)
     setHistoryError('')
-    catalogRequest<PageResult<Movement>>(
+    catalogRequest<PageResult<StockMovement>>(
       `admin/inventory/${selected.variantId}/movements?page=${historyPage}`,
       { signal: controller.signal },
     )
@@ -394,54 +377,13 @@ export default function AdminInventoryPage() {
                   {notice}
                 </p>
               )}
-              <div className="inventory-history">
-                <h3>Lịch sử kho</h3>
-                {historyError ? (
-                  <p role="alert">
-                    {historyError}{' '}
-                    <button onClick={() => setHistoryAttempt((n) => n + 1)}>Thử lại</button>
-                  </p>
-                ) : !history ? (
-                  <p role="status">Đang tải lịch sử…</p>
-                ) : (
-                  <>
-                    <ol>
-                      {history.items.map((m) => (
-                        <li key={m.id}>
-                          <div>
-                            <strong>{kindNames[m.kind] || m.kind}</strong>
-                            <span>
-                              {m.quantityDelta > 0 ? '+' : ''}
-                              {m.quantityDelta} · Tồn {m.balanceAfter}
-                            </span>
-                          </div>
-                          <p>{m.reason}</p>
-                          <small>
-                            {m.actorName} · {new Date(m.createdAt).toLocaleString('vi-VN')}
-                          </small>
-                          {m.kind === 'threshold' && <small>Ngưỡng: {m.thresholdAfter}</small>}
-                        </li>
-                      ))}
-                    </ol>
-                    {history.totalCount === 0 && <p>Chưa có thay đổi kho.</p>}
-                    <div className="catalog-pagination">
-                      <button
-                        disabled={historyPage <= 1}
-                        onClick={() => setHistoryPage((p) => p - 1)}
-                      >
-                        Trước
-                      </button>
-                      <span>{historyPage}</span>
-                      <button
-                        disabled={historyPage * history.pageSize >= history.totalCount}
-                        onClick={() => setHistoryPage((p) => p + 1)}
-                      >
-                        Sau
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
+              <InventoryHistory
+                history={history}
+                historyError={historyError}
+                historyPage={historyPage}
+                setHistoryPage={setHistoryPage}
+                retry={() => setHistoryAttempt((n) => n + 1)}
+              />
             </>
           ) : (
             <div className="inventory-placeholder">

@@ -1,12 +1,16 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 
 export default function AdminEditorDialog({
+  titleId = 'catalog-editor-title',
+  className = '',
   children,
   busy,
   error,
   notice,
   onClose,
 }: {
+  titleId?: string
+  className?: string
   children: ReactNode
   busy: boolean
   error: string
@@ -25,8 +29,8 @@ export default function AdminEditorDialog({
   return (
     <dialog
       ref={dialog}
-      className="admin-editor-dialog"
-      aria-labelledby="catalog-editor-title"
+      className={'admin-editor-dialog ' + className}
+      aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault()
         if (!busy) onClose()

@@ -1,3 +1,4 @@
+import AdminTabs from './AdminTabs'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { dashboardPeriod, useDashboard } from '../features/dashboard/useDashboard'
@@ -11,6 +12,7 @@ import AdminIcon from './AdminIcon'
 export default function AdminPage() {
   const auth = useAuth()
   const [params, setParams] = useSearchParams()
+  const view = params.get('view') === 'operations' ? 'operations' : 'business'
   const period = dashboardPeriod(params.get('days'))
   const { summary, report, query, refresh } = useDashboard(period, auth.expire)
   const reportUrl = '/admin/reports?' + query
@@ -85,47 +87,66 @@ export default function AdminPage() {
       </section>
       <p className="admin-section-caption">HOẠT ĐỘNG CỬA HÀNG · HIỆN TẠI</p>
       <OperationMetrics summary={summary.data} loading={summary.loading} />
-      <div className="dashboard-overview-grid">
-        <section
-          className="dashboard-panel dashboard-sales"
-          aria-labelledby="dashboard-sales-title"
-        >
-          <div className="dashboard-panel-heading">
-            <div>
-              <p className="dashboard-section-label">HIỆU QUẢ KINH DOANH</p>
-              <h2 id="dashboard-sales-title">Doanh thu cửa hàng</h2>
-            </div>
+      <AdminTabs
+        id="overview-view"
+        label="Góc nhìn tổng quan"
+        value={view}
+        options={[
+          { value: 'business', label: 'Kinh doanh' },
+          { value: 'operations', label: 'Vận hành' },
+        ]}
+        onChange={(value) => {
+          const next = new URLSearchParams(params)
+          next.set('view', value)
+          setParams(next)
+        }}
+      />
+      <div id="overview-view-panel" role="tabpanel" aria-labelledby={'overview-view-' + view}>
+        {view === 'business' ? (
+          <div className="overview-business-grid">
+            <section
+              className="dashboard-panel dashboard-sales"
+              aria-labelledby="dashboard-sales-title"
+            >
+              <div className="dashboard-panel-heading">
+                <div>
+                  <p className="dashboard-section-label">HIỆU QUẢ KINH DOANH</p>
+                  <h2 id="dashboard-sales-title">Doanh thu cửa hàng</h2>
+                </div>
+              </div>
+              {report.loading ? (
+                <p className="dashboard-chart-loading" role="status">
+                  Đang tải doanh thu…
+                </p>
+              ) : report.error ? (
+                <div className="dashboard-empty" role="alert">
+                  <p>{report.error}</p>
+                  <button onClick={refresh}>Thử lại doanh thu</button>
+                </div>
+              ) : (
+                report.data && <SalesChart key={query} report={report.data} />
+              )}
+              <div className="dashboard-sales-footer">
+                <span>
+                  Theo ngày hoàn tất · Giờ Việt Nam{report.data?.isDemo ? ' · Dữ liệu DEMO' : ''}
+                </span>
+                <Link to={reportUrl}>Báo cáo chi tiết</Link>
+              </div>
+            </section>
+            {report.data && !report.loading && (
+              <DashboardInsights report={report.data} reportUrl={reportUrl} />
+            )}
           </div>
-          {report.loading ? (
-            <p className="dashboard-chart-loading" role="status">
-              Đang tải doanh thu…
-            </p>
-          ) : report.error ? (
-            <div className="dashboard-empty" role="alert">
-              <p>{report.error}</p>
-              <button onClick={refresh}>Thử lại doanh thu</button>
-            </div>
-          ) : (
-            report.data && <SalesChart key={query} report={report.data} />
-          )}
-          <div className="dashboard-sales-footer">
-            <span>
-              Theo ngày hoàn tất · Giờ Việt Nam{report.data?.isDemo ? ' · Dữ liệu DEMO' : ''}
-            </span>
-            <Link to={reportUrl}>Báo cáo chi tiết</Link>
+        ) : (
+          <div className="overview-operations-grid">
+            <DashboardQueue data={summary.data} loading={summary.loading} />
+            <DashboardOrders
+              recent={summary.data?.recent || []}
+              loading={summary.loading}
+              error={summary.error}
+              revision={summary.updatedAt?.toISOString() || ''}
+            />
           </div>
-        </section>
-        <DashboardQueue data={summary.data} loading={summary.loading} />
-      </div>
-      <div className="dashboard-detail-grid">
-        <DashboardOrders
-          recent={summary.data?.recent || []}
-          loading={summary.loading}
-          error={summary.error}
-          revision={summary.updatedAt?.toISOString() || ''}
-        />
-        {report.data && !report.loading && (
-          <DashboardInsights report={report.data} reportUrl={reportUrl} />
         )}
       </div>
       <footer className="dashboard-footer">
