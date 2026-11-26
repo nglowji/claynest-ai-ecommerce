@@ -1074,3 +1074,26 @@
     max-width: none;
   }
 }
+
+@media (max-width: 600px) {
+  .dashboard-business-summary .dashboard-revenue-metrics strong {
+    font-size: 18px;
+    white-space: nowrap;
+    letter-spacing: -0.4px;
+  }
+  .admin-workspace .dashboard-v2 .dashboard-heading-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+  .admin-workspace .dashboard-heading-actions .dashboard-period {
+    grid-column: 1 / -1;
+  }
+  .admin-workspace .dashboard-period select {
+    width: 100%;
+  }
+  .admin-workspace .dashboard-heading-actions :is(button, a) {
+    justify-content: center;
+    white-space: nowrap;
+  }
+}

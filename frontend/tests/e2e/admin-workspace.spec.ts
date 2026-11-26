@@ -7,6 +7,27 @@ test('shared admin workspace searches real screens and mobile menu supports keyb
 }) => {
   await page.setViewportSize({ width: 1440, height: 960 })
   await loginAdminWithBackoff(page)
+  await page.getByRole('button', { name: 'Thu gọn menu quản trị' }).click()
+  await expect(page.locator('.admin-shell')).toHaveClass(/admin-sidebar-compact/)
+  await expect(
+    page.locator('.admin-sidebar').getByRole('link', { name: 'Khách hàng', exact: true }),
+  ).toBeVisible()
+  await page.reload()
+  await expect(page.locator('.admin-shell')).toHaveClass(/admin-sidebar-compact/)
+  await page.getByRole('button', { name: 'Mở rộng menu quản trị' }).click()
+  await expect(page.locator('.admin-shell')).not.toHaveClass(/admin-sidebar-compact/)
+  await page.getByLabel('Phạm vi tìm kiếm').selectOption('customers')
+  await page.getByLabel('Từ khóa tìm kiếm quản trị').fill('unmatched-customer-query')
+  await page.getByRole('button', { name: 'Tìm trong quản trị' }).click()
+  await expect(page.getByRole('heading', { name: 'Chưa tìm thấy khách hàng' })).toBeVisible()
+  await page.getByRole('button', { name: 'Xóa tìm kiếm' }).click()
+  const customers = await (await page.request.get('/api/v1/admin/customers')).json()
+  await expect(page.locator('.admin-customers-page tbody tr')).toHaveCount(customers.items.length)
+  if (customers.items.length) {
+    await page.getByLabel('Tìm khách hàng', { exact: true }).fill(customers.items[0].email)
+    await expect(page.locator('.admin-customers-page tbody tr')).toHaveCount(1)
+    await expect(page.locator('.admin-customers-page tbody')).toContainText(customers.items[0].name)
+  }
   await page.getByLabel('Phạm vi tìm kiếm').selectOption('products')
   await page.getByLabel('Từ khóa tìm kiếm quản trị').fill('Cốc')
   await page.getByRole('button', { name: 'Tìm trong quản trị' }).click()
@@ -18,10 +39,18 @@ test('shared admin workspace searches real screens and mobile menu supports keyb
   await expect(editor.getByLabel('Tên sản phẩm', { exact: true })).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(editor).not.toBeVisible()
-  for (const path of ['products', 'inventory', 'orders', 'reports', 'assistant', 'knowledge']) {
+  for (const path of [
+    'products',
+    'inventory',
+    'orders',
+    'customers',
+    'reports',
+    'assistant',
+    'knowledge',
+  ]) {
     await page.goto('/admin/' + path)
     await expect(page.locator('#admin-main h1')).toBeVisible()
-    if (['products', 'inventory', 'orders'].includes(path))
+    if (['products', 'inventory', 'orders', 'customers'].includes(path))
       await expect(page.locator('#admin-main .catalog-table')).toBeVisible()
     if (path === 'reports') await expect(page.locator('.report-metrics')).toBeVisible()
     await expect(page.getByRole('search', { name: 'Tìm kiếm quản trị' })).toBeVisible()
@@ -32,10 +61,18 @@ test('shared admin workspace searches real screens and mobile menu supports keyb
   await expect(page.locator('.admin-orders-table')).toBeVisible()
   await page.screenshot({ path: 'test-results/admin-workspace-orders.png', fullPage: true })
   await page.setViewportSize({ width: 390, height: 844 })
-  for (const path of ['products', 'inventory', 'orders', 'reports', 'assistant', 'knowledge']) {
+  for (const path of [
+    'products',
+    'inventory',
+    'orders',
+    'customers',
+    'reports',
+    'assistant',
+    'knowledge',
+  ]) {
     await page.goto('/admin/' + path)
     await expect(page.locator('#admin-main h1')).toBeVisible()
-    if (['products', 'inventory', 'orders'].includes(path))
+    if (['products', 'inventory', 'orders', 'customers'].includes(path))
       await expect(page.locator('#admin-main .catalog-table')).toBeVisible()
     if (path === 'reports') await expect(page.locator('.report-metrics')).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
