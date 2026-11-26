@@ -53,8 +53,17 @@ public sealed class AdminOrderService(CommerceDbContext db, TimeProvider clock) 
         new(o.CustomerName, o.Phone, o.Email, o.Province, o.Address, o.ShippingNote),
         o.Items.OrderBy(i => i.Sku).Select(i => new OrderLineDto(i.Sku, i.ProductName, i.VariantName, i.Image, i.Quantity, i.UnitPriceVnd, i.LineTotalVnd)).ToList(),
         await db.OrderStatusChanges.AsNoTracking().Where(e => e.OrderId == o.Id && e.Sequence <= o.Revision).OrderBy(e => e.Sequence)
-            .Select(e => new AdminOrderEvent(e.Id, e.Sequence, e.FromStatus, e.ToStatus, e.Reason, e.ActorId, e.ActorName, e.CreatedAt)).ToListAsync(ct), OrderFlow.Next(o.Status).ToList());
+            .Select(e => new AdminOrderEvent(e.Id, e.Sequence, e.FromStatus, e.ToStatus, e.Reason, e.ActorId, e.ActorName, e.CreatedAt)).ToListAsync(ct), await Allowed(o, ct), o.PaymentMethod);
 
+    private async Task<List<string>> Allowed(Order order, CancellationToken ct)
+    {
+        var next = OrderFlow.Next(order.Status).ToList();
+        if (order.PaymentMethod != "zalopay") return next;
+        if (order.PaymentStatus != "paid") next.RemoveAll(s => s != "cancelled");
+        var paymentState = await db.Set<ClayNest.Domain.Payments.ZaloPayment>().Where(p => p.OrderId == order.Id).Select(p => p.State).SingleOrDefaultAsync(ct);
+        if (order.PaymentStatus != "unpaid" || paymentState is not (null or "expired")) next.Remove("cancelled");
+        return next;
+    }
     public async Task<AdminOrderDetail> TransitionAsync(Guid id, OrderTransition input, Guid actorId, string actorName, CancellationToken ct)
     {
         var reason = input.Reason?.Trim() ?? "";
@@ -64,6 +73,7 @@ public sealed class AdminOrderService(CommerceDbContext db, TimeProvider clock) 
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
         var order = await db.Orders.FromSqlInterpolated($"SELECT * FROM commerce.\"Orders\" WHERE \"Id\" = {id} FOR UPDATE").SingleOrDefaultAsync(ct)
             ?? throw new KeyNotFoundException();
+        await db.Entry(order).ReloadAsync(ct);
         await db.Entry(order).Collection(o => o.Items).LoadAsync(ct);
         var previous = await db.OrderStatusChanges.AsNoTracking().SingleOrDefaultAsync(e => e.OrderId == id && e.RequestId == input.RequestId, ct);
         if (previous is not null)
@@ -72,6 +82,7 @@ public sealed class AdminOrderService(CommerceDbContext db, TimeProvider clock) 
             return await Detail(order, ct);
         }
         if (order.Revision != input.Revision) throw new OrderConflictException("order_conflict", "Đơn đã được cập nhật bởi thao tác khác. Vui lòng tải lại trước khi xử lý.");
+        if (!(await Allowed(order, ct)).Contains(input.Status)) throw new OrderRuleException("Đơn chưa đủ điều kiện chuyển trạng thái. Đơn ZaloPay cần xác nhận thanh toán; giao dịch còn hiệu lực chưa được hủy.");
         var from = order.Status;
         order.TransitionTo(input.Status, input.ConfirmCodCollected, clock.GetUtcNow());
         if (input.Status == "cancelled")

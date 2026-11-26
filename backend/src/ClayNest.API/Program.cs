@@ -88,6 +88,7 @@ app.MapReportEndpoints();
 app.MapCustomerEndpoints();
 app.MapReviewEndpoints();
 app.MapCustomerOrderEndpoints();
+app.MapZaloPaymentEndpoints();
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.Run();
 

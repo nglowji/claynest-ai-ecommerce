@@ -10,7 +10,7 @@ public sealed record AdminOrderEvent(Guid Id, int Sequence, string FromStatus, s
 public sealed record AdminOrderDetail(Guid Id, string Reference, string Status, string PaymentStatus,
     long SubtotalVnd, long ShippingFeeVnd, long GrandTotalVnd, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt,
     DateTimeOffset? CompletedAt, DateTimeOffset? CancelledAt, DateTimeOffset? RestockedAt, int Revision,
-    ShippingContact Contact, List<OrderLineDto> Items, List<AdminOrderEvent> History, List<string> AllowedTransitions);
+    ShippingContact Contact, List<OrderLineDto> Items, List<AdminOrderEvent> History, List<string> AllowedTransitions, string PaymentMethod = "cod");
 public sealed record OrderTransition(string Status, int Revision, string Reason, Guid RequestId, bool ConfirmCodCollected = false);
 public sealed class OrderConflictException(string code, string message) : Exception(message) { public string Code { get; } = code; }
 public interface IAdminOrderService

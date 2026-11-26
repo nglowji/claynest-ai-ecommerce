@@ -75,6 +75,11 @@ public static class DependencyInjection
         services.AddScoped<ClayNest.Application.Customers.ICustomerDirectory, ClayNest.Infrastructure.Customers.CustomerDirectory>();
         services.AddScoped<ClayNest.Application.Reviews.IProductReviews, ClayNest.Infrastructure.Reviews.ProductReviewService>();
         services.AddScoped<ClayNest.Application.Orders.ICustomerOrders, ClayNest.Infrastructure.Orders.CustomerOrders>();
+        services.Configure<ClayNest.Infrastructure.Payments.ZaloOptions>(configuration.GetSection("ZaloPay"));
+        services.AddHttpClient<ClayNest.Application.Payments.IZaloGateway, ClayNest.Infrastructure.Payments.ZaloGateway>(client => client.Timeout = TimeSpan.FromSeconds(12))
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+        services.AddScoped<ClayNest.Application.Payments.IZaloPayments, ClayNest.Infrastructure.Payments.ZaloPaymentService>();
+        services.AddHostedService<ClayNest.Infrastructure.Payments.ZaloReconciliationWorker>();
         return services;
     }
 }
