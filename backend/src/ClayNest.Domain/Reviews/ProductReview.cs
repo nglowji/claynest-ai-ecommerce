@@ -1,3 +1,4 @@
+using System.Text;
 namespace ClayNest.Domain.Reviews;
 
 public sealed class ReviewRuleException(string message) : Exception(message);
@@ -20,7 +21,7 @@ public sealed class ProductReview
     public void Update(int rating, string? comment, DateTimeOffset now)
     {
         var text = (comment ?? "").Trim();
-        if (rating is < 1 or > 5 || text.Length is < 10 or > 2000 || text.Any(c => char.IsControl(c) && c is not ('\r' or '\n' or '\t')))
+        if (rating is < 1 or > 5 || (text.EnumerateRunes().Count() < 10 || text.Length > 2000) || text.Any(c => char.IsControl(c) && c is not ('\r' or '\n' or '\t')))
             throw new ReviewRuleException("Chọn từ 1 đến 5 sao và viết đánh giá từ 10 đến 2.000 ký tự.");
         Rating = rating; Comment = text; UpdatedAt = now;
     }

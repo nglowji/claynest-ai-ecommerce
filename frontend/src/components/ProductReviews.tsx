@@ -259,6 +259,7 @@ export default function ProductReviews({ productId }: { productId: string }) {
                 <label>
                   Nội dung đánh giá
                   <textarea
+                    aria-label="Nội dung đánh giá"
                     required
                     minLength={10}
                     maxLength={2000}

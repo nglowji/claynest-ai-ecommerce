@@ -1,3 +1,4 @@
+using System.Text;
 using ClayNest.Application.Catalog;
 using ClayNest.Application.Reviews;
 using ClayNest.Domain.Reviews;
@@ -42,7 +43,7 @@ public sealed class ProductReviewService(CommerceDbContext db, TimeProvider cloc
         if (review is null) {
             var name = await db.Users.Where(u => u.Id == customerId).Select(u => u.DisplayName).SingleAsync(ct);
             var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var publicName = parts.Length > 1 ? parts[0] + " " + parts[^1][0] + "." : "Khách hàng";
+            var publicName = parts.Length > 1 ? parts[0] + " " + parts[^1].EnumerateRunes().First().ToString() + "." : "Khách hàng";
             review = new(productId, customerId, publicName, input.Rating, input.Comment, clock.GetUtcNow());
             db.Add(review);
         } else review.Update(input.Rating, input.Comment, clock.GetUtcNow());

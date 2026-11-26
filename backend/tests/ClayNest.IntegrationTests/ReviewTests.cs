@@ -29,6 +29,7 @@ public sealed class ReviewTests
         });
         using var badCsrf = await Save(csrf: "invalid"); Assert.Equal(HttpStatusCode.BadRequest, badCsrf.StatusCode);
         using var invalid = await Save(6); Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
+        using var tooShortUnicode = await Save(5, "🙂🙂🙂🙂🙂"); Assert.Equal(HttpStatusCode.BadRequest, tooShortUnicode.StatusCode);
         using var created = await Save(); Assert.Equal(HttpStatusCode.OK, created.StatusCode);
         var review = (await created.Content.ReadFromJsonAsync<ReviewRow>())!;
         using var updated = await Save(4, "Sản phẩm đẹp, chất men và màu sắc hài hòa."); Assert.Equal(HttpStatusCode.OK, updated.StatusCode);
