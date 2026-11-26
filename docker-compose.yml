@@ -165,6 +165,9 @@ services:
       context: ./backend
       target: runtime
     environment: &e2e-api-env
+      ZaloPay__AppId: "2554"
+      ZaloPay__Key1: "test-create-key"
+      ZaloPay__Key2: "test-callback-key"
       Reports__IsDemo: "true"
       AllowedHosts: localhost;127.0.0.1;e2e-api
       ASPNETCORE_ENVIRONMENT: Development

@@ -1,0 +1,112 @@
+.checkout-payment-methods {
+  border: 0;
+  padding: 0;
+  margin: 1.5rem 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.checkout-payment-methods legend {
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+.checkout-payment-methods label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid #dce1d3;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.checkout-payment-methods label:has(input:checked) {
+  border-color: #526347;
+  background: #f0f3eb;
+}
+.checkout-payment-methods input {
+  width: 18px;
+  height: 18px;
+  accent-color: #526347;
+  flex: 0 0 auto;
+}
+.checkout-payment-methods span {
+  display: grid;
+  gap: 0.2rem;
+}
+.checkout-payment-methods small {
+  color: #747b6d;
+  font-size: 0.78rem;
+}
+.zalo-payment-panel {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid #dce1d3;
+  border-radius: 24px;
+  background: #fffefa;
+  text-align: center;
+  box-shadow: 0 12px 50px #37432f08;
+}
+.zalo-payment-panel h1 {
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  margin: 1rem 0;
+}
+.zalo-payment-panel > p {
+  line-height: 1.7;
+}
+.zalo-payment-panel .eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: #64765b;
+}
+.zalo-amount {
+  display: block;
+  font-size: 1.8rem;
+  margin: 1.2rem 0;
+  color: #34492c;
+}
+.zalo-qr {
+  display: block;
+  width: min(100%, 320px);
+  height: auto;
+  margin: auto;
+  border: 1px solid #e8eadd;
+  border-radius: 14px;
+  background: white;
+}
+.zalo-countdown {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.zalo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
+  margin: 1.5rem 0;
+}
+.zalo-actions .button {
+  min-height: 46px;
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+}
+.zalo-actions .text-link {
+  padding: 0.7rem;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.zalo-payment-note {
+  padding-top: 1.2rem;
+  border-top: 1px solid #e5e8dc;
+  color: #767c70;
+  font-size: 0.8rem;
+}
+@media (max-width: 480px) {
+  .zalo-payment-panel {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+  .zalo-actions .button {
+    flex: 1 1 100%;
+  }
+}
