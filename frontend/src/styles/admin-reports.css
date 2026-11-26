@@ -167,3 +167,24 @@
     height: 190px;
   }
 }
+
+.admin-reports .report-filters label,
+.admin-reports .report-filters :is(input, select) {
+  min-width: 0;
+  width: 100%;
+}
+.admin-reports .report-presets {
+  margin-left: 0;
+  justify-content: flex-start;
+  width: 100%;
+}
+@media (max-width: 600px) {
+  .admin-reports .admin-view-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+  .admin-reports .admin-view-tabs button {
+    padding-inline: 10px;
+  }
+}

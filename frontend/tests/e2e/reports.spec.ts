@@ -14,9 +14,11 @@ test('sales report reconciles server totals, exports aggregate CSV and handles f
   await loginAdminWithBackoff(page)
   await page
     .getByRole('navigation', { name: 'Điều hướng quản trị' })
-    .getByRole('link', { name: 'Báo cáo bán hàng' })
+    .getByRole('link', { name: 'Báo cáo & phân tích' })
     .click()
-  await expect(page.getByRole('heading', { name: 'Báo cáo bán hàng', exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Báo cáo & phân tích', exact: true }),
+  ).toBeVisible()
   const sales = page.getByTestId('completed-sales')
   await expect(sales).toBeVisible()
   const response = await page.request.get('/api/v1/admin/reports')
@@ -47,6 +49,37 @@ test('sales report reconciles server totals, exports aggregate CSV and handles f
   expect(csv).not.toContain('0900000000')
   expect(csv).not.toContain('PRIVATE-REPORT-SENTINEL')
   expect(download.suggestedFilename()).toMatch(/^nang-gom-report-/)
+  await expect(page.locator('.report-comparison-period')).toContainText('So sánh kỳ trước:')
+  await page.getByRole('tab', { name: 'Xu hướng', exact: true }).click()
+  await expect(page.locator('#reports-view-panel tbody tr')).toHaveCount(10)
+  await page.getByRole('button', { name: 'Trang 2', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Trang 2', exact: true })).toHaveAttribute(
+    'aria-current',
+    'page',
+  )
+  await page.getByLabel('Sắp xếp kỳ báo cáo').selectOption('desc')
+  await expect(page.getByRole('button', { name: 'Trang 1', exact: true })).toHaveAttribute(
+    'aria-current',
+    'page',
+  )
+  await page.getByRole('tab', { name: 'Sản phẩm', exact: true }).click()
+  await expect(page.locator('#reports-view-panel tbody tr')).toHaveCount(
+    Math.min(5, report.topVariants.length),
+  )
+  await page.getByRole('tab', { name: 'Cảnh báo kho', exact: true }).click()
+  await expect(page.getByRole('link', { name: 'Xem kho' })).toHaveAttribute(
+    'href',
+    '/admin/inventory?lowOnly=true',
+  )
+  await expect(page.locator('#reports-view-panel tbody tr')).toHaveCount(
+    Math.min(5, report.lowStock.length),
+  )
+  await page.reload()
+  await expect(page.getByRole('tab', { name: 'Cảnh báo kho', exact: true })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  )
+  await page.getByRole('tab', { name: 'Doanh thu', exact: true }).click()
   await page.screenshot({ path: 'test-results/admin-reports-desktop.png', fullPage: true })
   await page.getByLabel('Nhóm báo cáo theo').selectOption('week')
   await page.getByRole('button', { name: 'Áp dụng', exact: true }).click()
@@ -70,4 +103,30 @@ test('sales report reconciles server totals, exports aggregate CSV and handles f
   await page.unroute('**/api/v1/admin/reports**')
   await page.getByRole('button', { name: 'Thử lại', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Chưa có đơn hoàn tất trong kỳ' })).toBeVisible()
+})
+
+test('prior-period outage keeps current report usable and refresh retries comparison', async ({
+  page,
+}) => {
+  test.setTimeout(120000)
+  await loginAdminWithBackoff(page)
+  await page.route('**/api/v1/admin/reports**', (route) =>
+    new URL(route.request().url()).searchParams.has('from') ? route.abort() : route.continue(),
+  )
+  await page.goto('/admin/reports')
+  await expect(page.getByTestId('completed-sales')).toBeVisible()
+  await expect(page.locator('.report-comparison-period')).toContainText('Chưa tải được kỳ trước')
+  await expect(page.locator('.report-chart svg')).toBeVisible()
+  await page.unroute('**/api/v1/admin/reports**')
+  await page.getByRole('button', { name: 'Làm mới', exact: true }).click()
+  await expect(page.locator('.report-comparison-period')).toContainText('So sánh kỳ trước:')
+  await page.route('**/api/v1/admin/reports/export.csv?**', (route) =>
+    route.fulfill({ status: 503 }),
+  )
+  await page.getByRole('button', { name: 'Xuất CSV', exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText('Chưa xuất được CSV')
+  await page.unroute('**/api/v1/admin/reports/export.csv?**')
+  const download = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Xuất CSV', exact: true }).click()
+  expect((await download).suggestedFilename()).toMatch(/^nang-gom-report-/)
 })
