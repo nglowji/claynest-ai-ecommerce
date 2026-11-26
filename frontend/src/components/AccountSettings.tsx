@@ -44,6 +44,14 @@ export default function AccountSettings() {
     }
     void perform('password', async () => {
       await accountRequest('change-password', { currentPassword: current, newPassword: password })
+      try {
+        sessionStorage.setItem(
+          'nang-gom-account-notice',
+          'Đã đổi mật khẩu và đăng xuất các phiên cũ. Vui lòng đăng nhập lại.',
+        )
+      } catch {
+        /* Navigation state remains available when storage is disabled. */
+      }
       setCurrent('')
       setPassword('')
       setConfirmation('')

@@ -1,5 +1,5 @@
 import SiteImage from './SiteImage'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { register } from '../auth/api'
@@ -21,9 +21,21 @@ export default function LoginPage() {
   const [show, setShow] = useState(false)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState('')
-  const [notice, setNotice] = useState(() =>
-    typeof location.state?.notice === 'string' ? location.state.notice : '',
-  )
+  const [notice, setNotice] = useState(() => {
+    if (typeof location.state?.notice === 'string') return location.state.notice
+    try {
+      return sessionStorage.getItem('nang-gom-account-notice') || ''
+    } catch {
+      return ''
+    }
+  })
+  useEffect(() => {
+    try {
+      sessionStorage.removeItem('nang-gom-account-notice')
+    } catch {
+      /* Optional success notice. */
+    }
+  }, [])
   if (auth.user) return <Navigate to={auth.user.role === 'Admin' ? '/admin' : returnTo} replace />
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
