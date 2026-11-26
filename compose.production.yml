@@ -8,6 +8,7 @@ x-api-environment: &api-environment
   ASPNETCORE_ENVIRONMENT: Production
   AllowedHosts: ${SITE_DOMAIN:?Set SITE_DOMAIN};localhost;api
   Cors__AllowedOrigins__0: https://${SITE_DOMAIN}
+  Cors__AllowedOrigins__1: https://${SITE_DOMAIN}
   Proxy__Address: ${PROXY_ADDRESS:-172.30.92.2}
   DataProtection__KeysPath: /app/keys
   Catalog__ImagePath: /app/media/catalog

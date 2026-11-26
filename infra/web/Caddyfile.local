@@ -1,8 +1,10 @@
 {
     admin off
+    http_port 8088
+    https_port 8443
 }
 import /etc/caddy/site.caddy
-https://localhost {
+https://localhost:8443 {
     tls internal
     import application
 }
