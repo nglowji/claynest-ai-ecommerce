@@ -414,7 +414,9 @@ export function AdminOrderDetailPage() {
                         ? data.paymentMethod === 'zalopay'
                           ? 'Đã xác minh thanh toán ZaloPay.'
                           : 'Đã ghi nhận thu đủ tiền COD.'
-                        : 'Chưa thanh toán · Thu tiền khi giao hàng.'}
+                        : data.paymentMethod === 'zalopay'
+                          ? 'Chờ xác nhận thanh toán ZaloPay.'
+                          : 'Chưa thanh toán · Thu tiền khi giao hàng.'}
                 </p>
               </section>
               <section className="fulfilment-panel">

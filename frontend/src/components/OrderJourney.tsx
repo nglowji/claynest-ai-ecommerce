@@ -17,8 +17,12 @@ export default function OrderJourney({ order }: { order: OrderStatus }) {
         <section className="order-cancelled">
           <h2>Đơn hàng đã hủy</h2>
           <p>
-            {order.cancelledAt ? purchaseDate(order.cancelledAt) : 'Đơn đã dừng xử lý'} · Không thu
-            tiền COD.
+            {order.cancelledAt ? purchaseDate(order.cancelledAt) : 'Đơn đã dừng xử lý'} ·{' '}
+            {order.paymentStatus === 'refund_required'
+              ? 'Cần đối soát khoản thanh toán ZaloPay.'
+              : order.paymentMethod === 'zalopay'
+                ? 'Giao dịch chưa thanh toán.'
+                : 'Không thu tiền COD.'}
           </p>
         </section>
         <ol className="order-progress" aria-label="Lịch sử đơn đã hủy">

@@ -31,6 +31,14 @@ public sealed class ZaloPaymentTests
         Assert.Equal(ZaloGateway.Sign("create-test", string.Join("|", f["app_id"], f["app_trans_id"], f["app_user"], f["amount"], f["app_time"], f["embed_data"], f["item"])), f["mac"]);
         using var again = await s.Post(s.Path, new {}); Assert.Equal(HttpStatusCode.OK, again.StatusCode);
         Assert.Equal(1, s.Gateway.Creates);
+        foreach (var target in new[] {"confirmed", "cancelled"}) {
+            await using var scope = s.Factory.Services.CreateAsyncScope();
+            var db = scope.ServiceProvider.GetRequiredService<ClayNest.Infrastructure.Persistence.CommerceDbContext>();
+            var order = await db.Orders.AsNoTracking().SingleAsync(o => o.Reference == s.Receipt.Reference);
+            var service = scope.ServiceProvider.GetRequiredService<IAdminOrderService>();
+            await Assert.ThrowsAsync<ClayNest.Domain.Orders.OrderRuleException>(() => service.TransitionAsync(order.Id,
+                new(target, order.Revision, "Test payment guard", Guid.NewGuid()), Guid.NewGuid(), "Test operator", default));
+        }
         Assert.Equal(2, await s.Callback(230000, false));
         Assert.Equal(2, await s.Callback(1));
         Assert.Equal(1, await s.Callback(230000));
@@ -85,6 +93,7 @@ public sealed class ZaloPaymentTests
     }
     internal sealed class GatewayHandler : HttpMessageHandler
     {
+        public long ProviderId = Random.Shared.NextInt64(1000000, long.MaxValue);
         public Dictionary<string,string> Form = []; public int Creates; public int Code = 3; public long Amount = 230000; public bool FailOnce;
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
@@ -95,7 +104,7 @@ public sealed class ZaloPaymentTests
                 return new(HttpStatusCode.OK) { Content = JsonContent.Create(new {return_code = 1, order_url = "https://qcgateway.zalopay.vn/payment/test"}) };
             }
             Assert.Equal(ZaloGateway.Sign("create-test", "2554|" + fields["app_trans_id"] + "|create-test"), fields["mac"]);
-            return new(HttpStatusCode.OK) { Content = JsonContent.Create(new {return_code = Code, amount = Amount, zp_trans_id = 123456L, is_processing = Code == 3}) };
+            return new(HttpStatusCode.OK) { Content = JsonContent.Create(new {return_code = Code, amount = Amount, zp_trans_id = ProviderId, is_processing = Code == 3}) };
         }
     }
     internal sealed class Session : IAsyncDisposable
@@ -128,9 +137,9 @@ public sealed class ZaloPaymentTests
         {
             using var request = new HttpRequestMessage(HttpMethod.Get,Path); request.Headers.Add("X-Order-Token",Receipt.AccessToken); return await Client.SendAsync(request);
         }
-        public async Task<int> Callback(long amount, bool valid = true, long providerId = 123456)
+        public async Task<int> Callback(long amount, bool valid = true, long? providerId = null)
         {
-            var data = JsonSerializer.Serialize(new {app_id = 2554, app_trans_id = Gateway.Form["app_trans_id"], amount, zp_trans_id = providerId});
+            var data = JsonSerializer.Serialize(new {app_id = 2554, app_trans_id = Gateway.Form["app_trans_id"], amount, zp_trans_id = providerId ?? Gateway.ProviderId});
             using var response = await Client.PostAsJsonAsync("/api/v1/payments/zalopay/callback", new {data, mac = valid ? ZaloGateway.Sign("callback-test", data) : new string('0',64), type = 1});
             Assert.Equal(HttpStatusCode.OK,response.StatusCode); return (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("return_code").GetInt32();
         }

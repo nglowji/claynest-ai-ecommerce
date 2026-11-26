@@ -194,13 +194,15 @@ export default function CustomerOrdersPage({
                   <footer>
                     <div>
                       <small>
-                        {order.status === 'cancelled'
-                          ? 'Giá trị đơn đã hủy'
-                          : order.paymentStatus === 'paid'
-                            ? 'Đã thanh toán'
-                            : order.paymentMethod === 'zalopay'
-                              ? 'Chờ thanh toán ZaloPay'
-                              : 'Thanh toán khi nhận hàng'}
+                        {order.paymentStatus === 'refund_required'
+                          ? 'Cần đối soát/hoàn tiền ZaloPay'
+                          : order.status === 'cancelled'
+                            ? 'Giá trị đơn đã hủy'
+                            : order.paymentStatus === 'paid'
+                              ? 'Đã thanh toán'
+                              : order.paymentMethod === 'zalopay'
+                                ? 'Chờ thanh toán ZaloPay'
+                                : 'Thanh toán khi nhận hàng'}
                       </small>
                       <strong>{money(order.grandTotalVnd)}</strong>
                     </div>
