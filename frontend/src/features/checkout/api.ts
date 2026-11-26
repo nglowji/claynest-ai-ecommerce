@@ -69,8 +69,9 @@ export const placeOrder = (key: string, command: Checkout) =>
     headers: { 'Idempotency-Key': key },
     body: JSON.stringify(command),
   })
-export const lookupOrder = (reference: string, token: string) =>
+export const lookupOrder = (reference: string, token: string, signal?: AbortSignal) =>
   catalogRequest<OrderStatus>(`orders/${encodeURIComponent(reference)}/status`, {
+    signal,
     headers: token ? { 'X-Order-Token': token } : {},
   })
 export function saveReceipt(receipt: Receipt) {
@@ -88,5 +89,14 @@ export function savedToken(reference: string): string {
     return typeof value === 'string' ? value : ''
   } catch {
     return ''
+  }
+}
+
+export function rememberOrderAccess(reference: string, token: string) {
+  if (!token || token.length > 128) return
+  try {
+    sessionStorage.setItem('nang-gom-order-' + reference, JSON.stringify({ accessToken: token }))
+  } catch {
+    /* Router state remains available in this tab. */
   }
 }

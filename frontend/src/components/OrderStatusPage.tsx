@@ -1,7 +1,15 @@
+import OrderJourney from './OrderJourney'
+import { useAuth } from '../auth/AuthContext'
+import { purchaseDate } from '../features/checkout/purchases'
 import SiteImage from './SiteImage'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { lookupOrder, savedToken, type OrderStatus } from '../features/checkout/api'
+import {
+  lookupOrder,
+  savedToken,
+  rememberOrderAccess,
+  type OrderStatus,
+} from '../features/checkout/api'
 import { money } from '../data/products'
 import Icon from './Icon'
 const labels: Record<string, string> = {
@@ -13,6 +21,7 @@ const labels: Record<string, string> = {
   cancelled: 'Đã hủy',
 }
 export default function OrderStatusPage() {
+  const auth = useAuth()
   const { reference } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
@@ -38,26 +47,38 @@ export default function OrderStatusPage() {
     setReference(reference || '')
     setData(null)
     setError('')
-    if (!reference) return
-    let active = true
+    if (!reference) {
+      setLoading(false)
+      setInputToken('')
+      return
+    }
+    const abort = new AbortController()
     setLoading(true)
-    lookupOrder(reference, access)
+    lookupOrder(reference, access, abort.signal)
       .then((result) => {
-        if (active) {
+        if (!abort.signal.aborted) {
           setData(result)
+          if (access) rememberOrderAccess(reference, access)
           setLoading(false)
         }
       })
       .catch((e) => {
-        if (active) {
+        if (!abort.signal.aborted) {
           setError(e instanceof Error ? e.message : 'Chưa tra cứu được đơn.')
           setLoading(false)
         }
       })
     return () => {
-      active = false
+      abort.abort()
     }
-  }, [reference, access, location.key, attempt])
+  }, [reference, access, location.key, attempt, auth.user?.id])
+  useEffect(() => {
+    if (!data || ['completed', 'cancelled'].includes(data.status)) return
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') setAttempt((n) => n + 1)
+    }, 30000)
+    return () => clearInterval(timer)
+  }, [data?.status, reference])
   function lookup(event: React.FormEvent) {
     event.preventDefault()
     navigate('/orders/' + encodeURIComponent(inputReference.trim().toUpperCase()), {
@@ -66,12 +87,12 @@ export default function OrderStatusPage() {
   }
   return (
     <section className="order-page container" aria-labelledby="order-title">
-      <div className="checkout-heading">
+      <div className="checkout-heading tracking-heading">
         <p className="eyebrow">NÀNG GỐM / ĐƠN HÀNG</p>
         <h1 id="order-title">
           {data ? (
             <>
-              Cảm ơn bạn <em>đã chọn Nàng.</em>
+              Theo dõi <em>đơn hàng của bạn.</em>
             </>
           ) : (
             <>
@@ -83,9 +104,13 @@ export default function OrderStatusPage() {
         </h1>
         <p>
           {data
-            ? 'Đơn hàng đã được ghi nhận. Bạn có thể kiểm tra trạng thái tại đây.'
+            ? 'Trạng thái từ cửa hàng · Tự làm mới mỗi 30 giây khi bạn đang xem.'
             : 'Nhập mã đơn và mã truy cập riêng được cấp khi đặt hàng.'}
         </p>
+      </div>
+      <div className="order-page-links">
+        <Link to="/account/orders">Đơn hàng đã mua</Link>
+        {reference && <Link to="/orders">Tra cứu đơn khác</Link>}
       </div>
       {loading && <p role="status">Đang tải đơn hàng…</p>}
       {error && (
@@ -112,6 +137,7 @@ export default function OrderStatusPage() {
             <input
               aria-label="Mã truy cập riêng"
               type="password"
+              required={!auth.user}
               maxLength={128}
               value={inputToken}
               onChange={(e) => setInputToken(e.target.value)}
@@ -130,27 +156,20 @@ export default function OrderStatusPage() {
             <div>
               <span>Mã đơn hàng</span>
               <strong>{data.reference}</strong>
-              <small>{new Date(data.createdAt).toLocaleString('vi-VN')}</small>
+              <small>{purchaseDate(data.createdAt)}</small>
             </div>
             <div className="order-status-tools">
               <span className="order-status-pill">{labels[data.status] || data.status}</span>
-              <button className="text-link" onClick={() => setAttempt((n) => n + 1)}>
+              <button
+                disabled={loading}
+                className="text-link"
+                onClick={() => setAttempt((n) => n + 1)}
+              >
                 Cập nhật trạng thái
               </button>
             </div>
           </div>
-          {data.timeline?.length > 0 && (
-            <ol className="order-progress" aria-label="Hành trình đơn hàng">
-              {data.timeline.map((step, index) => (
-                <li key={index}>
-                  <strong>{labels[step.status] || step.status}</strong>
-                  <time dateTime={step.changedAt}>
-                    {new Date(step.changedAt).toLocaleString('vi-VN')}
-                  </time>
-                </li>
-              ))}
-            </ol>
-          )}
+          <OrderJourney order={data} />
           <div className="checkout-layout">
             <section className="order-info">
               <h2>Thông tin nhận hàng</h2>
