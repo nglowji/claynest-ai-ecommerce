@@ -600,6 +600,54 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ClayNest.Domain.Reviews.ProductReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AuthorName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProductId", "CustomerId")
+                        .IsUnique();
+
+                    b.HasIndex("ProductId", "CreatedAt", "Id");
+
+                    b.ToTable("ProductReviews", "commerce", t =>
+                        {
+                            t.HasCheckConstraint("CK_Review_Comment", "char_length(\"Comment\") BETWEEN 10 AND 2000");
+
+                            t.HasCheckConstraint("CK_Review_Rating", "\"Rating\" BETWEEN 1 AND 5");
+                        });
+                });
+
             modelBuilder.Entity("ClayNest.Infrastructure.Identity.AdminUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -869,6 +917,21 @@ namespace ClayNest.Infrastructure.Persistence.Migrations
                     b.HasOne("ClayNest.Domain.Orders.Order", null)
                         .WithMany()
                         .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ClayNest.Domain.Reviews.ProductReview", b =>
+                {
+                    b.HasOne("ClayNest.Infrastructure.Identity.AdminUser", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ClayNest.Domain.Catalog.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
