@@ -1,0 +1,32 @@
+(application) {
+    encode zstd gzip
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+        X-Frame-Options DENY
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src https://www.google.com https://maps.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'"
+        -Server
+    }
+    @internal path /api/v1/internal/* /docs /docs/* /openapi/*
+    respond @internal 404
+    handle /healthz {
+        rewrite * /ready
+        reverse_proxy api:8080
+    }
+    @backend path /api /api/* /media/catalog/*
+    handle @backend {
+        reverse_proxy api:8080
+    }
+    handle /assets/* {
+        root * /srv
+        header Cache-Control "public, max-age=31536000, immutable"
+        file_server
+    }
+    handle {
+        root * /srv
+        header Cache-Control "no-cache"
+        try_files {path} /index.html
+        file_server
+    }
+}

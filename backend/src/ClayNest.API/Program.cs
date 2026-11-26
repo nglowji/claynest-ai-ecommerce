@@ -13,10 +13,12 @@ var removeSourceImages = args.Contains("--remove-source-images");
 var refreshCatalog = args.Contains("--refresh-catalog");
 var seedCatalog = args.Contains("--seed-catalog");
 var bootstrapAuth = args.Contains("--bootstrap-auth");
-var builder = WebApplication.CreateBuilder(args.Where(arg => arg != "--seed-development-activity" && arg != "--seed-report-demo" && arg != "--bootstrap-auth" && arg != "--seed-catalog" && arg != "--refresh-catalog" && arg != "--remove-source-images").ToArray());
+var migrateOnly = args.Contains("--migrate");
+var builder = WebApplication.CreateBuilder(args.Where(arg => arg != "--migrate" && arg != "--seed-development-activity" && arg != "--seed-report-demo" && arg != "--bootstrap-auth" && arg != "--seed-catalog" && arg != "--refresh-catalog" && arg != "--remove-source-images").ToArray());
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole(options => options.IncludeScopes = true);
 builder.Services.AddOpenApi();
+builder.Services.AddTrustedProxy(builder.Configuration);
 builder.Services.AddSingleton<ChatCapacity>();
 builder.Services.AddSingleton<AdminAiCapacity>();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -36,7 +38,7 @@ builder.Services.AddOptions<CorsOptions>().Configure<IOptions<ClientOptions>>((o
         .WithExposedHeaders("X-Correlation-ID", "X-Request-ID")));
 
 var app = builder.Build();
-if (seedActivity || bootstrapAuth || seedCatalog || refreshCatalog || removeSourceImages || seedReportDemo)
+if (migrateOnly || seedActivity || bootstrapAuth || seedCatalog || refreshCatalog || removeSourceImages || seedReportDemo)
 {
     if (seedActivity && !app.Environment.IsDevelopment()) throw new InvalidOperationException("Development activity is disabled outside Development.");
     await using var scope = app.Services.CreateAsyncScope();
@@ -53,6 +55,7 @@ if (seedActivity || bootstrapAuth || seedCatalog || refreshCatalog || removeSour
     if (seedReportDemo) await scope.ServiceProvider.GetRequiredService<ClayNest.Infrastructure.Reports.ReportDemoSeeder>().SeedAsync(CancellationToken.None);
     return;
 }
+app.UseForwardedHeaders();
 app.UseMiddleware<CorrelationMiddleware>();
 app.UseExceptionHandler(new ExceptionHandlerOptions { SuppressDiagnosticsCallback = _ => true });
 app.UseStatusCodePages(async status =>

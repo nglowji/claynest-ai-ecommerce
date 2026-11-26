@@ -1,0 +1,17 @@
+.git
+.env*
+.local
+.agents
+.codex
+.aws
+**/node_modules
+**/dist
+**/bin
+**/obj
+**/test-results
+**/TestResults
+**/__pycache__
+**/.venv
+**/*.md
+**/*.pem
+**/*.key

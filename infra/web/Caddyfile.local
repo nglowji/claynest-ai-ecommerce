@@ -1,0 +1,8 @@
+{
+    admin off
+}
+import /etc/caddy/site.caddy
+https://localhost {
+    tls internal
+    import application
+}
