@@ -45,7 +45,7 @@ export default function SalesChart({
         <div className="report-chart-empty">
           <AdminIcon name="reports" />
           <h3>Chưa có đơn hoàn tất trong kỳ</h3>
-          <p>Doanh thu sẽ được ghi nhận khi đơn giao xong và đã thu tiền COD.</p>
+          <p>Doanh thu sẽ được ghi nhận khi đơn giao xong và đã thanh toán.</p>
         </div>
       ) : (
         <div className="report-chart">

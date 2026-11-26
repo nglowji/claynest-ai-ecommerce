@@ -177,7 +177,11 @@ export default function AdminOrdersPage() {
                     <td>
                       <strong>{money(order.grandTotalVnd)}</strong>
                       <small>
-                        {order.paymentStatus === 'paid' ? 'Đã thu COD' : 'Chưa thanh toán'}
+                        {order.paymentStatus === 'refund_required'
+                          ? 'Cần đối soát/hoàn tiền'
+                          : order.paymentStatus === 'paid'
+                            ? 'Đã thanh toán'
+                            : 'Chưa thanh toán'}
                       </small>
                     </td>
                     <td>
@@ -395,16 +399,22 @@ export function AdminOrderDetailPage() {
                     <dd>{money(data.shippingFeeVnd)}</dd>
                   </div>
                   <div className="checkout-grand">
-                    <dt>{data.status === 'cancelled' ? 'Giá trị đơn đã hủy' : 'Tổng COD'}</dt>
+                    <dt>
+                      {data.status === 'cancelled' ? 'Giá trị đơn đã hủy' : 'Tổng thanh toán'}
+                    </dt>
                     <dd>{money(data.grandTotalVnd)}</dd>
                   </div>
                 </dl>
                 <p className="fulfilment-payment">
-                  {data.status === 'cancelled'
-                    ? 'Đơn đã hủy · Không thu tiền COD.'
-                    : data.paymentStatus === 'paid'
-                      ? 'Đã ghi nhận thu đủ tiền COD.'
-                      : 'Chưa thanh toán · Thu tiền khi giao hàng.'}
+                  {data.paymentStatus === 'refund_required'
+                    ? 'Đã nhận tiền sau khi đơn hủy. Cần đối soát/hoàn tiền ZaloPay.'
+                    : data.status === 'cancelled'
+                      ? 'Đơn đã hủy · Không thu tiền COD.'
+                      : data.paymentStatus === 'paid'
+                        ? data.paymentMethod === 'zalopay'
+                          ? 'Đã xác minh thanh toán ZaloPay.'
+                          : 'Đã ghi nhận thu đủ tiền COD.'
+                        : 'Chưa thanh toán · Thu tiền khi giao hàng.'}
                 </p>
               </section>
               <section className="fulfilment-panel">
@@ -485,7 +495,9 @@ export function AdminOrderDetailPage() {
                           checked={cod}
                           onChange={(e) => setCod(e.target.checked)}
                         />{' '}
-                        Đơn đã giao và đã thu đủ tiền COD.
+                        {data.paymentMethod === 'zalopay'
+                          ? 'Đơn đã giao; thanh toán ZaloPay đã được xác minh.'
+                          : 'Đơn đã giao và đã thu đủ tiền COD.'}
                       </label>
                     )}
                   </fieldset>
@@ -516,9 +528,11 @@ export function AdminOrderDetailPage() {
                 </form>
               ) : (
                 <p className="fulfilment-terminal">
-                  {data.status === 'cancelled'
-                    ? 'Đơn đã hủy. Số lượng đã được hoàn kho và lưu lịch sử.'
-                    : 'Đơn đã hoàn tất. Lịch sử và giá trị giao dịch được giữ nguyên.'}
+                  {data.paymentStatus === 'refund_required'
+                    ? 'Đã nhận tiền sau khi đơn hủy. Cần đối soát/hoàn tiền ZaloPay.'
+                    : data.status === 'cancelled'
+                      ? 'Đơn đã hủy. Số lượng đã được hoàn kho và lưu lịch sử.'
+                      : 'Đơn đã hoàn tất. Lịch sử và giá trị giao dịch được giữ nguyên.'}
                 </p>
               )}
               {actionError && (

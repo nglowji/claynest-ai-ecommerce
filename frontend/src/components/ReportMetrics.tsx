@@ -37,7 +37,7 @@ export default function ReportMetrics({
         <span>Đơn đã hoàn tất</span>
         <strong data-testid="completed-count">{number(report.metrics.completedOrders)}</strong>
         <p className="report-change">{comparison('completedOrders')}</p>
-        <small>Đã giao xong và thu tiền COD</small>
+        <small>Đã giao xong và thanh toán</small>
       </article>
       <article>
         <span>Giá trị đơn trung bình</span>

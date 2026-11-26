@@ -187,7 +187,14 @@ export default function OrderStatusPage() {
               {data.contact.note && <p>Ghi chú: {data.contact.note}</p>}
               <h2>Thanh toán</h2>
               <p>
-                {data.status === 'cancelled' ? (
+                {data.paymentStatus === 'refund_required' ? (
+                  'Đã nhận tiền ZaloPay sau khi đơn hủy. Cần liên hệ cửa hàng đối soát/hoàn tiền.'
+                ) : data.paymentMethod === 'zalopay' ? (
+                  <>
+                    Thanh toán ZaloPay ·{' '}
+                    {data.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                  </>
+                ) : data.status === 'cancelled' ? (
                   'Đơn đã hủy, không thu tiền COD.'
                 ) : (
                   <>
@@ -196,6 +203,13 @@ export default function OrderStatusPage() {
                   </>
                 )}
               </p>
+              {data.paymentMethod === 'zalopay' &&
+                data.paymentStatus === 'unpaid' &&
+                data.status !== 'cancelled' && (
+                  <Link className="button primary" to={'/checkout?pay=' + data.reference}>
+                    Thanh toán ZaloPay
+                  </Link>
+                )}
               {access && (
                 <details className="order-access">
                   <summary>Mã truy cập riêng của đơn</summary>

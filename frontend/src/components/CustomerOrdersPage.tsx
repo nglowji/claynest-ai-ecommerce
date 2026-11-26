@@ -198,7 +198,9 @@ export default function CustomerOrdersPage({
                           ? 'Giá trị đơn đã hủy'
                           : order.paymentStatus === 'paid'
                             ? 'Đã thanh toán'
-                            : 'Thanh toán khi nhận hàng'}
+                            : order.paymentMethod === 'zalopay'
+                              ? 'Chờ thanh toán ZaloPay'
+                              : 'Thanh toán khi nhận hàng'}
                       </small>
                       <strong>{money(order.grandTotalVnd)}</strong>
                     </div>
