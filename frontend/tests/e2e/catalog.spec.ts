@@ -17,7 +17,7 @@ test('admin creates draft, publishes, edits price, uploads image and archives; s
   await page
     .getByLabel('Mô tả', { exact: true })
     .fill('Sản phẩm tổng hợp dành cho kiểm thử trình duyệt.')
-  await page.getByLabel('SKU', { exact: true }).fill('E2E-' + key.toUpperCase())
+  await page.getByLabel('Mã sản phẩm (SKU)', { exact: true }).fill('E2E-' + key.toUpperCase())
   await page.getByLabel('Giá bán (VND)', { exact: true }).fill('250000')
   await page.getByLabel('Giá niêm yết (VND)', { exact: true }).fill('300000')
   await page.getByRole('button', { name: '+ Dùng ảnh có sẵn', exact: true }).click()
@@ -55,7 +55,7 @@ test('admin creates draft, publishes, edits price, uploads image and archives; s
   const imageUrl = (await (await page.request.get('/api/v1/products/' + slug)).json()).images[1].url
   expect((await page.request.get(imageUrl)).status()).toBe(200)
   await page.goto('/admin/products')
-  await page.getByLabel('Tìm tên hoặc SKU').fill(key)
+  await page.getByLabel('Tìm tên hoặc mã sản phẩm').fill(key)
   const row = page.getByRole('row').filter({ hasText: 'E2E Gốm ' + key })
   await expect(row).toBeVisible()
   await expect(row.locator('.admin-product-cell img')).toBeVisible()
@@ -196,7 +196,7 @@ test('admin catalog combines server filters and reset restores the full list', a
   await expect(page.getByLabel('Giá đến quản trị')).toHaveValue('')
   await expect(page.getByLabel('Còn hàng trong kho', { exact: true })).not.toBeChecked()
   await page.goto('/admin/products?q=no-matching-product-search')
-  await expect(page.getByLabel('Tìm tên hoặc SKU')).toHaveValue('no-matching-product-search')
+  await expect(page.getByLabel('Tìm tên hoặc mã sản phẩm')).toHaveValue('no-matching-product-search')
   await page.getByRole('button', { name: 'Xóa bộ lọc sản phẩm' }).click()
   await expect(page).toHaveURL('/admin/products')
   await expect(page.locator('.catalog-table tbody tr')).toHaveCount(Math.min(12, all.totalCount))

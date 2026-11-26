@@ -41,7 +41,7 @@ test('admin receives, adjusts, changes threshold and reads durable stock history
   const product = await created.json()
   await page.getByRole('link', { name: 'Quản lý kho', exact: true }).click()
   await expect(page).toHaveURL('/admin/inventory')
-  await page.getByLabel('Tìm sản phẩm hoặc SKU', { exact: true }).fill(key)
+  await page.getByLabel('Tìm sản phẩm hoặc mã', { exact: true }).fill(key)
   await page.getByRole('button', { name: 'Quản lý', exact: true }).click()
   await page.getByLabel('Số lượng nhập', { exact: true }).fill('30')
   await page.getByLabel('Lý do', { exact: true }).fill('Nhập hàng kiểm thử')

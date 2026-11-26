@@ -428,7 +428,7 @@ export default function AdminReportsPage() {
                     <table>
                       <thead>
                         <tr>
-                          <th>Sản phẩm / SKU</th>
+                          <th>Sản phẩm / Mã</th>
                           <th className="report-numeric">Số lượng</th>
                           <th className="report-numeric">Tiền hàng</th>
                         </tr>
@@ -470,7 +470,7 @@ export default function AdminReportsPage() {
                     <table>
                       <thead>
                         <tr>
-                          <th>Sản phẩm / SKU</th>
+                          <th>Sản phẩm / Mã</th>
                           <th className="report-numeric">Tồn</th>
                           <th className="report-numeric">Ngưỡng</th>
                         </tr>

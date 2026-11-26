@@ -95,7 +95,7 @@ export default function AdminToolbar({
           >
             <option value="orders">Đơn hàng</option>
             <option value="products">Sản phẩm</option>
-            <option value="inventory">SKU / kho</option>
+            <option value="inventory">Mã sản phẩm / kho</option>
             <option value="customers">Khách hàng</option>
           </select>
           <input

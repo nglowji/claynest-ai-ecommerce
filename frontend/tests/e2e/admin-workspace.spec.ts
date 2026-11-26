@@ -32,7 +32,7 @@ test('shared admin workspace searches real screens and mobile menu supports keyb
   await page.getByLabel('Từ khóa tìm kiếm quản trị').fill('Cốc')
   await page.getByRole('button', { name: 'Tìm trong quản trị' }).click()
   await expect(page).toHaveURL(/admin\/products\?q=/)
-  await expect(page.getByLabel('Tìm tên hoặc SKU')).toHaveValue('Cốc')
+  await expect(page.getByLabel('Tìm tên hoặc mã sản phẩm')).toHaveValue('Cốc')
   await page.getByRole('button', { name: 'Tạo sản phẩm', exact: true }).click()
   const editor = page.getByRole('dialog', { name: 'Sản phẩm mới' })
   await expect(editor).toBeVisible()

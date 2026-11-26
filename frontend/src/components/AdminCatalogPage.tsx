@@ -1,3 +1,4 @@
+import AdminPagination from './AdminPagination'
 import AdminActionButton from './AdminActionButton'
 import AdminProductCell from './AdminProductCell'
 import AdminEditorDialog from './AdminEditorDialog'
@@ -139,7 +140,7 @@ export default function AdminCatalogPage() {
               category: categoryFilter,
               sort,
               page: String(page),
-              pageSize: '12',
+              pageSize: '10',
               inStock: String(inStock),
               sale: String(sale),
               ...(minPrice ? { minPrice } : {}),
@@ -428,7 +429,7 @@ export default function AdminCatalogPage() {
                   <div className="editor-fields">
                     {(
                       [
-                        ['sku', 'SKU', 64],
+                        ['sku', 'Mã sản phẩm (SKU)', 64],
                         ['name', 'Tên biến thể', 120],
                         ['glaze', 'Màu men', 120],
                         ['intendedUse', 'Công dụng', 160],
@@ -649,7 +650,7 @@ export default function AdminCatalogPage() {
       <section className="admin-list-section">
         <h2>Danh sách sản phẩm</h2>
         <label className="auth-field">
-          Tìm tên hoặc SKU
+          Tìm tên hoặc mã sản phẩm
           <input
             value={q}
             maxLength={180}
@@ -811,97 +812,93 @@ export default function AdminCatalogPage() {
               </table>
             </div>
             {!list.totalCount && <p>Chưa có sản phẩm.</p>}
-            <div className="catalog-pagination">
-              <button disabled={page <= 1} onClick={() => setPage((n) => n - 1)}>
-                Trang trước
-              </button>
-              <span>
-                Trang {page} · {list.totalCount} sản phẩm
-              </span>
-              <button
-                disabled={page * list.pageSize >= list.totalCount}
-                onClick={() => setPage((n) => n + 1)}
-              >
-                Trang sau
-              </button>
-            </div>
+            <AdminPagination
+              page={page}
+              pageSize={list?.pageSize || 10}
+              totalCount={list?.totalCount || 0}
+              loading={loading}
+              onPage={setPage}
+            />
           </>
         )}
       </section>
-      <section className="category-editor">
-        <h2>Danh mục</h2>
-        <p className="detail-note">
-          Ẩn danh mục sẽ ẩn các sản phẩm thuộc danh mục đó trên cửa hàng.
-        </p>
-        <div className="category-tabs">
-          {categories.map((c) => (
+      <details className="admin-category-disclosure">
+        <summary>Quản lý danh mục</summary>
+        <section className="category-editor">
+          <h2>Danh mục</h2>
+          <p className="detail-note">
+            Ẩn danh mục sẽ ẩn các sản phẩm thuộc danh mục đó trên cửa hàng.
+          </p>
+          <div className="category-tabs">
+            {categories.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => {
+                  setCategoryId(c.id)
+                  setCategoryForm({
+                    name: c.name,
+                    slug: c.slug,
+                    active: c.active,
+                    revision: c.revision,
+                  })
+                }}
+              >
+                {c.name}
+                {!c.active ? ' (ẩn)' : ''}
+              </button>
+            ))}
             <button
-              key={c.id}
               onClick={() => {
-                setCategoryId(c.id)
-                setCategoryForm({
-                  name: c.name,
-                  slug: c.slug,
-                  active: c.active,
-                  revision: c.revision,
-                })
+                setCategoryId('')
+                setCategoryForm({ name: '', slug: '', active: true, revision: '' })
               }}
             >
-              {c.name}
-              {!c.active ? ' (ẩn)' : ''}
+              + Danh mục mới
             </button>
-          ))}
-          <button
-            onClick={() => {
-              setCategoryId('')
-              setCategoryForm({ name: '', slug: '', active: true, revision: '' })
-            }}
-          >
-            + Danh mục mới
-          </button>
-        </div>
-        <form onSubmit={saveCategory}>
-          <fieldset disabled={busy}>
-            <div className="editor-fields">
-              <label>
-                Tên danh mục
+          </div>
+          <form onSubmit={saveCategory}>
+            <fieldset disabled={busy}>
+              <div className="editor-fields">
+                <label>
+                  Tên danh mục
+                  <input
+                    required
+                    maxLength={100}
+                    value={categoryForm.name}
+                    onChange={(e) =>
+                      setCategoryForm({
+                        ...categoryForm,
+                        name: e.target.value,
+                        ...(!categoryId ? { slug: slugify(e.target.value) } : {}),
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  Slug danh mục
+                  <input
+                    required
+                    maxLength={140}
+                    value={categoryForm.slug}
+                    onChange={(e) => setCategoryForm({ ...categoryForm, slug: e.target.value })}
+                  />
+                </label>
+              </div>
+              <label className="editor-check">
                 <input
-                  required
-                  maxLength={100}
-                  value={categoryForm.name}
-                  onChange={(e) =>
-                    setCategoryForm({
-                      ...categoryForm,
-                      name: e.target.value,
-                      ...(!categoryId ? { slug: slugify(e.target.value) } : {}),
-                    })
-                  }
+                  type="checkbox"
+                  checked={categoryForm.active}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, active: e.target.checked })}
                 />
+                Hiển thị danh mục
               </label>
-              <label>
-                Slug danh mục
-                <input
-                  required
-                  maxLength={140}
-                  value={categoryForm.slug}
-                  onChange={(e) => setCategoryForm({ ...categoryForm, slug: e.target.value })}
-                />
-              </label>
-            </div>
-            <label className="editor-check">
-              <input
-                type="checkbox"
-                checked={categoryForm.active}
-                onChange={(e) => setCategoryForm({ ...categoryForm, active: e.target.checked })}
-              />
-              Hiển thị danh mục
-            </label>
-            <button className="button primary" type="submit">
-              Lưu danh mục
-            </button>
-          </fieldset>
-        </form>
-      </section>
+              <button className="button primary" type="submit">
+                Lưu danh mục
+              </button>
+            </fieldset>
+          </form>
+        </section>
+      </details>
     </section>
   )
 }
