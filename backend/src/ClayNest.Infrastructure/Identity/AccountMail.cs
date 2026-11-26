@@ -36,6 +36,7 @@ public sealed class AccountEmailSender(IOptions<AccountMailOptions> options, IHo
             smtp.Credentials = new NetworkCredential(config.Username, config.Password);
             smtp.Timeout = 10000;
         }
-        await smtp.SendMailAsync(message).WaitAsync(TimeSpan.FromSeconds(12));
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(12));
+        await smtp.SendMailAsync(message, timeout.Token);
     }
 }

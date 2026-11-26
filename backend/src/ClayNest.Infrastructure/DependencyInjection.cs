@@ -49,7 +49,12 @@ public static class DependencyInjection
             options.Lockout.MaxFailedAccessAttempts = 5;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
             options.Lockout.AllowedForNewUsers = true;
-        }).AddRoles<IdentityRole<Guid>>().AddEntityFrameworkStores<CommerceDbContext>().AddSignInManager();
+        }).AddRoles<IdentityRole<Guid>>().AddEntityFrameworkStores<CommerceDbContext>().AddSignInManager().AddDefaultTokenProviders();
+        services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(1));
+        services.Configure<AccountMailOptions>(configuration.GetSection("AccountMail"));
+        services.AddSingleton<AccountMailThrottle>();
+        services.AddScoped<IAccountEmailSender, AccountEmailSender>();
+        services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ClayNest.Application.Catalog.ICatalogService, ClayNest.Infrastructure.Catalog.CatalogService>();
         services.AddScoped<ClayNest.Application.Catalog.ICatalogImageStorage, ClayNest.Infrastructure.Catalog.LocalCatalogImageStorage>();
         services.AddScoped<IAdminAuthenticationService, AdminAuthenticationService>();
