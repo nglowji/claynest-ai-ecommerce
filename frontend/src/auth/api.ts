@@ -3,6 +3,7 @@ export type AdminUser = {
   email: string
   displayName: string
   role: 'Admin' | 'Customer'
+  emailConfirmed?: boolean
 }
 export class AuthError extends Error {
   constructor(
