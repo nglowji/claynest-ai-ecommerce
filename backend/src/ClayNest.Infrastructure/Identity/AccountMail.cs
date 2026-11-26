@@ -22,7 +22,7 @@ public sealed class AccountEmailSender(IOptions<AccountMailOptions> options, IHo
     public async Task SendAsync(string recipient, string subject, string body)
     {
         var config = options.Value;
-        using var message = new MailMessage { From = new MailAddress(config.From), Subject = subject, Body = body, BodyEncoding = System.Text.Encoding.UTF8, SubjectEncoding = System.Text.Encoding.UTF8 };
+        using var message = new MailMessage { From = new MailAddress(config.From), Subject = subject, Body = body, BodyEncoding = System.Text.Encoding.UTF8, SubjectEncoding = System.Text.Encoding.UTF8, BodyTransferEncoding = System.Net.Mime.TransferEncoding.Base64 };
         message.To.Add(new MailAddress(recipient));
         using var smtp = new SmtpClient();
         if (string.IsNullOrWhiteSpace(config.Host)) {
