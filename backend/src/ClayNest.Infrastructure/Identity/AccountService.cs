@@ -58,10 +58,11 @@ public sealed class AccountService(UserManager<AdminUser> users, SignInManager<A
         await Deliver(user.Email!, "Đặt lại mật khẩu Nàng Gốm", "Bạn đã yêu cầu đặt lại mật khẩu. Liên kết có hiệu lực 1 giờ và chỉ dùng một lần.\n\n"
             + Link("/reset-password", user, token) + "\n\nNếu không yêu cầu, bạn có thể bỏ qua email này.");
     }
-    public async Task RequestVerificationAsync(string userId)
+    public async Task RequestVerificationAsync(string address)
     {
-        var user = await users.FindByIdAsync(userId);
-        if (user is null || user.EmailConfirmed || !throttle.TryAcquire("verify:" + user.Id)) return;
+        if (!throttle.TryAcquire("verify:" + address.Trim().ToUpperInvariant())) return;
+        var user = await users.FindByEmailAsync(address.Trim());
+        if (user is null || user.EmailConfirmed) return;
         var token = await users.GenerateEmailConfirmationTokenAsync(user);
         await Deliver(user.Email!, "Xác minh email Nàng Gốm", "Xác minh địa chỉ email của bạn bằng liên kết sau (có hiệu lực 1 giờ):\n\n"
             + Link("/verify-email", user, token) + "\n\nNếu không yêu cầu, bạn có thể bỏ qua email này.");

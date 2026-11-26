@@ -77,6 +77,7 @@ app.UseAuthorization();
 app.UseRateLimiter();
 app.MapOperationalEndpoints();
 app.MapAuthenticationEndpoints();
+app.MapAccountEndpoints();
 app.MapCatalogEndpoints();
 app.MapInventoryEndpoints();
 app.MapOrderEndpoints();
