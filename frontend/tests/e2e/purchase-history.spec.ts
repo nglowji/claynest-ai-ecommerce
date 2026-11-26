@@ -46,6 +46,7 @@ test('customer returns to checkout, sees private purchase history, filters, page
   await page
     .getByLabel('Địa chỉ nhận hàng', { exact: true })
     .fill('123 Private Customer Purchase Street')
+  await expect(page.locator('.checkout-summary li')).toHaveCount(1)
   await page.getByRole('checkbox').check()
   await page.getByRole('button', { name: 'Xác nhận đặt hàng COD', exact: true }).click()
   await expect(page).toHaveURL(/\/orders\/NG-/)
