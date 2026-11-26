@@ -67,10 +67,10 @@ test('dashboard period and order filters use live server data and retain the sel
     page.locator('.dashboard-revenue-metrics > div').nth(1).locator('strong'),
   ).toHaveText(report.metrics.completedOrders.toLocaleString('vi-VN'))
   await expect(page.locator('.dashboard-ranking li')).toHaveCount(
-    Math.min(4, report.topVariants.length),
+    Math.min(2, report.topVariants.length),
   )
   await expect(page.locator('.dashboard-stock-list li')).toHaveCount(
-    Math.min(4, report.lowStock.length),
+    Math.min(2, report.lowStock.length),
   )
   const response = page.waitForResponse(
     (res) => res.url().includes('/api/v1/admin/reports?') && res.status() === 200,
@@ -89,7 +89,7 @@ test('dashboard period and order filters use live server data and retain the sel
     (res) =>
       res.url().includes('/api/v1/admin/orders/?') &&
       res.url().includes('status=pending') &&
-      new URL(res.url()).searchParams.get('pageSize') === '6',
+      new URL(res.url()).searchParams.get('pageSize') === '4',
   )
   await filters.getByRole('button', { name: 'Chờ xác nhận' }).click()
   const pending = await (await ordersResponse).json()

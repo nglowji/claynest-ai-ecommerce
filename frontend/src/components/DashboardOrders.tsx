@@ -19,7 +19,7 @@ export default function DashboardOrders({ recent, loading, error, revision }: Pr
     setPending(true)
     setFailure('')
     setRows([])
-    listOrders(new URLSearchParams({ status: filter, pageSize: '6', page: '1' }), controller.signal)
+    listOrders(new URLSearchParams({ status: filter, pageSize: '4', page: '1' }), controller.signal)
       .then((data) => {
         if (!controller.signal.aborted) setRows(data.items)
       })
@@ -35,7 +35,7 @@ export default function DashboardOrders({ recent, loading, error, revision }: Pr
   }, [filter, revision, attempt])
   const busy = filter ? pending : loading
   const problem = filter ? failure : error
-  const orders = filter ? rows : recent
+  const orders = filter ? rows : recent.slice(0, 4)
   const filters = [
     { value: '', label: 'Mới nhất' },
     { value: 'pending', label: 'Chờ xác nhận' },
@@ -123,7 +123,7 @@ export default function DashboardOrders({ recent, loading, error, revision }: Pr
         </div>
       )}
       <div className="dashboard-table-footer">
-        <span>Hiển thị tối đa 6 đơn mới nhất</span>
+        <span>Hiển thị tối đa 4 đơn mới nhất</span>
         <Link to={'/admin/orders' + (filter ? '?status=' + filter : '')}>Xem danh sách đầy đủ</Link>
       </div>
     </section>

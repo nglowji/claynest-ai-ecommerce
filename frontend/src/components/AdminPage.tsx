@@ -117,15 +117,17 @@ export default function AdminPage() {
         </section>
         <DashboardQueue data={summary.data} loading={summary.loading} />
       </div>
-      <DashboardOrders
-        recent={summary.data?.recent || []}
-        loading={summary.loading}
-        error={summary.error}
-        revision={summary.updatedAt?.toISOString() || ''}
-      />
-      {report.data && !report.loading && (
-        <DashboardInsights report={report.data} reportUrl={reportUrl} />
-      )}
+      <div className="dashboard-detail-grid">
+        <DashboardOrders
+          recent={summary.data?.recent || []}
+          loading={summary.loading}
+          error={summary.error}
+          revision={summary.updatedAt?.toISOString() || ''}
+        />
+        {report.data && !report.loading && (
+          <DashboardInsights report={report.data} reportUrl={reportUrl} />
+        )}
+      </div>
       <footer className="dashboard-footer">
         <span>Nàng Gốm · Chăm chút cửa hàng mỗi ngày</span>
         <Link to="/">

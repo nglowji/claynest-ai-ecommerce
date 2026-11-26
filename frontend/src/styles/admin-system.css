@@ -1097,3 +1097,115 @@
     white-space: nowrap;
   }
 }
+
+/* Compact previews; the full lists remain available on their dedicated pages. */
+.admin-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--admin-muted);
+}
+.admin-pagination > div,
+.admin-pagination-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.admin-pagination button {
+  min-height: 36px;
+  min-width: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--admin-ink);
+}
+.admin-pagination button[aria-current='page'] {
+  background: #214b3c;
+  border-color: #214b3c;
+  color: #fff;
+}
+.admin-pagination button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.admin-category-disclosure {
+  margin-top: 22px;
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  background: #fff;
+}
+.admin-category-disclosure > summary {
+  padding: 18px 22px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.admin-workspace .admin-category-disclosure .category-editor {
+  border: 0;
+  margin: 0;
+  box-shadow: none;
+}
+.admin-workspace .dashboard-sales .report-chart svg {
+  height: 180px;
+}
+.dashboard-detail-grid {
+  display: grid;
+  gap: 22px;
+  align-items: start;
+}
+.dashboard-detail-grid .dashboard-insights-grid {
+  margin-top: 0;
+}
+@media (min-width: 1200px) {
+  .admin-workspace #admin-main > .container,
+  .admin-workspace :is(.admin-dashboard, .admin-ai-page) {
+    max-width: none;
+    padding: 26px 30px;
+  }
+  .admin-workspace .dashboard-heading {
+    margin-bottom: 16px;
+  }
+  .admin-workspace .dashboard-context {
+    margin-bottom: 16px;
+  }
+  .dashboard-business-summary {
+    margin-bottom: 18px;
+  }
+  .dashboard-business-summary .dashboard-revenue-metrics > div {
+    padding: 16px 20px;
+  }
+  .admin-workspace .dashboard-v2 .dashboard-metric {
+    padding: 14px 18px;
+  }
+  .dashboard-detail-grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+  }
+  .dashboard-detail-grid .dashboard-insights-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .dashboard-detail-grid .dashboard-panel-heading {
+    padding: 16px 20px;
+  }
+  .dashboard-detail-grid :is(.dashboard-ranking, .dashboard-stock-list) li {
+    padding: 12px 0;
+  }
+  .dashboard-detail-grid .dashboard-order-table :is(td, th) {
+    padding: 12px 16px;
+  }
+  .admin-workspace .catalog-table td {
+    padding-block: 12px;
+  }
+}
+@media (max-width: 600px) {
+  .admin-pagination > div {
+    flex-wrap: wrap;
+  }
+  .admin-pagination {
+    align-items: flex-start;
+  }
+}

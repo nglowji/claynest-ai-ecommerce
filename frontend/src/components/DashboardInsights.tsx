@@ -23,7 +23,7 @@ export default function DashboardInsights({
         </div>
         {report.topVariants.length ? (
           <ol className="dashboard-ranking">
-            {report.topVariants.slice(0, 4).map((item, index) => (
+            {report.topVariants.slice(0, 2).map((item, index) => (
               <li key={item.variantId}>
                 <span className="dashboard-rank">{String(index + 1).padStart(2, '0')}</span>
                 <div>
@@ -60,7 +60,7 @@ export default function DashboardInsights({
         </div>
         {report.lowStock.length ? (
           <ul className="dashboard-stock-list">
-            {report.lowStock.slice(0, 4).map((item) => (
+            {report.lowStock.slice(0, 2).map((item) => (
               <li key={item.variantId}>
                 <div>
                   <Link to={'/admin/inventory?q=' + encodeURIComponent(item.sku)}>
