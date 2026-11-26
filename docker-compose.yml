@@ -47,6 +47,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       DataProtection__KeysPath: /app/keys
       Catalog__ImagePath: /app/media/catalog
+      ZaloPay__AppId: ${ZALO_APP_ID:-0}
+      ZaloPay__Key1: ${ZALO_KEY1:-}
+      ZaloPay__Key2: ${ZALO_KEY2:-}
+      ZaloPay__ApiEndpoint: ${ZALO_API_ENDPOINT:-https://sb-openapi.zalopay.vn/v2/create}
+      ZaloPay__CallbackUrl: ${ZALO_CALLBACK_URL:-}
+      ZaloPay__FrontendUrl: ${ZALO_FRONTEND_URL:-http://127.0.0.1:5173}
       Ai__BaseUrl: http://ai-service:8001
       Ai__GatewaySecret: ${AI_GATEWAY_SECRET}
       Ai__KnowledgeAdminSecret: ${AI_KNOWLEDGE_ADMIN_SECRET}
