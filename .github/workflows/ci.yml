@@ -50,3 +50,21 @@ jobs:
       - name: Stop browser test services
         if: always()
         run: docker compose --profile e2e stop e2e-api e2e-ai db-test
+
+  release-rehearsal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Build localhost HTTPS production rehearsal
+        run: python scripts/rehearsal.py up
+      - name: Verify TLS sessions checkout and database runtime permissions
+        run: python scripts/release_smoke.py
+      - name: Stop only the isolated rehearsal project
+        if: always()
+        run: python scripts/rehearsal.py stop
