@@ -27,11 +27,19 @@ type StockItem = {
 export default function AdminInventoryPage() {
   const auth = useAuth()
   const [params, setParams] = useSearchParams()
-  const query = params.get('q') || ''
-  const lowOnly = params.get('lowOnly') === 'true'
+  const queryParam = params.get('q') || ''
+  const lowParam = params.get('lowOnly') === 'true'
+  const [query, setQuery] = useState(queryParam)
+  const [lowOnly, setLowOnly] = useState(lowParam)
+  useEffect(() => {
+    setQuery(queryParam)
+    setLowOnly(lowParam)
+  }, [queryParam, lowParam])
   const rawPage = Number(params.get('page') || 1)
   const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1
   function filter(key: string, value: string) {
+    if (key === 'q') setQuery(value)
+    if (key === 'lowOnly') setLowOnly(value === 'true')
     const next = new URLSearchParams(params)
     if (value) next.set(key, value)
     else next.delete(key)

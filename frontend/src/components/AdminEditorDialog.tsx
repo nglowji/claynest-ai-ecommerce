@@ -19,11 +19,16 @@ export default function AdminEditorDialog({
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
   useEffect(() => {
+    const trigger = document.activeElement
+    const element = dialog.current
     const previous = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    dialog.current?.showModal()
+    element?.showModal()
     return () => {
+      element?.close()
       document.body.style.overflow = previous
+      if (trigger instanceof HTMLElement && trigger.isConnected)
+        trigger.focus({ preventScroll: true })
     }
   }, [])
   return (
