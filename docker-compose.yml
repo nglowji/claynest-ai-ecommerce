@@ -264,6 +264,7 @@ services:
     shm_size: 1gb
     volumes:
       - ./.local/test-mail:/mail:ro
+      - ./.local/browser-results:/work/test-results
     environment:
       E2E_MAIL_DIR: /mail
       API_PROXY_TARGET: http://e2e-api:8080

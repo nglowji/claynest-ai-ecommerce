@@ -373,6 +373,7 @@ export default function CheckoutPage({
               <input
                 type="checkbox"
                 required
+                disabled={quote.loading || !quote.data?.canCheckout || expired}
                 checked={accepted}
                 onChange={(e) => setAccepted(e.target.checked)}
               />{' '}

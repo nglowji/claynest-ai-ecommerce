@@ -12,15 +12,12 @@ test('ZaloPay QR stays inside checkout, survives reload and waits for server ver
   let receipt: { reference: string; grandTotalVnd: number; accessToken: string }
   let paid = false
   let orderCount = 0
-  page.on('response', async (response) => {
-    if (
-      response.request().method() === 'POST' &&
-      response.url().endsWith('/api/v1/orders') &&
-      response.status() === 201
-    ) {
-      receipt = await response.json()
-      orderCount++
-    }
+  await page.route('**/api/v1/orders', async (route) => {
+    const response = await route.fetch()
+    expect(response.status()).toBe(201)
+    receipt = await response.json()
+    orderCount++
+    await route.fulfill({ response })
   })
   // Gateway UI fixture; signed callbacks and server reconciliation are covered by integration tests.
   await page.route('**/api/v1/orders/*/zalopay/', async (route) => {
@@ -45,6 +42,7 @@ test('ZaloPay QR stays inside checkout, survives reload and waits for server ver
   await page.getByLabel('Tỉnh / thành phố', { exact: true }).fill('Trà Vinh')
   await page.getByLabel('Địa chỉ nhận hàng', { exact: true }).fill('123 Đường Gốm, phường Trà Vinh')
   await page.getByRole('radio', { name: /ZaloPay/ }).check()
+  await expect(page.locator('.checkout-grand')).toContainText('290.000')
   await page.getByRole('checkbox').check()
   await page.getByRole('button', { name: 'Tạo mã QR ZaloPay', exact: true }).click()
   const qr = page.getByRole('img', { name: /Mã QR ZaloPay/ })

@@ -34,6 +34,10 @@ def browser(shard, shards, suites=None):
     if os.name != "nt":
         # Only synthetic test email enters this directory; the API runs as a non-root UID.
         mailbox.chmod(0o777)
+    results = ROOT / ".local/browser-results"
+    results.mkdir(parents=True, exist_ok=True)
+    if os.name != "nt":
+        results.chmod(0o777)
     compose("--profile", "e2e", "build", "e2e-api", "e2e-bootstrap", "e2e-ai", "frontend-tests")
     try:
         for suite in selected:
