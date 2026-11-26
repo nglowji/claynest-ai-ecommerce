@@ -58,6 +58,9 @@ export default function AccountPage() {
           <a className="personal-nav active" href="#profile">
             <Icon name="user" /> Thông tin cá nhân
           </a>
+          <Link className="personal-nav" to="/account/orders">
+            <Icon name="bag" /> Đơn hàng đã mua
+          </Link>
           <Link className="personal-nav" to="/orders">
             <Icon name="gift" /> Tra cứu đơn hàng
           </Link>

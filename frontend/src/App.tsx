@@ -1,3 +1,5 @@
+import CustomerOrdersPage from './components/CustomerOrdersPage'
+import { reorderCart, type PurchaseItem } from './features/checkout/purchases'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import Icon from './components/Icon'
@@ -92,7 +94,7 @@ function StoreApp() {
                 ? 'Đăng ký | Nàng Gốm'
                 : location.pathname === '/login'
                   ? 'Đăng nhập | Nàng Gốm'
-                  : location.pathname === '/account'
+                  : location.pathname.startsWith('/account')
                     ? 'Tài khoản | Nàng Gốm'
                     : story
                       ? `${story.title} | Nàng Gốm`
@@ -115,6 +117,16 @@ function StoreApp() {
     }
     basket.add(product.variantId, product.stockQty)
     setNotice(`Đã thêm ${product.name} vào giỏ hàng`)
+  }
+  function reorder(items: PurchaseItem[]) {
+    const result = reorderCart(cart, items)
+    basket.replace(result.cart)
+    setNotice(
+      result.added
+        ? `Đã thêm ${result.added} sản phẩm vào giỏ. Vui lòng kiểm tra giá và số lượng.`
+        : 'Chưa thêm được sản phẩm: kiểm tra tồn kho hoặc số lượng trong giỏ.',
+    )
+    navigate('/cart')
   }
   function showProduct(product: Product) {
     navigate('/products/' + product.slug + '?variant=' + product.variantId)
@@ -203,6 +215,7 @@ function StoreApp() {
           <Route path="/orders" element={<OrderStatusPage />} />
           <Route path="/orders/:reference" element={<OrderStatusPage />} />
           <Route path="/account" element={<AccountPage />} />
+          <Route path="/account/orders" element={<CustomerOrdersPage onReorder={reorder} />} />
           <Route path="/products" element={<ProductsPage {...actions} />} />
           <Route path="/products/:slug" element={<ProductPage {...actions} />} />
           <Route path="/knowledge/:id" element={<KnowledgeSourcePage />} />

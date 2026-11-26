@@ -31,6 +31,9 @@ export function useCart() {
   }, [quantities])
   return {
     quantities,
+    replace(next: Cart) {
+      set(next)
+    },
     count: Object.values(quantities).reduce((n, q) => n + q, 0),
     add(id: string, available: number) {
       set((current) =>
