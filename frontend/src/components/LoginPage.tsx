@@ -8,7 +8,11 @@ import Icon from './Icon'
 export default function LoginPage() {
   const auth = useAuth()
   const navigate = useNavigate()
-  const signingUp = useLocation().pathname === '/register'
+  const location = useLocation()
+  const signingUp = location.pathname === '/register'
+  const next = new URLSearchParams(location.search).get('next')
+  const returnTo = next && ['/checkout', '/account/orders'].includes(next) ? next : '/account'
+  const suffix = returnTo === '/account' ? '' : '?next=' + encodeURIComponent(returnTo)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
@@ -18,7 +22,7 @@ export default function LoginPage() {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
-  if (auth.user) return <Navigate to={auth.user.role === 'Admin' ? '/admin' : '/account'} replace />
+  if (auth.user) return <Navigate to={auth.user.role === 'Admin' ? '/admin' : returnTo} replace />
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (pending) return
@@ -35,11 +39,11 @@ export default function LoginPage() {
         setPassword('')
         setConfirmation('')
         setNotice('Tài khoản đã sẵn sàng. Đăng nhập để ghé góc nhỏ của bạn.')
-        navigate('/login', { replace: true })
+        navigate('/login' + suffix, { replace: true })
       } else {
         const user = await auth.login(email.trim(), password, remember)
         setPassword('')
-        navigate(user.role === 'Admin' ? '/admin' : '/account', { replace: true })
+        navigate(user.role === 'Admin' ? '/admin' : returnTo, { replace: true })
       }
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : 'Vui lòng thử lại sau.')
@@ -77,10 +81,18 @@ export default function LoginPage() {
             ← Ghé nhà Nàng Gốm
           </Link>
           <nav className="auth-tabs" aria-label="Tài khoản">
-            <Link to="/login" onClick={switchMode} aria-current={!signingUp ? 'page' : undefined}>
+            <Link
+              to={'/login' + suffix}
+              onClick={switchMode}
+              aria-current={!signingUp ? 'page' : undefined}
+            >
               Đăng nhập
             </Link>
-            <Link to="/register" onClick={switchMode} aria-current={signingUp ? 'page' : undefined}>
+            <Link
+              to={'/register' + suffix}
+              onClick={switchMode}
+              aria-current={signingUp ? 'page' : undefined}
+            >
               Đăng ký
             </Link>
           </nav>

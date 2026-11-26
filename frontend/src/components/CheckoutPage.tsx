@@ -1,9 +1,8 @@
-import SiteImage from './SiteImage'
+import CheckoutSummary from './CheckoutSummary'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { AuthError } from '../auth/api'
-import { money } from '../data/products'
 import type { Cart } from '../features/cart/useCart'
 import { placeOrder, saveReceipt, type Checkout, type Contact } from '../features/checkout/api'
 import { useQuote } from '../features/checkout/useQuote'
@@ -63,6 +62,14 @@ export default function CheckoutPage({
   useEffect(() => {
     setAccepted(false)
   }, [quote.data?.quoteToken])
+  useEffect(() => {
+    if (pending || !auth.user) return
+    setContact((current) => ({
+      ...current,
+      name: current.name || auth.user!.displayName,
+      email: current.email || auth.user!.email,
+    }))
+  }, [auth.user?.id])
   const expired = !!quote.data && Date.parse(quote.data.expiresAt) <= now
   const update = (key: keyof Contact, value: string) =>
     setContact((current) => ({ ...current, [key]: value }))
@@ -139,11 +146,16 @@ export default function CheckoutPage({
         <span>/</span>
         <span>Đặt hàng</span>
       </nav>
+      <ol className="commerce-steps" aria-label="Các bước đặt hàng">
+        <li>
+          <Link to="/cart">01 · Giỏ hàng</Link>
+        </li>
+        <li aria-current="step">02 · Giao hàng &amp; thanh toán</li>
+        <li>03 · Hoàn tất</li>
+      </ol>
       <div className="checkout-heading">
         <p className="eyebrow">THÊM MỘT CHÚT GỐM CHO NHÀ</p>
-        <h1 id="checkout-title">
-          Sắp về <em>bên bạn.</em>
-        </h1>
+        <h1 id="checkout-title">Giao hàng &amp; thanh toán</h1>
         <p>Kiểm tra món gốm và thông tin nhận hàng trước khi xác nhận.</p>
       </div>
       <div className="checkout-layout">
@@ -151,8 +163,8 @@ export default function CheckoutPage({
           <h2>Thông tin giao hàng</h2>
           {!auth.user && (
             <p className="checkout-signin">
-              Bạn có thể đặt hàng ngay hoặc <Link to="/login">đăng nhập</Link> để liên kết đơn với
-              tài khoản.
+              Bạn có thể đặt hàng ngay hoặc <Link to="/login?next=%2Fcheckout">đăng nhập</Link> để
+              liên kết đơn với tài khoản.
             </p>
           )}
           <fieldset disabled={submitting || !!pending}>
@@ -253,8 +265,8 @@ export default function CheckoutPage({
           )}
           {pending && !submitting && (
             <p className="checkout-pending" role="status">
-              Yêu cầu đang chờ xác nhận kết quả. Kiểm tra lại bằng cùng mã yêu cầu để tránh tạo đơn
-              trùng.
+              Chưa nhận được kết quả đặt hàng. Chọn kiểm tra lại đơn đã gửi để xác nhận mà không đặt
+              thêm đơn mới.
             </p>
           )}
           <button
@@ -276,74 +288,16 @@ export default function CheckoutPage({
             Quay lại giỏ hàng
           </Link>
         </form>
-        <aside className="checkout-summary">
-          <h2>Món gốm bạn chọn</h2>
-          {quote.loading && <p role="status">Đang kiểm tra báo giá…</p>}
-          {quote.error && (
-            <p role="alert">
-              {quote.error} <button onClick={quote.retry}>Thử lại</button>
-            </p>
-          )}
-          {quote.data && (
-            <>
-              <ul>
-                {quote.data.items.map((line) => (
-                  <li key={line.variantId}>
-                    {line.image && <SiteImage src={line.image} alt={line.name} />}
-                    <div>
-                      <strong>{line.name}</strong>
-                      <span>
-                        {line.variantName} · SL {line.quantity}
-                      </span>
-                      {line.issue && <p className="checkout-line-issue">{line.issue}</p>}
-                    </div>
-                    <b>{money(line.lineTotalVnd)}</b>
-                  </li>
-                ))}
-              </ul>
-              <dl className="checkout-totals">
-                <div>
-                  <dt>Tiền sản phẩm</dt>
-                  <dd>{money(quote.data.subtotalVnd)}</dd>
-                </div>
-                <div>
-                  <dt>Phí giao hàng</dt>
-                  <dd>
-                    {quote.data.shippingFeeVnd ? money(quote.data.shippingFeeVnd) : 'Miễn phí'}
-                  </dd>
-                </div>
-                <div className="checkout-grand">
-                  <dt>Tổng thanh toán</dt>
-                  <dd>{money(quote.data.grandTotalVnd)}</dd>
-                </div>
-              </dl>
-              <div className="checkout-policy">
-                <p>{quote.data.shippingPolicy}</p>
-                <p>
-                  <Icon name="gift" /> {quote.data.packingNote}
-                </p>
-                <p>Giỏ hàng và báo giá chưa giữ tồn kho.</p>
-              </div>
-              <div className="quote-validity">
-                <p>
-                  {expired
-                    ? 'Báo giá đã hết hạn.'
-                    : 'Báo giá có hiệu lực 5 phút; giá và tồn kho được kiểm tra lại khi đặt hàng.'}
-                </p>
-                <button
-                  type="button"
-                  disabled={submitting || !!pending}
-                  onClick={() => {
-                    setAccepted(false)
-                    quote.retry()
-                  }}
-                >
-                  Cập nhật báo giá
-                </button>
-              </div>
-            </>
-          )}
-        </aside>
+        <CheckoutSummary
+          quote={quote}
+          pending={!!pending}
+          locked={submitting || !!pending}
+          expired={expired}
+          onRetry={() => {
+            setAccepted(false)
+            quote.retry()
+          }}
+        />
       </div>
     </section>
   )
