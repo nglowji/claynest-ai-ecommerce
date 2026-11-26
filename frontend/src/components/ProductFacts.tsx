@@ -38,7 +38,8 @@ export default function ProductFacts({
       <details>
         <summary>Chăm sóc &amp; sử dụng</summary>
         <p>
-          {variant.careNote || 'Liên hệ Nàng để được hướng dẫn bảo quản phù hợp với món gốm này.'}
+          {(variant.careVerified && variant.careNote) ||
+            'Liên hệ Nàng để được hướng dẫn bảo quản phù hợp với món gốm này.'}
         </p>
       </details>
     </section>

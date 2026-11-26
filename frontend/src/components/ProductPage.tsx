@@ -1,4 +1,6 @@
-import SiteImage from './SiteImage'
+import ProductGallery from './ProductGallery'
+import ProductFacts from './ProductFacts'
+import ProductReviews from './ProductReviews'
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { catalogRequest } from '../catalog/api'
@@ -12,7 +14,6 @@ export default function ProductPage({ onAdd }: ProductActions) {
   const [params] = useSearchParams()
   const [data, setData] = useState<CatalogProduct | null>(null)
   const [selected, setSelected] = useState('')
-  const [image, setImage] = useState('')
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
   useEffect(() => {
@@ -20,7 +21,6 @@ export default function ProductPage({ onAdd }: ProductActions) {
     setData(null)
     setError('')
     setSelected('')
-    setImage('')
     catalogRequest<CatalogProduct>('products/' + encodeURIComponent(slug || ''), {
       signal: abort.signal,
     })
@@ -56,35 +56,33 @@ export default function ProductPage({ onAdd }: ProductActions) {
     )
   const product = productView(
     data,
-    data.variants.find((v) => v.id === (selected || params.get('variant'))),
+    data.variants.find((v) => v.active && v.id === (selected || params.get('variant'))),
   )
   const variant = data.variants.find((v) => v.id === product.variantId)!
   return (
-    <section className={'container product-page' + (data.sourceUrl ? ' source-detail' : '')}>
+    <section
+      className={
+        'container product-page product-page-v2' + (data.sourceUrl ? ' source-detail' : '')
+      }
+    >
       <nav className="breadcrumbs">
         <Link to="/products">Sản phẩm</Link>
         <span>/</span>
         <span>{data.name}</span>
       </nav>
       <div className="product-detail">
-        <div className="product-gallery">
-          <SiteImage
-            src={image || product.image}
-            alt={data.images.find((i) => i.url === (image || product.image))?.alt || data.name}
-          />
-          <div className="product-thumbnails">
-            {data.images
-              .filter((i) => !i.variantId || i.variantId === variant.id)
-              .map((i) => (
-                <button key={i.id} onClick={() => setImage(i.url)} aria-label={'Xem ảnh ' + i.alt}>
-                  <SiteImage src={i.url} alt={i.alt} />
-                </button>
-              ))}
-          </div>
-        </div>
-        <div>
+        <ProductGallery
+          key={data.id}
+          images={data.images.filter((i) => !i.variantId || i.variantId === variant.id)}
+          initial={product.image}
+          name={data.name}
+        />
+        <div className="product-purchase-panel">
           <p className="eyebrow">{data.category}</p>
           <h1>{data.name}</h1>
+          <a className="product-review-jump" href="#product-reviews">
+            Xem đánh giá từ người mua ↓
+          </a>
           <ProductPrice product={product} />
           <p>{data.description}</p>
           <label className="auth-field">
@@ -93,14 +91,15 @@ export default function ProductPage({ onAdd }: ProductActions) {
               value={product.variantId}
               onChange={(e) => {
                 setSelected(e.target.value)
-                setImage('')
               }}
             >
-              {data.variants.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.name} · {v.glaze}
-                </option>
-              ))}
+              {data.variants
+                .filter((v) => v.active)
+                .map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name} · {v.glaze}
+                  </option>
+                ))}
             </select>
           </label>
           <p>
@@ -129,40 +128,10 @@ export default function ProductPage({ onAdd }: ProductActions) {
               {variant.stockQty ? 'Thêm vào giỏ' : 'Tạm hết hàng'}
             </button>
           )}
-          <dl className="product-specs">
-            {[
-              ['Chất liệu', data.material],
-              ['Kích thước', data.sourceDimensions],
-              ['Công dụng', variant.intendedUse],
-              ['Dung tích', variant.capacityMl ? `${variant.capacityMl} ml` : ''],
-              ['Chiều rộng', variant.widthCm ? `${variant.widthCm} cm` : ''],
-              ['Chiều cao', variant.heightCm ? `${variant.heightCm} cm` : ''],
-              ['Khối lượng', variant.weightG ? `${variant.weightG} g` : ''],
-            ]
-              .filter(([, v]) => v)
-              .map(([k, v]) => (
-                <div key={k}>
-                  <dt>{k}</dt>
-                  <dd>{v}</dd>
-                </div>
-              ))}
-          </dl>
-          {data.handmadeNote && <p className="detail-note">{data.handmadeNote}</p>}
-          <h2>Câu chuyện của món gốm</h2>
-          <p>{data.craftStory || 'Nàng đang chăm chút thêm câu chuyện cho món gốm này.'}</p>
-          <h2>Chăm sóc & sử dụng</h2>
-          {variant.careVerified ? (
-            <>
-              <p>{variant.careNote}</p>
-              <p className="detail-note">Nguồn được quản trị xác minh: {variant.careSource}</p>
-            </>
-          ) : (
-            <p className="detail-note">
-              Vui lòng liên hệ để được hướng dẫn sử dụng và bảo quản phù hợp với thiết kế này.
-            </p>
-          )}
+          <ProductFacts product={data} variant={variant} />
         </div>
       </div>
+      <ProductReviews key={data.id} productId={data.id} />
     </section>
   )
 }
